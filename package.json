@@ -1,0 +1,31 @@
+{
+  "name": "delphi-agent",
+  "version": "1.0.0",
+  "description": "Trading agent for the Delphi Agent Arena competition",
+  "type": "module",
+  "main": "dist/index.js",
+  "scripts": {
+    "check-setup": "tsx check-setup.ts",
+    "start": "tsx src/index.ts",
+    "build": "tsc",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [
+    "delphi",
+    "prediction-markets",
+    "trading-agent"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@gensyn-ai/gensyn-delphi-sdk": "^2.1.0",
+    "openai": "^6.49.0",
+    "string-similarity": "^4.0.4"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.2",
+    "@types/string-similarity": "^4.0.2",
+    "tsx": "^4.23.5",
+    "typescript": "^5.9.3"
+  }
+}
