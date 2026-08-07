@@ -1,164 +1,165 @@
 /**
- * Lazy Falcon
+ * Lazy Falcon — closed loop: forecast -> blend -> risk check -> journal ->
+ * (maybe) trade -> redeem settled winners -> repeat.
  *
- * This is a skeleton trading loop. It fetches open markets, hands each one
- * to `decide()`, and executes whatever trade (if any) the strategy returns.
- * Replace `decide()` with any strategy — rules-based, quant model,
- * LLM-driven, whatever you want.
- *
- * Run with: npm start
+ * Run with: npx tsx src/index.ts
  */
 import "dotenv/config";
+import fs from "node:fs";
 import { DelphiClient, type Market } from "@gensyn-ai/gensyn-delphi-sdk";
-import type { MarketStatus } from "@gensyn-ai/gensyn-delphi-sdk";
 import { findSimilarPolymarketOdds } from "./externalOdds.js";
 import getLlmForecast from "./llmForecast.js";
+import { getGeminiForecast } from "./geminiForecast.js";
+import { blendSignals, isTimeSensitive, type Signal } from "./blend.js";
+import { appendReceipt, patchReceiptExecution, recomputeSummary, type Receipt } from "./journal.js";
+import { checkAndRedeemSettledPositions } from "./redeem.js";
+import { CONFIG, getDryRun } from "./config.js";
 
 const client = new DelphiClient();
 
-// How often to run the trading loop.
-const LOOP_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
-
-// Don't risk more than this many collateral tokens (human units) per trade.
-const MAX_TOKENS_PER_TRADE = 10;
-
 interface TradeDecision {
   outcomeIdx: number;
-  /** Collateral tokens (human units, e.g. 5.0) to spend. */
   tokensToSpend: number;
+  bestEdge: number;
+  minEdge: number;
+  blendedProbs: number[];
+  confidence: number;
+  disagreement: number | null;
 }
 
-/**
- * STRATEGY GOES HERE
- */
-async function decide(market: Market): Promise<TradeDecision | null> {
-  const question =
-    (market as any).question ||
-    (market as any).metadata?.question ||
-    "";
+async function decide(market: Market): Promise<{ decision: TradeDecision | null; receipt: Receipt }> {
+  const question = (market as any).question || (market as any).metadata?.question || "";
   const outcomes: string[] =
-    (market as any).outcomes ||
-    (market as any).metadata?.outcomes ||
-    ["Yes", "No"];
+    (market as any).outcomes || (market as any).metadata?.outcomes || ["Yes", "No"];
+  const category = (market as any).category;
 
-  // Already 0-1 floats  
   const rawProbs = market.spotImpliedProbabilities ?? [];
-
-  // Treat missing / zero / near-zero books as even odds (new markets assumption)
   const hasValidPrice =
-    rawProbs.length >= 2 &&
-    rawProbs.every((p) => Number.isFinite(p) && p > 0.01 && p < 0.99);
-
+    rawProbs.length >= 2 && rawProbs.every((p) => Number.isFinite(p) && p > 0.01 && p < 0.99);
   const marketProbs = hasValidPrice
     ? rawProbs
     : Array.from({ length: Math.max(outcomes.length, 2) }, () => 0.5);
 
-  // 1. External signal (Polymarket or similar)
+  // 1. Polymarket
   let external: Awaited<ReturnType<typeof findSimilarPolymarketOdds>> = null;
   try {
     external = await findSimilarPolymarketOdds(question, outcomes);
   } catch (err) {
-    console.log(
-      `  Polymarket lookup failed for ${market.id}:`,
-      err instanceof Error ? err.message : err
-    );
+    console.log(`  Polymarket lookup failed for ${market.id}:`, err instanceof Error ? err.message : err);
   }
 
-  // 2. LLM forecast
+  // 2. Primary OPENAI_MODEL 
   const { probs: llmProbs, confidence } = await getLlmForecast(question, outcomes);
 
-  // 3. Blend when we have a strong external match
-  let myProbs = [...llmProbs];
+  const signals: Signal[] = [{ name: "llm", probs: llmProbs, weight: 1.0 }];
   if (external && external.similarity > 0.65) {
-    const w = Math.min(0.6, external.similarity);
-    myProbs = myProbs.map((p, i) => (1 - w) * p + w * (external.probs[i] ?? p));
+    signals.push({ name: "polymarket", probs: external.probs, weight: Math.min(0.6, external.similarity) });
   }
 
-  // Ensure length matches
-  while (myProbs.length < marketProbs.length) myProbs.push(0.5);
-  myProbs = myProbs.slice(0, marketProbs.length);
+  // 3. Gemini — only for time-sensitive markets, grounded with search.
+  let geminiSignal: Awaited<ReturnType<typeof getGeminiForecast>> = null;
+  if (CONFIG.geminiEnabled && isTimeSensitive(question)) {
+    geminiSignal = await getGeminiForecast(question, outcomes, { grounded: true });
+    if (geminiSignal) {
+      signals.push({ name: "gemini", probs: geminiSignal.probs, weight: geminiSignal.confidence });
+    }
+  }
 
-  // 4. Edge check against real price or synthetic 0.5
+  // 4. Blend + disagreement-aware edge bar
+  const blend = blendSignals(signals, marketProbs.length);
+
   let bestIdx = -1;
   let bestEdge = 0;
-  for (let i = 0; i < myProbs.length; i++) {
-    const edge = myProbs[i] - (marketProbs[i] ?? 0.5);
+  for (let i = 0; i < blend.blendedProbs.length; i++) {
+    const edge = blend.blendedProbs[i] - (marketProbs[i] ?? 0.5);
     if (edge > bestEdge) {
       bestEdge = edge;
       bestIdx = i;
     }
   }
 
-  // Stricter threshold when price is synthetic (empty book)
-  const minEdge = hasValidPrice
+  const baseMinEdge = hasValidPrice
     ? confidence > 0.7
       ? 0.08
       : 0.12
     : confidence > 0.65
       ? 0.15
-      : 0.20;
+      : 0.2;
+  const minEdge = baseMinEdge * blend.edgeMultiplier;
 
-  if (bestIdx === -1 || bestEdge < minEdge) {
-    console.log(
-      `  SKIP ${market.id}: bestEdge=${bestEdge.toFixed(3)} < minEdge=${minEdge.toFixed(2)} ` +
-        `(validPrice=${hasValidPrice}, conf=${confidence.toFixed(2)})`
-    );
-    return null;
+  const receiptBase: Omit<Receipt, "decision" | "outcomeIdx" | "edge" | "thresholdUsed" | "size" | "execution" | "skipReason"> = {
+    ts: new Date().toISOString(),
+    marketId: market.id,
+    question,
+    category,
+    outcomes,
+    rawPrice: hasValidPrice ? rawProbs : null,
+    syntheticPrice: !hasValidPrice,
+    signals: {
+      llm: { probs: llmProbs, confidence },
+      gemini: geminiSignal ? { probs: geminiSignal.probs, confidence: geminiSignal.confidence, grounded: geminiSignal.grounded } : null,
+      polymarket: external ? { probs: external.probs, similarity: external.similarity, url: external.url } : null,
+    },
+    disagreement: blend.disagreement,
+    blendedProbs: blend.blendedProbs,
+    confidence,
+  };
+
+  if (blend.skip || bestIdx === -1 || bestEdge < minEdge) {
+    const skipReason = blend.skip
+      ? blend.skipReason!
+      : `bestEdge=${bestEdge.toFixed(3)} < minEdge=${minEdge.toFixed(2)}`;
+    console.log(`  SKIP ${market.id}: ${skipReason}`);
+    return {
+      decision: null,
+      receipt: { ...receiptBase, decision: "skip", outcomeIdx: bestIdx >= 0 ? bestIdx : null, edge: bestEdge, thresholdUsed: minEdge, size: null, execution: null, skipReason },
+    };
   }
 
-  // Slightly smaller size when we are guessing against synthetic 0.5
   const sizeMultiplier = hasValidPrice ? 1.0 : 0.7;
   const tokensToSpend = Math.min(
-    MAX_TOKENS_PER_TRADE,
+    CONFIG.maxTokensPerTrade,
     (2 + bestEdge * 15 * confidence) * sizeMultiplier
   );
 
   console.log(
-    `  BUY signal ${market.id}: outcome=${bestIdx} edge=${bestEdge.toFixed(3)} ` +
-      `size≈${tokensToSpend.toFixed(2)} validPrice=${hasValidPrice}`
+    `  BUY signal ${market.id}: outcome=${bestIdx} edge=${bestEdge.toFixed(3)} size≈${tokensToSpend.toFixed(2)} ` +
+      `disagreement=${blend.disagreement?.toFixed(2) ?? "n/a"}`
   );
 
   return {
-    outcomeIdx: bestIdx,
-    tokensToSpend,
+    decision: { outcomeIdx: bestIdx, tokensToSpend, bestEdge, minEdge, blendedProbs: blend.blendedProbs, confidence, disagreement: blend.disagreement },
+    receipt: { ...receiptBase, decision: "trade", outcomeIdx: bestIdx, edge: bestEdge, thresholdUsed: minEdge, size: tokensToSpend, execution: null },
   };
 }
 
-async function tradeOnMarket(market: Market, decision: TradeDecision) {
+async function tradeOnMarket(market: Market, decision: TradeDecision, dryRun: boolean): Promise<Receipt["execution"]> {
+  if (dryRun) {
+    console.log(`  DRY RUN: would buy outcome ${decision.outcomeIdx} on ${market.id}, ~${decision.tokensToSpend.toFixed(2)} tokens`);
+    return null;
+  }
+
   const { balance, decimals } = await client.getErc20BalanceWithDecimals();
-  const maxTokensIn = BigInt(
-    Math.floor(Math.min(decision.tokensToSpend, MAX_TOKENS_PER_TRADE) * 10 ** decimals)
-  );
+  const maxTokensIn = BigInt(Math.floor(Math.min(decision.tokensToSpend, CONFIG.maxTokensPerTrade) * 10 ** decimals));
 
   if (maxTokensIn > balance) {
     console.log(`  Skipping ${market.id}: insufficient balance for desired spend.`);
-    return;
+    return null;
   }
 
-  // Quote first — you need a target share amount, so estimate via quoteBuy
-  // in reverse isn't directly supported; a simple approach is to quote a
-  // trial share amount and scale, or iterate. Keeping this simple/explicit
-  // so you can swap in your own sizing logic.
-  const trialShares = maxTokensIn; // 1:1 starting guess in wei units, refine as needed
+  const trialShares = maxTokensIn;
   const quote = await client.quoteBuy({
     marketAddress: market.id as `0x${string}`,
     outcomeIdx: decision.outcomeIdx,
     sharesOut: trialShares,
   });
 
-  console.log(
-    `  Quote: ${trialShares} shares of outcome ${decision.outcomeIdx} costs ${quote.tokensIn} tokens`
-  );
-
   if (quote.tokensIn > maxTokensIn) {
     console.log("  Skipping: quoted cost exceeds max spend.");
-    return;
+    return null;
   }
 
-  await client.ensureTokenApproval({
-    marketAddress: market.id as `0x${string}`,
-    minimumAmount: quote.tokensIn,
-  });
+  await client.ensureTokenApproval({ marketAddress: market.id as `0x${string}`, minimumAmount: quote.tokensIn });
 
   const result = await client.buyShares({
     marketAddress: market.id as `0x${string}`,
@@ -168,47 +169,86 @@ async function tradeOnMarket(market: Market, decision: TradeDecision) {
   });
 
   console.log(`  Trade executed: ${result.transactionHash}`);
+  return { txHash: result.transactionHash, quotedTokensIn: Number(quote.tokensIn), sharesOut: trialShares.toString() };
+}
+
+function writeLoopStatus(status: Record<string, unknown>) {
+  fs.writeFileSync(CONFIG.loopStatusPath, JSON.stringify({ ...status, updatedAt: new Date().toISOString() }, null, 2));
 }
 
 async function runOnce() {
-  console.log(`\n[${new Date().toISOString()}] Fetching open markets...`);
+  const dryRun = getDryRun();
+  console.log(`\n[${new Date().toISOString()}] Loop start (dryRun=${dryRun})`);
 
-  const openStatus: MarketStatus = "open";
-  const { markets } = await client.listMarkets({
-    status: openStatus,
-    limit: 50,
-    pricesAndImpliedProbabilities: true,
-  });
+  let errors: string[] = [];
 
-  if (!markets || markets.length === 0) {
-    console.log("No open markets found.");
+  // 0. Redeem any settled winning positions from prior loops first, so
+  // collateral is freed up before we size new trades this loop.
+  try {
+    const redemptions = await checkAndRedeemSettledPositions(client, dryRun);
+    if (redemptions.length) console.log(`  Redemption check: ${JSON.stringify(redemptions)}`);
+  } catch (err) {
+    const msg = `redemption check failed: ${err instanceof Error ? err.message : err}`;
+    console.error(" ", msg);
+    errors.push(msg);
+  }
+
+  const openStatus = "open" as any;
+  let markets: Market[] = [];
+  try {
+    const res = await client.listMarkets({ status: openStatus, limit: CONFIG.maxMarketsPerLoop, pricesAndImpliedProbabilities: true });
+    markets = res.markets ?? [];
+  } catch (err) {
+    const msg = `listMarkets failed: ${err instanceof Error ? err.message : err}`;
+    console.error(" ", msg);
+    errors.push(msg);
+    writeLoopStatus({ dryRun, openMarkets: 0, evaluated: 0, traded: 0, skipped: 0, errors });
     return;
   }
 
   console.log(`Evaluating ${markets.length} market(s)`);
+  let traded = 0,
+    skipped = 0;
 
   for (const market of markets) {
-    const decision = await decide(market);
-    if (!decision) continue;
-
-    console.log(`Decision for ${market.id}: buy outcome ${decision.outcomeIdx}`);
     try {
-      await tradeOnMarket(market, decision);
+      const { decision, receipt } = await decide(market);
+      if (!decision) {
+        appendReceipt(receipt);
+        skipped++;
+        continue;
+      }
+
+      let execution: Receipt["execution"] = null;
+      try {
+        execution = await tradeOnMarket(market, decision, dryRun);
+        traded++;
+      } catch (err) {
+        const msg = `trade failed for ${market.id}: ${err instanceof Error ? err.message : err}`;
+        console.error(" ", msg);
+        errors.push(msg);
+      }
+      appendReceipt({ ...receipt, execution });
     } catch (err) {
-      console.error(`  Trade failed for ${market.id}:`, err instanceof Error ? err.message : err);
+      const msg = `decide() failed for ${market.id}: ${err instanceof Error ? err.message : err}`;
+      console.error(" ", msg);
+      errors.push(msg);
     }
   }
+
+  await recomputeSummary();
+  writeLoopStatus({ dryRun, openMarkets: markets.length, evaluated: markets.length, traded, skipped, errors });
 }
 
 async function main() {
   console.log("Starting Lazy Falcon");
-  console.log(`Loop interval: ${LOOP_INTERVAL_MS / 1000}s\n`);
+  console.log(`Loop interval: ${CONFIG.loopIntervalMs / 1000}s`);
+  console.log(`Dry run: ${getDryRun()} (toggle via dashboard or data/runtime-config.json)\n`);
 
-  // Run immediately, then on an interval.
   await runOnce().catch((err) => console.error("Loop error:", err));
   setInterval(() => {
     runOnce().catch((err) => console.error("Loop error:", err));
-  }, LOOP_INTERVAL_MS);
+  }, CONFIG.loopIntervalMs);
 }
 
 main();

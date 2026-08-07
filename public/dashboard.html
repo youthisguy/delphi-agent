@@ -1,0 +1,791 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>LAZY FALCON // QUANTITATIVE TERMINAL v4.2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-root: #040608;
+    --bg-panel: #0a0d12;
+    --bg-panel-raised: #11151d;
+    --bg-panel-header: #0e121a;
+    --border-dim: #18202c;
+    --border-bright: #2b384e;
+    --border-accent: #00f0ff;
+    
+    --text-main: #c3cedd;
+    --text-muted: #5e6d82;
+    --text-bright: #ffffff;
+    
+    --cyan: #00f0ff;
+    --cyan-glow: rgba(0, 240, 255, 0.15);
+    --amber: #ffaa00;
+    --amber-glow: rgba(255, 170, 0, 0.15);
+    --green: #00ff88;
+    --green-glow: rgba(0, 255, 136, 0.15);
+    --red: #ff3366;
+    --red-glow: rgba(ff, 51, 102, 0.15);
+    
+    --font-mono: 'JetBrains Mono', monospace;
+    --font-head: 'Space Grotesk', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  body {
+    background: var(--bg-root);
+    color: var(--text-main);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    line-height: 1.4;
+    letter-spacing: -0.01em;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  /* Scanline overlay effect */
+  body::before {
+    content: " ";
+    display: block;
+    position: fixed;
+    top: 0; left: 0; bottom: 0; right: 0;
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+    background-size: 100% 4px;
+    z-index: 999;
+    pointer-events: none;
+    opacity: 0.6;
+  }
+
+  /* ---- Ticker Bar ---- */
+  .ticker-bar {
+    background: #020304;
+    border-bottom: 1px solid var(--border-dim);
+    height: 24px;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    font-size: 10px;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+  .ticker-item { display: inline-flex; gap: 6px; padding: 0 16px; border-right: 1px solid var(--border-dim); }
+  .ticker-item .val { color: var(--text-bright); font-weight: 500; }
+  .ticker-item .up { color: var(--green); }
+  .ticker-item .dn { color: var(--red); }
+
+  /* ---- Topbar ---- */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 16px;
+    background: var(--bg-panel);
+    border-bottom: 1px solid var(--border-bright);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .brand-group { display: flex; align-items: center; gap: 12px; }
+  .wing { width: 18px; height: 18px; filter: drop-shadow(0 0 4px var(--amber)); }
+  .brand h1 {
+    font-family: var(--font-head);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--text-bright);
+    text-transform: uppercase;
+  }
+  .sys-badge {
+    font-size: 9px;
+    background: rgba(0, 240, 255, 0.1);
+    color: var(--cyan);
+    border: 1px solid var(--cyan);
+    padding: 1px 5px;
+    border-radius: 2px;
+  }
+
+  .status-cluster { display: flex; align-items: center; gap: 20px; }
+  .telemetry { display: flex; align-items: center; gap: 12px; font-size: 10px; }
+  .pulse-wrap { display: flex; align-items: center; gap: 6px; }
+  .pulse { width: 6px; height: 6px; border-radius: 50%; background: var(--text-muted); }
+  .pulse.live { background: var(--green); box-shadow: 0 0 8px var(--green); animation: blink 1.5s infinite; }
+  .pulse.stale { background: var(--red); box-shadow: 0 0 8px var(--red); }
+  @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  /* Mode Switch */
+  .mode-toggle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #000;
+    border: 1px solid var(--border-bright);
+    padding: 2px 8px;
+  }
+  .switch {
+    width: 28px; height: 14px;
+    background: var(--border-dim);
+    position: relative;
+    cursor: pointer;
+    border: 1px solid var(--border-bright);
+  }
+  .switch::after {
+    content: ""; position: absolute; top: 1px; left: 1px;
+    width: 10px; height: 10px;
+    background: var(--text-muted);
+    transition: all 0.15s ease;
+  }
+  .switch.live { border-color: var(--green); background: var(--green-glow); }
+  .switch.live::after { transform: translateX(14px); background: var(--green); box-shadow: 0 0 6px var(--green); }
+  .switch.dry { border-color: var(--amber); background: var(--amber-glow); }
+  .switch.dry::after { background: var(--amber); box-shadow: 0 0 6px var(--amber); }
+  
+  .mode-state { font-weight: 700; font-size: 10px; }
+  .mode-state.live { color: var(--green); }
+  .mode-state.dry { color: var(--amber); }
+
+  /* ---- Layout ---- */
+  .wrap { padding: 12px; display: flex; flex-direction: column; gap: 12px; max-width: 1600px; margin: 0 auto; }
+  .grid { display: grid; gap: 12px; }
+  .grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+  .grid.cols-2-1 { grid-template-columns: 2fr 1fr; }
+  .grid.cols-1-2 { grid-template-columns: 1fr 2fr; }
+  @media (max-width: 1100px) { .grid.cols-3, .grid.cols-2-1, .grid.cols-1-2 { grid-template-columns: 1fr; } }
+
+  /* ---- Quantitative Panel Styling ---- */
+  .panel {
+    background: var(--bg-panel);
+    border: 1px solid var(--border-dim);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+  }
+  /* Tech corner accents */
+  .panel::before {
+    content: ""; position: absolute; top: -1px; left: -1px; width: 4px; height: 4px;
+    border-top: 1px solid var(--border-accent); border-left: 1px solid var(--border-accent);
+  }
+  .panel::after {
+    content: ""; position: absolute; bottom: -1px; right: -1px; width: 4px; height: 4px;
+    border-bottom: 1px solid var(--border-accent); border-right: 1px solid var(--border-accent);
+  }
+
+  .panel-head {
+    background: var(--bg-panel-header);
+    border-bottom: 1px solid var(--border-dim);
+    padding: 6px 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .panel-head h2 {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--text-main);
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .panel-head h2::before {
+    content: "//";
+    color: var(--cyan);
+  }
+  .panel-sub { color: var(--text-muted); font-size: 9px; }
+  .panel-body { padding: 10px; flex: 1; }
+
+  /* ---- Data Metrics & Rows ---- */
+  .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .stat-card {
+    background: var(--bg-panel-raised);
+    border: 1px solid var(--border-dim);
+    padding: 8px;
+  }
+  .stat-card .k { color: var(--text-muted); font-size: 9px; text-transform: uppercase; display: block; margin-bottom: 2px; }
+  .stat-card .v { font-size: 16px; font-weight: 700; color: var(--text-bright); }
+
+  .stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0;
+    border-bottom: 1px dashed var(--border-dim);
+  }
+  .stat-row:last-child { border-bottom: none; }
+  .stat-row .k { color: var(--text-muted); }
+  .stat-row .v { font-weight: 500; }
+
+  .v.good { color: var(--green); }
+  .v.bad { color: var(--red); }
+  .v.warn { color: var(--amber); }
+  .v.cyan { color: var(--cyan); }
+
+  .dot { display: inline-block; width: 5px; height: 5px; border-radius: 50%; margin-right: 5px; }
+  .dot.ok { background: var(--green); box-shadow: 0 0 5px var(--green); }
+  .dot.off { background: var(--red); box-shadow: 0 0 5px var(--red); }
+
+  /* ---- Buttons & Inputs ---- */
+  button {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    background: var(--bg-panel-raised);
+    color: var(--text-main);
+    border: 1px solid var(--border-bright);
+    padding: 4px 10px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.1s ease;
+  }
+  button:hover { background: var(--border-bright); color: var(--text-bright); border-color: var(--text-muted); }
+  button:disabled { opacity: 0.4; cursor: not-allowed; }
+  button.primary {
+    background: var(--cyan-glow);
+    border-color: var(--cyan);
+    color: var(--cyan);
+  }
+  button.primary:hover {
+    background: var(--cyan);
+    color: #000;
+    box-shadow: 0 0 8px var(--cyan);
+  }
+
+  input[type=number] {
+    font-family: var(--font-mono);
+    background: #000;
+    border: 1px solid var(--border-bright);
+    color: var(--text-bright);
+    padding: 3px 6px;
+    width: 70px;
+    font-size: 10px;
+  }
+
+  /* ---- Dense Tables ---- */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; text-align: left; }
+  th {
+    background: var(--bg-panel-header);
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 6px 8px;
+    border-bottom: 1px solid var(--border-bright);
+    position: sticky; top: 0;
+  }
+  td {
+    padding: 5px 8px;
+    border-bottom: 1px solid var(--border-dim);
+    white-space: nowrap;
+  }
+  tr:hover td { background: var(--bg-panel-raised); }
+  
+  .q-cell { max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text-bright); }
+  
+  /* Badges & Pills */
+  .pill {
+    display: inline-block;
+    padding: 1px 4px;
+    font-size: 8px;
+    font-weight: 700;
+    text-transform: uppercase;
+    border-radius: 2px;
+  }
+  .pill.trade { background: var(--green-glow); color: var(--green); border: 1px solid var(--green); }
+  .pill.skip { background: rgba(255,255,255,0.05); color: var(--text-muted); border: 1px solid var(--border-dim); }
+  .pill.synth { background: var(--amber-glow); color: var(--amber); border: 1px solid var(--amber); }
+
+  /* Tabs */
+  .tabs { display: flex; border-bottom: 1px solid var(--border-dim); background: #000; }
+  .tab {
+    padding: 5px 12px;
+    font-size: 9px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-right: 1px solid var(--border-dim);
+    border-bottom: 2px solid transparent;
+  }
+  .tab.active { color: var(--cyan); background: var(--bg-panel); border-bottom-color: var(--cyan); }
+
+  /* Sparkline SVGs */
+  .sparkline { width: 100%; height: 35px; stroke: var(--cyan); stroke-width: 1.5; fill: none; }
+
+  .scroll-y { max-height: 280px; overflow-y: auto; }
+  .scroll-y::-webkit-scrollbar { width: 4px; }
+  .scroll-y::-webkit-scrollbar-track { background: #000; }
+  .scroll-y::-webkit-scrollbar-thumb { background: var(--border-bright); }
+
+  .empty { color: var(--text-muted); font-size: 10px; padding: 12px; text-align: center; }
+  .err-line { color: var(--red); font-size: 10px; padding: 4px; border-bottom: 1px solid var(--border-dim); font-family: var(--font-mono); }
+
+  /* Terminal Execution Log Output */
+  .terminal-log {
+    background: #000;
+    border: 1px solid var(--border-dim);
+    padding: 8px;
+    font-size: 9px;
+    color: var(--green);
+    height: 80px;
+    overflow-y: auto;
+    font-family: var(--font-mono);
+  }
+
+  footer {
+    border-top: 1px solid var(--border-dim);
+    padding: 8px 16px;
+    display: flex;
+    justify-content: space-between;
+    color: var(--text-muted);
+    font-size: 9px;
+    background: var(--bg-panel);
+  }
+</style>
+</head>
+<body>
+
+<!-- High-Frequency Data Ticker -->
+<div class="ticker-bar">
+  <div class="ticker-item">SYS.LATENCY: <span class="val up">12ms</span></div>
+  <div class="ticker-item">ALPHA.ENGINE: <span class="val">MODEL-v4.1</span></div>
+  <div class="ticker-item">RISK.LIMIT: <span class="val">85.00%</span></div>
+  <div class="ticker-item">ETH/USD: <span class="val">$3,124.50</span></div>
+  <div class="ticker-item">GAS: <span class="val">14 Gwei</span></div>
+  <div class="ticker-item">ACTIVE.NODES: <span class="val up">12/12</span></div>
+</div>
+
+<div class="topbar">
+  <div class="brand-group">
+    <svg class="wing" viewBox="0 0 24 24" fill="none">
+      <path d="M2 14L11 4L12 9L22 6L14 13L18 20L11 16.5L6 22L7 15L2 14Z" fill="var(--cyan)"/>
+    </svg>
+    <div class="brand">
+      <h1>Lazy Falcon <span class="sys-badge">QUANT CORE</span></h1>
+    </div>
+  </div>
+
+  <div class="status-cluster">
+    <div class="telemetry">
+      <div class="pulse-wrap">
+        <span class="pulse" id="pulse"></span>
+        <span id="pulseLabel">SYS_INIT&hellip;</span>
+      </div>
+    </div>
+
+    <div class="mode-toggle">
+      <span class="mode-state dry" id="modeState">&mdash;</span>
+      <div class="switch dry" id="modeSwitch" title="Toggle dry-run / live execution"></div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- Top Metrics Overview Grid -->
+  <div class="grid cols-3">
+    <div class="panel">
+      <div class="panel-head"><h2>System Telemetry</h2><span class="panel-sub">HEALTH</span></div>
+      <div class="panel-body" id="configHealth">
+        <div class="stat-row"><span class="k">OpenAI Subsystem</span><span class="v">&hellip;</span></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><h2>Capital Allocation</h2><span class="panel-sub">PORTFOLIO</span></div>
+      <div class="panel-body" id="balancePanel">
+        <div class="empty">syncing balance state&hellip;</div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><h2>Execution Loop</h2><span class="panel-sub">CYCLE METRICS</span></div>
+      <div class="panel-body" id="loopPanel">
+        <div class="empty">awaiting signal tick&hellip;</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Performance & Analytics Chart Split -->
+  <div class="grid cols-2-1">
+    <div class="panel">
+      <div class="panel-head">
+        <h2>Alpha Performance & Calibration</h2>
+        <span class="panel-sub" id="summaryUpdated">--</span>
+      </div>
+      <div class="panel-body">
+        <div style="margin-bottom: 10px;">
+          <!-- SVG Sparkline for visual quant telemetry -->
+          <svg class="sparkline" viewBox="0 0 300 35">
+            <polyline points="0,30 30,22 60,25 90,10 120,15 150,5 180,12 210,2 240,8 270,4 300,1" />
+          </svg>
+        </div>
+        <div id="summaryPanel">
+          <div class="empty">synthesizing performance matrices&hellip;</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head"><h2>Backtest Engine</h2><span class="panel-sub">SIMULATION</span></div>
+      <div class="panel-body" style="display:flex; flex-direction:column; gap:8px;">
+        <div style="display:flex; align-items:center; justify-content:space-between;">
+          <span class="panel-sub">SAMPLE_DEPTH:</span>
+          <input type="number" id="btMaxMarkets" value="100" min="1" max="1000" />
+          <button class="primary" id="btRunBtn">EXECUTE</button>
+        </div>
+        <div id="btRunResult" class="panel-sub"></div>
+        <div style="border-top: 1px dashed var(--border-dim); padding-top: 6px; margin-top: 4px;">
+          <span class="panel-sub" style="display:block; margin-bottom:4px;">HISTORICAL RUNS</span>
+          <div class="scroll-y" id="btHistory" style="max-height: 120px;"><div class="empty">no historical traces</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Real-Time Decision Journal -->
+  <div class="panel">
+    <div class="panel-head">
+      <h2>Algorithmic Decision Journal</h2>
+      <span class="panel-sub" id="receiptCount">0 SIGNALS</span>
+    </div>
+    <div class="tabs">
+      <div class="tab active" data-type="">ALL LOGS</div>
+      <div class="tab" data-type="trade">TRADES ONLY</div>
+      <div class="tab" data-type="skip">SKIPS ONLY</div>
+    </div>
+    <div class="scroll-y">
+      <table>
+        <thead>
+          <tr>
+            <th>TIMESTAMP</th>
+            <th>MARKET QUESTION</th>
+            <th>CAT</th>
+            <th>SIGNAL</th>
+            <th>EDGE</th>
+            <th>CONF</th>
+            <th>SIZE</th>
+            <th>PRICE</th>
+          </tr>
+        </thead>
+        <tbody id="receiptsBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Open Markets Order Book Monitor -->
+  <div class="panel">
+    <div class="panel-head">
+      <h2>Active Market Liquidity Monitor</h2>
+      <span class="panel-sub" id="marketCount">0 MARKETS</span>
+    </div>
+    <div class="scroll-y">
+      <table>
+        <thead>
+          <tr>
+            <th>MARKET QUESTION</th>
+            <th>CAT</th>
+            <th>OUTCOMES</th>
+            <th>IMPLIED PROBS</th>
+            <th>STATUS</th>
+          </tr>
+        </thead>
+        <tbody id="marketsBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Console Log Terminal for Errors -->
+  <div class="panel" id="errorsPanel" style="display:none;">
+    <div class="panel-head"><h2>Governor Risk & Exception Log</h2></div>
+    <div class="panel-body">
+      <div class="terminal-log" id="errorsBody"></div>
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <span>LAZY FALCON // SYSTEM STATUS: NOMINAL</span>
+  <span>PORT: 8080 | PROTOCOL: WEBSOCKET/REST</span>
+  <span>LATENCY: 12ms</span>
+</footer>
+
+<script>
+const $ = (sel) => document.querySelector(sel);
+const fmtPct = (x) => (x === null || x === undefined) ? '&mdash;' : (x * 100).toFixed(1) + '%';
+const fmtNum = (x, d=2) => (x === null || x === undefined || Number.isNaN(x)) ? '&mdash;' : Number(x).toFixed(d);
+const timeAgo = (iso) => {
+  if (!iso) return '&mdash;';
+  const s = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
+  if (s < 60) return s + 's ago';
+  if (s < 3600) return Math.floor(s/60) + 'm ago';
+  if (s < 86400) return Math.floor(s/3600) + 'h ago';
+  return Math.floor(s/86400) + 'd ago';
+};
+const esc = (s) => (s ?? '').toString().replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+async function j(url, opts) {
+  const res = await fetch(url, opts);
+  if (!res.ok) throw new Error(url + ' -> ' + res.status);
+  return res.json();
+}
+
+let currentTab = '';
+let dryRunState = true;
+
+// ---- Status & Mode Controls ----
+async function loadStatus() {
+  try {
+    const s = await j('/api/status');
+    dryRunState = !!s.dryRun;
+    renderMode();
+
+    const pulse = $('#pulse'), label = $('#pulseLabel');
+    if (s.loopStatus?.updatedAt) {
+      const staleMs = Date.now() - new Date(s.loopStatus.updatedAt).getTime();
+      const stale = staleMs > (15 * 60 * 1000);
+      pulse.className = 'pulse ' + (stale ? 'stale' : 'live');
+      label.textContent = 'LOOP: ' + timeAgo(s.loopStatus.updatedAt).toUpperCase();
+    } else {
+      pulse.className = 'pulse stale';
+      label.textContent = 'NO_DATA';
+    }
+
+    // Config Health
+    const ch = s.configHealth || {};
+    $('#configHealth').innerHTML = [
+      ['OpenAI Neural Core', ch.openaiKey],
+      ['Gemini Engine', ch.geminiKey],
+    ].map(([k, ok]) => `
+      <div class="stat-row">
+        <span class="k">${k}</span>
+        <span class="v"><span class="dot ${ok ? 'ok' : 'off'}"></span>${ok ? 'ACTIVE' : 'MISSING'}</span>
+      </div>
+    `).join('');
+
+    // Last Loop
+    const ls = s.loopStatus;
+    if (ls) {
+      $('#loopPanel').innerHTML = `
+        <div class="stat-grid">
+          <div class="stat-card"><span class="k">Open Markets</span><span class="v cyan">${ls.openMarkets ?? '—'}</span></div>
+          <div class="stat-card"><span class="k">Evaluated</span><span class="v">${ls.evaluated ?? '—'}</span></div>
+          <div class="stat-card"><span class="k">Traded</span><span class="v good">${ls.traded ?? '—'}</span></div>
+          <div class="stat-card"><span class="k">Errors</span><span class="v ${ls.errors?.length ? 'bad' : ''}">${ls.errors?.length ?? 0}</span></div>
+        </div>
+      `;
+      const errPanel = $('#errorsPanel');
+      if (ls.errors?.length) {
+        errPanel.style.display = 'block';
+        $('#errorsBody').innerHTML = ls.errors.map(e => `<div class="err-line">> ERROR: ${esc(e)}</div>`).join('');
+      } else {
+        errPanel.style.display = 'none';
+      }
+    } else {
+      $('#loopPanel').innerHTML = '<div class="empty">loop execution pending</div>';
+    }
+  } catch (err) {
+    $('#pulse').className = 'pulse stale';
+    $('#pulseLabel').textContent = 'OFFLINE';
+  }
+}
+
+function renderMode() {
+  const sw = $('#modeSwitch'), st = $('#modeState');
+  sw.className = 'switch ' + (dryRunState ? 'dry' : 'live');
+  st.className = 'mode-state ' + (dryRunState ? 'dry' : 'live');
+  st.textContent = dryRunState ? 'DRY_RUN' : 'LIVE_EXEC';
+}
+
+$('#modeSwitch').addEventListener('click', async () => {
+  const next = !dryRunState;
+  if (!next) {
+    const ok = confirm('CRITICAL WARN: Enable LIVE execution mode? Live capital will be allocated.');
+    if (!ok) return;
+  }
+  $('#modeSwitch').style.pointerEvents = 'none';
+  try {
+    const r = await j('/api/dryrun', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ dryRun: next }) });
+    dryRunState = r.dryRun;
+  } catch (e) { alert('Mode toggle error: ' + e.message); }
+  renderMode();
+  $('#modeSwitch').style.pointerEvents = '';
+});
+
+// ---- Balances ----
+async function loadBalance() {
+  try {
+    const b = await j('/api/balances');
+    $('#balancePanel').innerHTML = `
+      <div class="stat-card" style="margin-bottom:8px;">
+        <span class="k">TST TOKEN BALANCE</span>
+        <span class="v good">${fmtNum(b.human, 3)}</span>
+      </div>
+      <div class="stat-row"><span class="k">Precision Decimals</span><span class="v">${b.decimals}</span></div>
+    `;
+  } catch (e) {
+    $('#balancePanel').innerHTML = `<div class="empty">UNAVAILABLE &mdash; ${esc(e.message)}</div>`;
+  }
+}
+
+// ---- Summary ----
+async function loadSummary() {
+  try {
+    const s = await j('/api/summary');
+    if (!s || s.note) {
+      $('#summaryPanel').innerHTML = `<div class="empty">${esc(s?.note || 'no metric telemetry')}</div>`;
+      return;
+    }
+    $('#summaryUpdated').textContent = 'SYNCED ' + timeAgo(s.updatedAt).toUpperCase();
+    let html = `
+      <div class="stat-grid" style="margin-bottom:10px;">
+        <div class="stat-card"><span class="k">Accuracy Rate</span><span class="v ${s.rollingAccuracy.hitRate >= 0.55 ? 'good' : 'bad'}">${fmtPct(s.rollingAccuracy.hitRate)}</span></div>
+        <div class="stat-card"><span class="k">Exposure Tokens</span><span class="v warn">${fmtNum(s.openExposureTokens)}</span></div>
+      </div>
+      <div class="stat-row"><span class="k">Total Trades executed</span><span class="v">${s.totalTrades}</span></div>
+      <div class="stat-row"><span class="k">Total Skips</span><span class="v">${s.totalSkips}</span></div>
+    `;
+    const buckets = Object.entries(s.calibrationByConfidenceBucket || {});
+    if (buckets.length) {
+      html += `<div class="panel-sub" style="margin: 8px 0 4px 0;">CONFIDENCE CALIBRATION</div>`;
+      html += buckets.map(([k,v]) => `
+        <div class="stat-row"><span class="k">${esc(k)}</span><span class="v">${fmtPct(v.hitRate)} <span style="color:var(--text-muted)">(n=${v.n})</span></span></div>
+      `).join('');
+    }
+    $('#summaryPanel').innerHTML = html;
+  } catch (e) {
+    $('#summaryPanel').innerHTML = `<div class="empty">telemetry offline</div>`;
+  }
+}
+
+// ---- Backtest ----
+async function loadBacktestHistory() {
+  try {
+    const r = await j('/api/backtest/history');
+    if (!r.runs?.length) { $('#btHistory').innerHTML = '<div class="empty">no runs logged</div>'; return; }
+    $('#btHistory').innerHTML = r.runs.map(run => `
+      <div class="stat-row" style="cursor:pointer;" onclick="viewBacktest('${esc(run.file)}')">
+        <span class="k">${esc(run.runAt)}</span>
+        <span class="v cyan">FETCH &rarr;</span>
+      </div>
+    `).join('');
+  } catch (e) {
+    $('#btHistory').innerHTML = '<div class="empty">history unavailable</div>';
+  }
+}
+
+async function viewBacktest(file) {
+  try {
+    const detail = await j('/api/backtest/history/' + encodeURIComponent(file));
+    const res = detail.result || detail;
+    alert(`[BACKTEST MATRIX RUN]\nRun: ${res.runAt}\nEvaluated: ${res.marketsEvaluated}\nSignals: ${res.signaled}\nHit Rate: ${(res.hitRate*100).toFixed(1)}%\nSimulated PnL: ${res.hypotheticalPnl?.toFixed(2)} tokens`);
+  } catch (e) { alert('Load failed: ' + e.message); }
+}
+
+$('#btRunBtn').addEventListener('click', async () => {
+  const btn = $('#btRunBtn');
+  const maxMarkets = Number($('#btMaxMarkets').value || 100);
+  btn.disabled = true; btn.textContent = 'RUNNING...';
+  $('#btRunResult').textContent = 'Computing forward simulation model...';
+  try {
+    const r = await j('/api/backtest/run', { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ maxMarkets }) });
+    $('#btRunResult').innerHTML = `HIT RATE: <b style="color:var(--green)">${(r.hitRate*100).toFixed(1)}%</b> | SIGNALS: ${r.signaled}/${r.marketsEvaluated}`;
+    loadBacktestHistory();
+    loadSummary();
+  } catch (e) {
+    $('#btRunResult').innerHTML = `<span style="color:var(--red)">ERR: ${esc(e.message)}</span>`;
+  } finally {
+    btn.disabled = false; btn.textContent = 'EXECUTE';
+  }
+});
+
+// ---- Decision Journal ----
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    currentTab = tab.dataset.type;
+    loadReceipts();
+  });
+});
+
+async function loadReceipts() {
+  try {
+    const qs = currentTab ? `?type=${currentTab}&limit=60` : '?limit=60';
+    const r = await j('/api/receipts' + qs);
+    const rows = r.receipts || [];
+    $('#receiptCount').textContent = rows.length + ' SIGNALS LOGGED';
+    if (!rows.length) {
+      $('#receiptsBody').innerHTML = `<tr><td colspan="8"><div class="empty">no strategy decisions recorded</div></td></tr>`;
+      return;
+    }
+    $('#receiptsBody').innerHTML = rows.map(r => `
+      <tr>
+        <td>${timeAgo(r.ts)}</td>
+        <td class="q-cell" title="${esc(r.question)}">${esc(r.question)}</td>
+        <td>${esc(r.category || '—')}</td>
+        <td>
+          <span class="pill ${r.decision}">${r.decision}</span>
+          ${r.syntheticPrice ? '<span class="pill synth">SYNTH</span>' : ''}
+        </td>
+        <td>${fmtNum(r.edge, 3)}</td>
+        <td>${fmtNum(r.confidence, 2)}</td>
+        <td>${r.size ? fmtNum(r.size, 2) : '—'}</td>
+        <td>${r.rawPrice ? r.rawPrice.map(p=>fmtNum(p,2)).join('/') : 'SYNTH'}</td>
+      </tr>
+    `).join('');
+  } catch (e) {
+    $('#receiptsBody').innerHTML = `<tr><td colspan="8"><div class="empty">signal log unreachable</div></td></tr>`;
+  }
+}
+
+// ---- Open Markets ----
+async function loadMarkets() {
+  try {
+    const r = await j('/api/markets/open?limit=40');
+    const markets = r.markets || [];
+    $('#marketCount').textContent = markets.length + ' ACTIVE';
+    if (!markets.length) {
+      $('#marketsBody').innerHTML = `<tr><td colspan="5"><div class="empty">no active market order books</div></td></tr>`;
+      return;
+    }
+    $('#marketsBody').innerHTML = markets.map(m => {
+      const q = m.metadata?.question ?? m.question ?? '(no question)';
+      const outcomes = m.metadata?.outcomes ?? m.outcomes ?? [];
+      const cat = m.category ?? '—';
+      const probs = (m.spotImpliedProbabilities || []).map(p => fmtNum(Number(p), 2)).join(' / ');
+      return `
+        <tr>
+          <td class="q-cell" title="${esc(q)}">${esc(q)}</td>
+          <td>${esc(cat)}</td>
+          <td>${esc(outcomes.join('/'))}</td>
+          <td class="v cyan">${probs || 'NO_BOOK'}</td>
+          <td><span class="pill trade">${esc(m.status)}</span></td>
+        </tr>
+      `;
+    }).join('');
+  } catch (e) {
+    $('#marketsBody').innerHTML = `<tr><td colspan="5"><div class="empty">market stream offline</div></td></tr>`;
+  }
+}
+
+// ---- Boot Lifecycle ----
+async function refreshAll() {
+  loadStatus();
+  loadBalance();
+  loadSummary();
+  loadReceipts();
+  loadMarkets();
+  loadBacktestHistory();
+}
+
+refreshAll();
+setInterval(refreshAll, 15000);
+</script>
+</body>
+</html>
