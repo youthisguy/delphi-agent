@@ -186,9 +186,19 @@
 
   <div class="grid cols-3">
     <div class="panel">
-      <div class="panel-head"><h2><span class="chev">&raquo;</span>Config health</h2></div>
-      <div id="configHealth">
-        <div class="stat-row"><span class="k">OpenAI key</span><span class="v">&hellip;</span></div>
+      <div class="panel-head">
+        <h2>System Telemetry</h2>
+        <span class="panel-sub">HEALTH</span>
+      </div>
+      <div class="panel-body">
+        <div class="stat-row" style="margin-bottom:6px;">
+          <span class="k">Inference nodes</span>
+          <button type="button" class="primary" id="nodeHealthBtn">Health check</button>
+        </div>
+        <div id="configHealth">
+          <div class="empty">loading nodes…</div>
+        </div>
+        <div id="nodeHealthResult" class="panel-sub" style="margin-top:6px;"></div>
       </div>
     </div>
 

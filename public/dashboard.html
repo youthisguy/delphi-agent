@@ -349,16 +349,6 @@
 </head>
 <body>
 
-<!-- High-Frequency Data Ticker -->
-<div class="ticker-bar">
-  <div class="ticker-item">SYS.LATENCY: <span class="val up">12ms</span></div>
-  <div class="ticker-item">ALPHA.ENGINE: <span class="val">MODEL-v4.1</span></div>
-  <div class="ticker-item">RISK.LIMIT: <span class="val">85.00%</span></div>
-  <div class="ticker-item">ETH/USD: <span class="val">$3,124.50</span></div>
-  <div class="ticker-item">GAS: <span class="val">14 Gwei</span></div>
-  <div class="ticker-item">ACTIVE.NODES: <span class="val up">12/12</span></div>
-</div>
-
 <div class="topbar">
   <div class="brand-group">
     <svg class="wing" viewBox="0 0 24 24" fill="none">
@@ -388,9 +378,30 @@
   <!-- Top Metrics Overview Grid -->
   <div class="grid cols-3">
     <div class="panel">
-      <div class="panel-head"><h2>System Telemetry</h2><span class="panel-sub">HEALTH</span></div>
-      <div class="panel-body" id="configHealth">
-        <div class="stat-row"><span class="k">OpenAI Subsystem</span><span class="v">&hellip;</span></div>
+      <div class="panel-head">
+        <h2>System Telemetry</h2>
+        <span class="panel-sub">HEALTH</span>
+      </div>
+      <div class="panel-body">
+        <div class="stat-row" style="margin-bottom:8px; border-bottom:1px dashed var(--border-dim); padding-bottom:8px;">
+          <span class="k">Inference nodes</span>
+          <button type="button" class="primary" id="nodeHealthBtn">Health check</button>
+        </div>
+
+        <!-- Filled by loadNodes() / loadStatus() -->
+        <div id="configHealth">
+          <div class="stat-row">
+            <span class="k">OpenAI pool</span>
+            <span class="v">…</span>
+          </div>
+          <div class="stat-row">
+            <span class="k">Gemini pool</span>
+            <span class="v">…</span>
+          </div>
+          <div class="empty" style="padding:8px 0;">awaiting node matrix…</div>
+        </div>
+
+        <div id="nodeHealthResult" class="panel-sub" style="margin-top:8px;"></div>
       </div>
     </div>
 
@@ -509,9 +520,9 @@
 </div>
 
 <footer>
-  <span>LAZY FALCON // SYSTEM STATUS: NOMINAL</span>
+  <!-- <span>LAZY FALCON // SYSTEM STATUS: NOMINAL</span>
   <span>PORT: 8080 | PROTOCOL: WEBSOCKET/REST</span>
-  <span>LATENCY: 12ms</span>
+  <span>LATENCY: 12ms</span> -->
 </footer>
 
 <script>
@@ -549,7 +560,7 @@ async function loadStatus() {
       const staleMs = Date.now() - new Date(s.loopStatus.updatedAt).getTime();
       const stale = staleMs > (15 * 60 * 1000);
       pulse.className = 'pulse ' + (stale ? 'stale' : 'live');
-      label.textContent = 'LOOP: ' + timeAgo(s.loopStatus.updatedAt).toUpperCase();
+      label.textContent = 'LAST RUN: ' + timeAgo(s.loopStatus.updatedAt).toUpperCase();
     } else {
       pulse.className = 'pulse stale';
       label.textContent = 'NO_DATA';
@@ -703,6 +714,10 @@ $('#btRunBtn').addEventListener('click', async () => {
   }
 });
 
+document.getElementById("nodeHealthBtn")?.addEventListener("click", () => {
+  runNodeHealthCheck();
+});
+
 // ---- Decision Journal ----
 document.querySelectorAll('.tab').forEach(tab => {
   tab.addEventListener('click', () => {
@@ -781,6 +796,7 @@ async function refreshAll() {
   loadReceipts();
   loadMarkets();
   loadBacktestHistory();
+  loadNodes(); 
 }
 
 refreshAll();
