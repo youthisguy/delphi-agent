@@ -25,10 +25,8 @@ function readRuntimeConfig(): RuntimeConfig {
   ensureDataDir();
   if (!fs.existsSync(RUNTIME_CONFIG_PATH)) {
     const initial: RuntimeConfig = {
-      // Default is dry-run ON. This is a safety default: the scope calls
-      // for keeping dry-run on until the receipt ledger + settled win-rate
-      // pipeline + dashboard are producing stable numbers. Flip explicitly
-      // via the dashboard or DRY_RUN=false once you're ready.
+       // Flip explicitly
+      // via the dashboard or DRY_RUN=false.
       dryRun: process.env.DRY_RUN !== "false",
     };
     fs.writeFileSync(RUNTIME_CONFIG_PATH, JSON.stringify(initial, null, 2));
@@ -60,10 +58,10 @@ export const CONFIG = {
   // Server
   port: Number(process.env.PORT ?? 8787),
 
-  // Gemini backup forecaster
-  geminiEnabled: process.env.GEMINI_API_KEY ? true : false,
+  // Gemini backup forecaster — enabled if either a single key or a pool is set.
+  // The actual key(s) used at call time come from keyPool.ts, not this field.
+  geminiEnabled: Boolean(process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEYS),
   geminiModel: process.env.GEMINI_MODEL || "gemini-flash-latest",
-  geminiApiKey: process.env.GEMINI_API_KEY,
 
   // Agreement / disagreement rules for blending LLM + Gemini + Polymarket
   disagreementSoftThreshold: Number(process.env.DISAGREEMENT_SOFT ?? 0.15), // raise edge bar

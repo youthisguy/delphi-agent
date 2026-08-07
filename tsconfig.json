@@ -13,5 +13,5 @@
     "declaration": false,
     "sourceMap": true
   },
-  "include": ["src", "check-setup.ts"]
+  "include": ["src", "check-setup.ts", "public/dashboard.js"]
 }

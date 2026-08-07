@@ -6,6 +6,7 @@ import { DelphiClient } from "@gensyn-ai/gensyn-delphi-sdk";
 import { CONFIG, getDryRun, setDryRun } from "./config.js";
 import { readReceipts, readPinnedSummary } from "./journal.js";
 import { runBacktest, listBacktestRuns, readBacktestRun } from "./backtest.js";
+import { getAllNodesView, getPoolSummary, runHealthCheck } from "./keyPool.js";
 
 const app = express();
 app.use(express.json());
@@ -44,6 +45,27 @@ app.get("/api/balances", async (_req, res) => {
   try {
     const { balance, decimals } = await client.getErc20BalanceWithDecimals();
     res.json({ balance: balance.toString(), decimals, human: Number(balance) / 10 ** decimals });
+  } catch (err) {
+    res.status(500).json({ error: err instanceof Error ? err.message : String(err) });
+  }
+});
+
+// --- key pool / nodes -------------------------------------------------------
+
+// Current status of every configured OpenAI/Gemini key ("node"), as last
+// updated by live forecast calls or the manual health check below.
+app.get("/api/nodes", (_req: any, res: any) => {
+  res.json({ nodes: getAllNodesView(), summary: getPoolSummary() });
+});
+
+// Manual / periodic verification: actively pings every node so the
+// dashboard reflects reality even for nodes that haven't been used by a
+// live forecast recently. Does not affect runtime rotation directly —
+// that happens automatically on every forecast call via keyPool.ts.
+app.post("/api/nodes/health-check", async (_req: any, res: any) => {
+  try {
+    const result = await runHealthCheck();
+    res.json(result);
   } catch (err) {
     res.status(500).json({ error: err instanceof Error ? err.message : String(err) });
   }

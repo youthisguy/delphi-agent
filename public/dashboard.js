@@ -84,6 +84,3 @@ function statusDot(status) {
   
   // wire button once DOM ready
   document.getElementById("nodeHealthBtn")?.addEventListener("click", runNodeHealthCheck);
-  
-  // in refreshAll():
-  // loadNodes();

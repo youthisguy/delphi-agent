@@ -27,7 +27,7 @@
     --green: #00ff88;
     --green-glow: rgba(0, 255, 136, 0.15);
     --red: #ff3366;
-    --red-glow: rgba(ff, 51, 102, 0.15);
+    --red-glow: rgba(255, 51, 102, 0.15);
     
     --font-mono: 'JetBrains Mono', monospace;
     --font-head: 'Space Grotesk', sans-serif;
@@ -487,7 +487,7 @@
     </div>
   </div>
 
-  <!-- Open Markets Order Book Monitor -->
+  <!-- Active Market Liquidity Monitor -->
   <div class="panel">
     <div class="panel-head">
       <h2>Active Market Liquidity Monitor</h2>
@@ -525,6 +525,7 @@
   <span>LATENCY: 12ms</span> -->
 </footer>
 
+<script src="dashboard.js"></script>
 <script>
 const $ = (sel) => document.querySelector(sel);
 const fmtPct = (x) => (x === null || x === undefined) ? '&mdash;' : (x * 100).toFixed(1) + '%';
@@ -566,17 +567,9 @@ async function loadStatus() {
       label.textContent = 'NO_DATA';
     }
 
-    // Config Health
-    const ch = s.configHealth || {};
-    $('#configHealth').innerHTML = [
-      ['OpenAI Neural Core', ch.openaiKey],
-      ['Gemini Engine', ch.geminiKey],
-    ].map(([k, ok]) => `
-      <div class="stat-row">
-        <span class="k">${k}</span>
-        <span class="v"><span class="dot ${ok ? 'ok' : 'off'}"></span>${ok ? 'ACTIVE' : 'MISSING'}</span>
-      </div>
-    `).join('');
+    // Note: #configHealth is owned by loadNodes() (dashboard.js), which
+    // renders the live node matrix. Nothing here writes to it anymore —
+    // see loadNodes() for OpenAI/Gemini pool status.
 
     // Last Loop
     const ls = s.loopStatus;
@@ -714,9 +707,8 @@ $('#btRunBtn').addEventListener('click', async () => {
   }
 });
 
-document.getElementById("nodeHealthBtn")?.addEventListener("click", () => {
-  runNodeHealthCheck();
-});
+// Node health-check button wiring lives in dashboard.js (runNodeHealthCheck
+// is bound to #nodeHealthBtn there) — not duplicated here.
 
 // ---- Decision Journal ----
 document.querySelectorAll('.tab').forEach(tab => {

@@ -1,4 +1,11 @@
-import { CONFIG } from "./config.js";
+import {
+  getCandidateNodes,
+  advanceCursor,
+  markSuccess,
+  markFailure,
+  isDeadKeyError,
+  type NodeState,
+} from "./keyPool.js";
 
 /**
  * Selective backup forecaster. Only called for markets flagged
@@ -7,9 +14,9 @@ import { CONFIG } from "./config.js";
  * Search) is only switched on for those same time-sensitive calls since
  * that's where a stale training cutoff actually hurts.
  *
- * Uses the plain REST endpoint rather than a client library so this file
- * has zero extra deps beyond `dotenv`. Swap in `@google/genai` if you'd
- * rather have typed responses.
+ * Rotates through GEMINI_API_KEYS nodes the same way llmForecast.ts does:
+ * a failing node goes on cooldown (or dead, for 401/403) and the next
+ * node in the pool is tried immediately, up to NODE_MAX_RETRIES nodes.
  */
 
 export interface GeminiForecast {
@@ -19,16 +26,15 @@ export interface GeminiForecast {
   reasoning?: string;
 }
 
-export async function getGeminiForecast(
+const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-flash-latest";
+
+async function callGemini(
+  node: NodeState,
   question: string,
   outcomes: string[],
   opts: { grounded: boolean }
-): Promise<GeminiForecast | null> {
-  if (!CONFIG.geminiEnabled || !CONFIG.geminiApiKey) {
-    return null; // no key configured — caller should treat as "signal unavailable", not zero-fill
-  }
-
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${CONFIG.geminiModel}:generateContent?key=${CONFIG.geminiApiKey}`;
+): Promise<GeminiForecast> {
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${node.apiKey}`;
 
   const prompt = `You are a careful probabilistic forecaster for prediction markets.
 Question: ${question}
@@ -48,60 +54,91 @@ Return ONLY this JSON object, no markdown fences, no extra text:
     generationConfig: { temperature: 0.2 },
   };
 
-  // Grounding only for time-sensitive markets, per scope.
   if (opts.grounded) {
     body.tools = [{ google_search: {} }];
   }
 
-  try {
-    const res = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
-    });
-    if (!res.ok) {
-      console.warn(`  [Gemini] HTTP ${res.status}: ${await res.text().catch(() => "")}`);
-      return null;
-    }
-    const data: any = await res.json();
-    const text: string =
-      data?.candidates?.[0]?.content?.parts?.map((p: any) => p.text ?? "").join("") ?? "{}";
-    const cleaned = text.replace(/```json|```/g, "").trim();
-    const parsed = JSON.parse(cleaned) as {
-      probs?: number[];
-      confidence?: number;
-      reasoning?: string;
-    };
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
 
-    let probs = Array.isArray(parsed.probs) ? parsed.probs.map(Number) : [];
-    while (probs.length < outcomes.length) probs.push(0);
-    probs = probs.slice(0, outcomes.length);
-    const sum = probs.reduce((a, b) => a + (Number.isFinite(b) ? b : 0), 0);
-    probs =
-      sum > 0
-        ? probs.map((p) => (Number.isFinite(p) ? p : 0) / sum)
-        : Array.from({ length: outcomes.length }, () => 1 / outcomes.length);
-
-    let confidence = Number(parsed.confidence);
-    if (!Number.isFinite(confidence)) confidence = 0.5;
-    confidence = Math.max(0.05, Math.min(0.95, confidence));
-
-    // Was grounding actually used, per the API's own report? Fall back to
-    // what we requested if the field isn't present in this API version.
-    const groundedActual =
-      Boolean(data?.candidates?.[0]?.groundingMetadata) || opts.grounded;
-
-    console.log(
-      `  [Gemini${groundedActual ? "+search" : ""}] probs=[${probs
-        .map((p) => p.toFixed(3))
-        .join(", ")}] conf=${confidence.toFixed(2)}`
-    );
-
-    return { probs, confidence, grounded: groundedActual, reasoning: parsed.reasoning };
-  } catch (err) {
-    console.warn("  [Gemini] forecast failed:", err instanceof Error ? err.message : err);
-    return null;
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    const err: any = new Error(`Gemini HTTP ${res.status}: ${text}`);
+    err.status = res.status;
+    throw err;
   }
+
+  const data: any = await res.json();
+  const text: string =
+    data?.candidates?.[0]?.content?.parts?.map((p: any) => p.text ?? "").join("") ?? "{}";
+  const cleaned = text.replace(/```json|```/g, "").trim();
+  const parsed = JSON.parse(cleaned) as {
+    probs?: number[];
+    confidence?: number;
+    reasoning?: string;
+  };
+
+  let probs = Array.isArray(parsed.probs) ? parsed.probs.map(Number) : [];
+  while (probs.length < outcomes.length) probs.push(0);
+  probs = probs.slice(0, outcomes.length);
+  const sum = probs.reduce((a, b) => a + (Number.isFinite(b) ? b : 0), 0);
+  probs =
+    sum > 0
+      ? probs.map((p) => (Number.isFinite(p) ? p : 0) / sum)
+      : Array.from({ length: outcomes.length }, () => 1 / outcomes.length);
+
+  let confidence = Number(parsed.confidence);
+  if (!Number.isFinite(confidence)) confidence = 0.5;
+  confidence = Math.max(0.05, Math.min(0.95, confidence));
+
+  const groundedActual = Boolean(data?.candidates?.[0]?.groundingMetadata) || opts.grounded;
+
+  console.log(
+    `  [Gemini:${node.label}${groundedActual ? "+search" : ""}] probs=[${probs
+      .map((p) => p.toFixed(3))
+      .join(", ")}] conf=${confidence.toFixed(2)}`
+  );
+
+  return { probs, confidence, grounded: groundedActual, reasoning: parsed.reasoning };
+}
+
+export async function getGeminiForecast(
+  question: string,
+  outcomes: string[],
+  opts: { grounded: boolean }
+): Promise<GeminiForecast | null> {
+  const candidates = getCandidateNodes("gemini");
+
+  if (candidates.length === 0) {
+    return null; // no keys configured — caller treats as "signal unavailable", not zero-fill
+  }
+
+  let lastErr: unknown;
+  for (const node of candidates) {
+    try {
+      const result = await callGemini(node, question, outcomes, opts);
+      markSuccess(node);
+      advanceCursor("gemini");
+      return result;
+    } catch (err) {
+      lastErr = err;
+      markFailure(node, err, { dead: isDeadKeyError(err) });
+      console.warn(
+        `  [Gemini] node ${node.label} failed (${isDeadKeyError(err) ? "dead" : "cooldown"}), trying next…`,
+        err instanceof Error ? err.message : err
+      );
+    }
+  }
+
+  advanceCursor("gemini");
+  console.warn(
+    "  [Gemini] all candidate nodes failed this request:",
+    lastErr instanceof Error ? lastErr.message : lastErr
+  );
+  return null; // soft-fail — caller just proceeds without the Gemini signal
 }
 
 export default getGeminiForecast;
