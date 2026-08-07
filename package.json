@@ -7,6 +7,8 @@
   "scripts": {
     "check-setup": "tsx check-setup.ts",
     "start": "tsx src/index.ts",
+    "demo": "tsx src/demo.ts",
+    "backtest": "tsx src/backtest.ts",
     "build": "tsc",
     "typecheck": "tsc --noEmit"
   },
@@ -19,7 +21,7 @@
   "license": "ISC",
   "dependencies": {
     "@gensyn-ai/gensyn-delphi-sdk": "^2.1.0",
-    "openai": "^6.49.0",
+    "openai": "^7.4.0",
     "string-similarity": "^4.0.4"
   },
   "devDependencies": {

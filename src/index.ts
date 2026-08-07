@@ -41,10 +41,8 @@ async function decide(market: Market): Promise<TradeDecision | null> {
     (market as any).metadata?.outcomes ||
     ["Yes", "No"];
 
-  // Raw implied probabilities from the API (1e18 → [0,1])
-  const rawProbs = (market.spotImpliedProbabilities ?? []).map(
-    (p) => Number(p) / 1e18
-  );
+  // Already 0-1 floats  
+  const rawProbs = market.spotImpliedProbabilities ?? [];
 
   // Treat missing / zero / near-zero books as even odds (new markets assumption)
   const hasValidPrice =
@@ -67,18 +65,13 @@ async function decide(market: Market): Promise<TradeDecision | null> {
   }
 
   // 2. LLM forecast
-  const { probs: llmProbs, confidence } = await getLlmForecast(
-    question,
-    outcomes
-  );
+  const { probs: llmProbs, confidence } = await getLlmForecast(question, outcomes);
 
   // 3. Blend when we have a strong external match
   let myProbs = [...llmProbs];
   if (external && external.similarity > 0.65) {
     const w = Math.min(0.6, external.similarity);
-    myProbs = myProbs.map(
-      (p, i) => (1 - w) * p + w * (external.probs[i] ?? p)
-    );
+    myProbs = myProbs.map((p, i) => (1 - w) * p + w * (external.probs[i] ?? p));
   }
 
   // Ensure length matches
@@ -192,7 +185,7 @@ async function runOnce() {
     return;
   }
 
-  console.log(`Evaluating ${markets.length} market(s)...`);
+  console.log(`Evaluating ${markets.length} market(s)`);
 
   for (const market of markets) {
     const decision = await decide(market);
@@ -208,7 +201,7 @@ async function runOnce() {
 }
 
 async function main() {
-  console.log("Starting Lazy Falcon trading loop...");
+  console.log("Starting Lazy Falcon");
   console.log(`Loop interval: ${LOOP_INTERVAL_MS / 1000}s\n`);
 
   // Run immediately, then on an interval.

@@ -46,10 +46,8 @@ async function evaluate(market: Market) {
     (market as any).metadata?.outcomes ||
     ["Yes", "No"];
 
-  // Raw implied probabilities from the API (1e18 → [0,1])
-  const rawProbs = (market.spotImpliedProbabilities ?? []).map(
-    (p) => Number(p) / 1e18
-  );
+  // Already 0-1 floats  
+  const rawProbs = market.spotImpliedProbabilities ?? [];
 
   // Treat missing / zero / near-zero books as even odds (new markets assumption)
   const hasValidPrice =
@@ -65,28 +63,20 @@ async function evaluate(market: Market) {
   try {
     external = await findSimilarPolymarketOdds(question, outcomes);
   } catch (err) {
-    console.log(
-      `    Polymarket lookup failed:`,
-      err instanceof Error ? err.message : err
-    );
+    console.log(`    Polymarket lookup failed:`, err instanceof Error ? err.message : err);
   }
 
   if (external) {
     console.log(
       `    Polymarket match (sim=${external.similarity.toFixed(2)}): "${external.question.slice(0, 60)}..."`
     );
-    console.log(
-      `    external probs: [${external.probs.map((p) => p.toFixed(3)).join(", ")}]`
-    );
+    console.log(`    external probs: [${external.probs.map((p) => p.toFixed(3)).join(", ")}]`);
   } else {
     console.log(`    No good Polymarket match`);
   }
 
   // 2. LLM forecast
-  const { probs: llmProbs, confidence } = await getLlmForecast(
-    question,
-    outcomes
-  );
+  const { probs: llmProbs, confidence } = await getLlmForecast(question, outcomes);
   console.log(
     `    LLM probs: [${llmProbs.map((p) => p.toFixed(3)).join(", ")}] conf=${confidence.toFixed(2)}`
   );
@@ -95,12 +85,8 @@ async function evaluate(market: Market) {
   let myProbs = [...llmProbs];
   if (external && external.similarity > 0.65) {
     const w = Math.min(0.6, external.similarity);
-    myProbs = myProbs.map(
-      (p, i) => (1 - w) * p + w * (external.probs[i] ?? p)
-    );
-    console.log(
-      `    blended: [${myProbs.map((p) => p.toFixed(3)).join(", ")}] (w=${w.toFixed(2)})`
-    );
+    myProbs = myProbs.map((p, i) => (1 - w) * p + w * (external.probs[i] ?? p));
+    console.log(`    blended: [${myProbs.map((p) => p.toFixed(3)).join(", ")}] (w=${w.toFixed(2)})`);
   }
 
   // Ensure length matches
@@ -137,10 +123,7 @@ async function evaluate(market: Market) {
 
   // Slightly smaller size when guessing against synthetic 0.5
   const sizeMultiplier = hasValidPrice ? 1.0 : 0.7;
-  const tokens = Math.min(
-    10,
-    (2 + bestEdge * 15 * confidence) * sizeMultiplier
-  );
+  const tokens = Math.min(10, (2 + bestEdge * 15 * confidence) * sizeMultiplier);
 
   console.log(
     `    → WOULD BUY outcome ${bestIdx}  edge=${bestEdge.toFixed(3)}  ` +
