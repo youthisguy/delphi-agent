@@ -6,11 +6,13 @@
   "main": "dist/index.js",
   "scripts": {
     "check-setup": "tsx check-setup.ts",
-    "start": "tsx src/index.ts",
+    "start": "concurrently -k \"tsx src/server.ts\" \"tsx src/index.ts\"",
+   "server": "tsx src/server.ts",
     "demo": "tsx src/demo.ts",
     "backtest": "tsx src/backtest.ts",
-    "build": "tsc",
-    "typecheck": "tsc --noEmit"
+    "build": "echo 'no build step'",
+    "typecheck": "tsc --noEmit",
+    "loop": "tsx src/index.ts"
   },
   "keywords": [
     "delphi",
@@ -21,6 +23,7 @@
   "license": "ISC",
   "dependencies": {
     "@gensyn-ai/gensyn-delphi-sdk": "^2.1.0",
+    "concurrently": "^9.2.4",
     "express": "^5.2.1",
     "openai": "^7.4.0",
     "string-similarity": "^4.0.4"
