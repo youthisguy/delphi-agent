@@ -14,7 +14,8 @@ import { blendSignals, isTimeSensitive, type Signal } from "./blend.js";
 import { appendReceipt, patchReceiptExecution, recomputeSummary, type Receipt } from "./journal.js";
 import { checkAndRedeemSettledPositions } from "./redeem.js";
 import { getOpenPositions } from "./positions.js";
-import { CONFIG, getDryRun } from "./config.js";
+import { getErc20Balance, getErc20Decimals, hasContractCode, resolveWalletAddress } from "./chainRead.js";
+import { CONFIG, getDryRun, getCompetitionTokenAddress } from "./config.js";
 
 const client = new DelphiClient();
 
@@ -62,23 +63,56 @@ interface CycleBudget {
  * failure propagates — sizing against an unknown balance isn't safe.
  */
 async function getCycleBudget(dryRun: boolean): Promise<CycleBudget> {
-  try {
-    const { balance, decimals } = await client.getErc20BalanceWithDecimals();
-    const humanBalance = Number(balance) / 10 ** decimals;
-    const openPositions = await getOpenPositions(client);
-    const openExposure = openPositions.reduce((sum, p) => sum + p.size, 0);
-    const available = Math.max(0, humanBalance - openExposure - CONFIG.bankrollReserveTokens);
-    return { total: available, source: "on-chain" };
-  } catch (err) {
-    if (dryRun) {
-      console.warn(
-        "  [budget] couldn't read live balance in dry-run — using virtual bankroll:",
-        err instanceof Error ? err.message : err
-      );
-      return { total: CONFIG.dryRunVirtualBankroll, source: "virtual (dry-run fallback)" };
-    }
-    throw err;
+  // Dry-run is for paper-testing signal/sizing logic independent of
+  // whatever the wallet's real balance happens to be right now (e.g.
+  // pre-funding, it's legitimately 0 — that shouldn't block every
+  // market from ever generating a sized signal). Live balance only
+  // matters once trades actually execute, i.e. dryRun === false.
+  if (dryRun) {
+    return { total: CONFIG.dryRunVirtualBankroll, source: "virtual (dry-run fallback)" };
   }
+
+  // Live sizing must be checked against the actual competition token —
+  // client.getErc20BalanceWithDecimals() reads whatever token the SDK
+  // is internally wired to by default, which is NOT guaranteed to be the
+  // same contract as COMPETITION_TOKEN_ADDRESS. Read the configured
+  // token explicitly via raw eth_call instead, same path the dashboard's
+  // /api/balances competitionToken field already uses.
+  const tokenAddress = getCompetitionTokenAddress();
+  if (!tokenAddress) {
+    throw new Error(
+      "COMPETITION_TOKEN_ADDRESS is not set — refusing to size live trades against an unconfirmed token. " +
+        "Set it via env or POST /api/token-address before disabling dryRun."
+    );
+  }
+  if (!process.env.DELPHI_RPC_URL) {
+    throw new Error("DELPHI_RPC_URL is not set — required to read the competition token's balance directly.");
+  }
+
+  const walletAddress = await resolveWalletAddress(client);
+  if (!walletAddress) {
+    throw new Error("Could not resolve trading wallet address — set WALLET_ADDRESS explicitly.");
+  }
+
+  const codeExists = await hasContractCode(tokenAddress);
+  if (!codeExists) {
+    throw new Error(
+      `no contract found at ${tokenAddress} — DELPHI_RPC_URL is likely pointing at a different network ` +
+        `than the one this token lives on.`
+    );
+  }
+
+  const [rawBalance, onChainDecimals] = await Promise.all([
+    getErc20Balance(tokenAddress, walletAddress),
+    CONFIG.competitionTokenDecimals !== null ? Promise.resolve(null) : getErc20Decimals(tokenAddress),
+  ]);
+  const decimals = CONFIG.competitionTokenDecimals ?? onChainDecimals ?? 18;
+  const humanBalance = Number(rawBalance) / 10 ** decimals;
+
+  const openPositions = await getOpenPositions(client);
+  const openExposure = openPositions.reduce((sum, p) => sum + p.size, 0);
+  const available = Math.max(0, humanBalance - openExposure - CONFIG.bankrollReserveTokens);
+  return { total: available, source: "on-chain" };
 }
 
 async function decide(
@@ -205,14 +239,32 @@ async function tradeOnMarket(market: Market, decision: TradeDecision, dryRun: bo
     return null;
   }
 
-  const { balance, decimals } = await client.getErc20BalanceWithDecimals();
+  // Same fix as getCycleBudget(): check against the configured
+  // competition token, not whatever the SDK defaults to.
+  const tokenAddress = getCompetitionTokenAddress();
+  if (!tokenAddress) throw new Error("COMPETITION_TOKEN_ADDRESS not set — refusing to trade live.");
+  const walletAddress = await resolveWalletAddress(client);
+  if (!walletAddress) throw new Error("Could not resolve trading wallet address.");
+
+  const rawBalance = await getErc20Balance(tokenAddress, walletAddress);
+  const decimals = CONFIG.competitionTokenDecimals ?? (await getErc20Decimals(tokenAddress));
   const maxTokensIn = BigInt(Math.floor(Math.min(decision.tokensToSpend, CONFIG.maxTokensPerTrade) * 10 ** decimals));
 
-  if (maxTokensIn > balance) {
-    console.log(`  Skipping ${market.id}: insufficient balance for desired spend.`);
+  if (maxTokensIn > rawBalance) {
+    console.log(`  Skipping ${market.id}: insufficient competition-token balance for desired spend.`);
     return null;
   }
 
+  // ⚠️ UNVERIFIED: quoteBuy / ensureTokenApproval / buyShares below are
+  // opaque SDK calls that take no token-address parameter — they rely on
+  // whatever collateral token the SDK itself resolves per market
+  // internally. The balance check above now correctly confirms you HOLD
+  // enough of the real competition token, but that does NOT guarantee
+  // these calls will actually spend that same token. Before trusting
+  // this live, confirm with the SDK docs/source (or a single small live
+  // test trade) that the market's collateral token matches
+  // COMPETITION_TOKEN_ADDRESS — otherwise approval/spend could target a
+  // different contract than the balance you just checked.
   const trialShares = maxTokensIn;
   const quote = await client.quoteBuy({
     marketAddress: market.id as `0x${string}`,

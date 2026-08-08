@@ -7,6 +7,29 @@
  */
 import { fetchWithTimeout } from "./fetchWithTimeout.js";
 
+/**
+ * Resolves the trading wallet's address, trying the explicit env override
+ * first, then falling back to whatever the SDK client exposes. Shared by
+ * server.ts (dashboard balance display) and index.ts (live sizing/budget
+ * checks against the competition token) so both read the same address.
+ */
+export async function resolveWalletAddress(client: any): Promise<string | null> {
+  if (process.env.WALLET_ADDRESS) return process.env.WALLET_ADDRESS;
+  try {
+    const signer = await client.getSigner?.();
+    if (signer?.address) return signer.address;
+  } catch {
+    /* fall through to legacy guesses */
+  }
+  return (
+    client.walletAddress ??
+    client.address ??
+    client.account?.address ??
+    client.signer?.address ??
+    null
+  );
+}
+
 const RPC_URL = process.env.DELPHI_RPC_URL;
 
 async function rpcCall(method: string, params: unknown[]): Promise<any> {

@@ -685,27 +685,25 @@ async function loadBalance() {
     if (b.competitionTokenAddress && b.competitionToken && !b.competitionToken.error) {
       html += `
         <div class="stat-card" style="margin-bottom:8px;">
-          <span class="k">COMPETITION TOKEN BALANCE</span>
+          <span class="k">TOKEN BALANCE</span>
           <span class="v good">${fmtNum(b.competitionToken.human, 3)}</span>
         </div>`;
     } else if (b.competitionTokenAddress) {
       html += `
         <div class="stat-card" style="margin-bottom:4px;">
-          <span class="k">COMPETITION TOKEN BALANCE</span>
+          <span class="k">TOKEN BALANCE</span>
           <span class="v bad">UNAVAILABLE</span>
         </div>
         <div class="empty" style="padding:2px 0 8px; text-align:left; font-size:9px;">${esc(b.competitionToken?.error || '')}</div>`;
     } else {
       html += `
         <div class="stat-card" style="margin-bottom:8px;">
-          <span class="k">COMPETITION TOKEN BALANCE</span>
+          <span class="k">TOKEN BALANCE</span>
           <span class="v bad">NOT CONFIGURED</span>
         </div>`;
     }
 
-    // Native gas balance — surface the actual reason inline (missing
-    // WALLET_ADDRESS or DELPHI_RPC_URL are the two usual causes) rather
-    // than hiding it behind a hover tooltip.
+    // Native gas balance
     if (b.gas && !b.gas.error) {
       html += `<div class="stat-row"><span class="k">Gas (ETH)</span><span class="v ${b.gas.human < 0.005 ? 'bad' : 'good'}">${fmtNum(b.gas.human, 5)}</span></div>`;
     } else {
@@ -871,14 +869,26 @@ async function loadReceipts() {
       const bought = (r.decision === 'trade' && r.outcomeIdx !== null && r.outcomeIdx !== undefined && r.outcomes?.[r.outcomeIdx] !== undefined)
         ? r.outcomes[r.outcomeIdx]
         : '—';
+      // Backend already computes WHY a market was skipped (skipReason)
+      // and how far the underlying signals disagreed with each other
+      // (disagreement) — a big edge number alone doesn't explain a skip,
+      // since the hard-disagreement rule overrides edge entirely. Show
+      // both instead of leaving them buried in the raw API response.
+      const disagreementText = (r.disagreement !== null && r.disagreement !== undefined)
+        ? `disagreement=${fmtNum(r.disagreement, 2)}`
+        : '';
+      const reasonText = r.decision === 'skip'
+        ? [r.skipReason, disagreementText].filter(Boolean).join(' · ')
+        : disagreementText;
       return `
       <tr>
         <td>${timeAgo(r.ts)}</td>
         <td class="q-cell" title="${esc(r.question)}">${esc(r.question)}</td>
         <td>${esc(r.category || '—')}</td>
         <td>
-          <span class="pill ${r.decision}">${r.decision}</span>
+          <span class="pill ${r.decision}" title="${esc(reasonText)}">${r.decision}</span>
           ${r.syntheticPrice ? '<span class="pill synth">SYNTH</span>' : ''}
+          ${reasonText ? `<div style="color:var(--text-muted); font-size:9px; margin-top:2px; max-width:160px; white-space:normal;">${esc(reasonText)}</div>` : ''}
         </td>
         <td class="q-cell" style="max-width:140px;" title="${esc(bought)}">${esc(bought)}</td>
         <td>${fmtNum(r.edge, 3)}</td>

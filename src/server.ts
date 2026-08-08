@@ -7,7 +7,7 @@ import { CONFIG, getDryRun, setDryRun, getCompetitionTokenAddress, setCompetitio
 import { readReceipts, readPinnedSummary } from "./journal.js";
 import { runBacktest, listBacktestRuns, readBacktestRun } from "./backtest.js";
 import { getAllNodesView, getPoolSummary, runHealthCheck } from "./keyPool.js";
-import { getNativeBalance, getErc20Balance, getErc20Decimals, hasContractCode, getChainId } from "./chainRead.js";
+import { getNativeBalance, getErc20Balance, getErc20Decimals, hasContractCode, getChainId, resolveWalletAddress } from "./chainRead.js";
 import { getOpenPositions } from "./positions.js";
 
 const app = express();
@@ -15,23 +15,6 @@ app.use(express.json());
 app.use(express.static(path.resolve(process.cwd(), "public")));
 
 const client = new DelphiClient();
-
-async function resolveWalletAddress(): Promise<string | null> {
-  if (process.env.WALLET_ADDRESS) return process.env.WALLET_ADDRESS;
-  try {
-    const signer = await (client as any).getSigner?.();
-    if (signer?.address) return signer.address;
-  } catch {
-    /* fall through to legacy guesses */
-  }
-  const fromClient =
-    (client as any).walletAddress ??
-    (client as any).address ??
-    (client as any).account?.address ??
-    (client as any).signer?.address ??
-    null;
-  return fromClient;
-}
 
 // --- status / config health ---------------------------------------------
 
@@ -72,7 +55,7 @@ app.get("/api/balances", async (_req: any, res: any) => {
     result.sdkToken = { error: err instanceof Error ? err.message : String(err) };
   }
 
-  const walletAddress = await resolveWalletAddress();
+  const walletAddress = await resolveWalletAddress(client);
   result.walletAddress = walletAddress;
 
   // Gas (native ETH) — per check-setup.ts, client.getEthBalance() works
