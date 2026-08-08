@@ -172,13 +172,29 @@ async function tradeOnMarket(market: Market, decision: TradeDecision, dryRun: bo
   return { txHash: result.transactionHash, quotedTokensIn: Number(quote.tokensIn), sharesOut: trialShares.toString() };
 }
 
+// Last completed cycle's counters, kept in memory so a "running: true"
+// status write mid-cycle doesn't have to blank out the previous numbers
+// the dashboard is already showing.
+let lastCycleStats = { openMarkets: 0, evaluated: 0, traded: 0, skipped: 0, errors: [] as string[] };
+
 function writeLoopStatus(status: Record<string, unknown>) {
-  fs.writeFileSync(CONFIG.loopStatusPath, JSON.stringify({ ...status, updatedAt: new Date().toISOString() }, null, 2));
+  fs.writeFileSync(
+    CONFIG.loopStatusPath,
+    JSON.stringify({ ...lastCycleStats, ...status, updatedAt: new Date().toISOString() }, null, 2)
+  );
 }
 
 async function runOnce() {
   const dryRun = getDryRun();
+  // Fixed at the top of the cycle so "next run" reflects the loop's actual
+  // cadence (setInterval fires on a fixed period from when this cycle
+  // *started*, not from when it finishes), rather than drifting by however
+  // long this particular cycle takes to run.
+  const cycleStartedAt = Date.now();
+  const nextRunAt = cycleStartedAt + CONFIG.loopIntervalMs;
   console.log(`\n[${new Date().toISOString()}] Loop start (dryRun=${dryRun})`);
+
+  writeLoopStatus({ dryRun, running: true, intervalMs: CONFIG.loopIntervalMs, nextRunAt, startedAt: new Date(cycleStartedAt).toISOString() });
 
   let errors: string[] = [];
 
@@ -202,7 +218,8 @@ async function runOnce() {
     const msg = `listMarkets failed: ${err instanceof Error ? err.message : err}`;
     console.error(" ", msg);
     errors.push(msg);
-    writeLoopStatus({ dryRun, openMarkets: 0, evaluated: 0, traded: 0, skipped: 0, errors });
+    lastCycleStats = { openMarkets: 0, evaluated: 0, traded: 0, skipped: 0, errors };
+    writeLoopStatus({ dryRun, running: false, intervalMs: CONFIG.loopIntervalMs, nextRunAt });
     return;
   }
 
@@ -237,13 +254,21 @@ async function runOnce() {
   }
 
   await recomputeSummary();
-  writeLoopStatus({ dryRun, openMarkets: markets.length, evaluated: markets.length, traded, skipped, errors });
+  lastCycleStats = { openMarkets: markets.length, evaluated: markets.length, traded, skipped, errors };
+  writeLoopStatus({ dryRun, running: false, intervalMs: CONFIG.loopIntervalMs, nextRunAt });
 }
 
 async function main() {
   console.log("Starting Lazy Falcon");
   console.log(`Loop interval: ${CONFIG.loopIntervalMs / 1000}s`);
   console.log(`Dry run: ${getDryRun()} (toggle via dashboard or data/runtime-config.json)\n`);
+
+  writeLoopStatus({
+    dryRun: getDryRun(),
+    running: false,
+    intervalMs: CONFIG.loopIntervalMs,
+    nextRunAt: Date.now(), // first cycle kicks off immediately below
+  });
 
   await runOnce().catch((err) => console.error("Loop error:", err));
   setInterval(() => {

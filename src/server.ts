@@ -3,16 +3,35 @@ import express from "express";
 import fs from "node:fs";
 import path from "node:path";
 import { DelphiClient } from "@gensyn-ai/gensyn-delphi-sdk";
-import { CONFIG, getDryRun, setDryRun } from "./config.js";
+import { CONFIG, getDryRun, setDryRun, getCompetitionTokenAddress, setCompetitionTokenAddress } from "./config.js";
 import { readReceipts, readPinnedSummary } from "./journal.js";
 import { runBacktest, listBacktestRuns, readBacktestRun } from "./backtest.js";
 import { getAllNodesView, getPoolSummary, runHealthCheck } from "./keyPool.js";
+import { getNativeBalance, getErc20Balance, getErc20Decimals } from "./chainRead.js";
 
 const app = express();
 app.use(express.json());
 app.use(express.static(path.resolve(process.cwd(), "public")));
 
 const client = new DelphiClient();
+
+/**
+ * NOTE ON SDK FIELD NAME: the exact property the SDK exposes the trading
+ * wallet's address under wasn't included in what you shared, so this
+ * tries a few common shapes and falls back to an explicit WALLET_ADDRESS
+ * env var. Same caveat as redeem.ts's TODO on the SDK's redeem method —
+ * check @gensyn-ai/gensyn-delphi-sdk's actual exports and, if none of
+ * these match, just set WALLET_ADDRESS in .env.
+ */
+function resolveWalletAddress(): string | null {
+  const fromClient =
+    (client as any).walletAddress ??
+    (client as any).address ??
+    (client as any).account?.address ??
+    (client as any).signer?.address ??
+    null;
+  return process.env.WALLET_ADDRESS || fromClient || null;
+}
 
 // --- status / config health ---------------------------------------------
 
@@ -41,13 +60,69 @@ app.post("/api/dryrun", (req, res) => {
   res.json(setDryRun(dryRun));
 });
 
-app.get("/api/balances", async (_req, res) => {
+app.get("/api/balances", async (_req: any, res: any) => {
+  const result: Record<string, unknown> = {};
+
+  // SDK's own token (the test/competition token it's currently wired to).
+  // Kept as-is so nothing breaks before the real CA is known.
   try {
     const { balance, decimals } = await client.getErc20BalanceWithDecimals();
-    res.json({ balance: balance.toString(), decimals, human: Number(balance) / 10 ** decimals });
+    result.sdkToken = { balance: balance.toString(), decimals, human: Number(balance) / 10 ** decimals };
   } catch (err) {
-    res.status(500).json({ error: err instanceof Error ? err.message : String(err) });
+    result.sdkToken = { error: err instanceof Error ? err.message : String(err) };
   }
+
+  const walletAddress = resolveWalletAddress();
+  result.walletAddress = walletAddress;
+
+  if (!walletAddress) {
+    result.gas = { error: "wallet address unresolved — set WALLET_ADDRESS in .env" };
+  } else if (!process.env.DELPHI_RPC_URL) {
+    result.gas = { error: "DELPHI_RPC_URL not configured" };
+  } else {
+    try {
+      const gas = await getNativeBalance(walletAddress);
+      result.gas = { wei: gas.wei.toString(), human: gas.human };
+    } catch (err) {
+      result.gas = { error: err instanceof Error ? err.message : String(err) };
+    }
+
+    const tokenAddress = getCompetitionTokenAddress();
+    result.competitionTokenAddress = tokenAddress;
+    if (tokenAddress) {
+      try {
+        const [raw, decimals] = await Promise.all([
+          getErc20Balance(tokenAddress, walletAddress),
+          getErc20Decimals(tokenAddress),
+        ]);
+        result.competitionToken = { balance: raw.toString(), decimals, human: Number(raw) / 10 ** decimals };
+      } catch (err) {
+        result.competitionToken = { error: err instanceof Error ? err.message : String(err) };
+      }
+    }
+  }
+
+  res.json(result);
+});
+
+// Competition token contract address isn't known yet — this lets you set
+// it from the dashboard the moment it's announced, no redeploy needed.
+// GET returns the currently configured address (or null if unset).
+app.get("/api/token-address", (_req: any, res: any) => {
+  res.json({ address: getCompetitionTokenAddress() });
+});
+
+// POST { address: "0x..." } to set it, or { address: null } to clear back
+// to "unknown" (e.g. if the CA changes mid-competition).
+app.post("/api/token-address", (req: any, res: any) => {
+  const { address } = req.body ?? {};
+  const isValidAddress = typeof address === "string" && /^0x[a-fA-F0-9]{40}$/.test(address);
+  if (address !== null && !isValidAddress) {
+    return res
+      .status(400)
+      .json({ error: "body must be { address: '0x' + 40 hex chars } or { address: null } to clear" });
+  }
+  res.json(setCompetitionTokenAddress(address));
 });
 
 // --- key pool / nodes -------------------------------------------------------
