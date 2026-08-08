@@ -15,14 +15,6 @@ app.use(express.static(path.resolve(process.cwd(), "public")));
 
 const client = new DelphiClient();
 
-/**
- * Wallet address resolution. check-setup.ts shows the SDK exposes
- * client.getSigner() -> { address, ... } directly — prefer that. The old
- * guesswork against (client as any).walletAddress/.address/etc. is kept
- * only as a last-resort fallback in case getSigner() isn't available on
- * whatever SDK version is installed, plus an explicit WALLET_ADDRESS env
- * override for manual pinning.
- */
 async function resolveWalletAddress(): Promise<string | null> {
   if (process.env.WALLET_ADDRESS) return process.env.WALLET_ADDRESS;
   try {

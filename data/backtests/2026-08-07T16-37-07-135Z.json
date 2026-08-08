@@ -1,0 +1,241 @@
+{
+  "result": {
+    "runAt": "2026-08-07T16:37:07.135Z",
+    "marketsEvaluated": 10,
+    "marketsFetched": 10,
+    "skippedNoWinner": 0,
+    "signaled": 2,
+    "correct": 1,
+    "hitRate": 0.5,
+    "hypotheticalPnl": -0.6080106336777193,
+    "breakdowns": {
+      "byCategory": {
+        "sports": {
+          "n": 1,
+          "correct": 0,
+          "hitRate": 0
+        },
+        "crypto": {
+          "n": 1,
+          "correct": 1,
+          "hitRate": 1
+        }
+      },
+      "byConfidenceBucket": {
+        "high(0.6-0.8)": {
+          "n": 1,
+          "correct": 0,
+          "hitRate": 0
+        },
+        "mid(0.4-0.6)": {
+          "n": 1,
+          "correct": 1,
+          "hitRate": 1
+        }
+      },
+      "bySyntheticPrice": {
+        "synthetic": {
+          "n": 0,
+          "hitRate": 0
+        },
+        "real": {
+          "n": 2,
+          "hitRate": 0.5
+        }
+      }
+    },
+    "logPath": "/Users/a0000/Desktop/delphi-agent/data/backtests/2026-08-07T16-37-07-135Z.json"
+  },
+  "rows": [
+    {
+      "id": "0x2a488b4bde1fb4bc09ffdeda137b60f7a552f060",
+      "question": "Will over 1.5 goals be scored in Utah Royals vs Portland Thorns match on Aug 2, 2026?",
+      "category": "sports",
+      "llmProbs": [
+        0.72,
+        0.28
+      ],
+      "confidence": 0.67,
+      "disagreement": null,
+      "bestIdx": 1,
+      "bestEdge": 0.16079707797788248,
+      "hasValidPrice": true,
+      "signaled": true,
+      "winningOutcomeIdx": 0,
+      "correct": false,
+      "tokensToSpend": 3.6160106336777194,
+      "entryPriceUsed": 0.11920292202211755
+    },
+    {
+      "id": "0xe297ae534cec5e24f248a5c6552b712d0efe39ed",
+      "question": "Will over 3.5 goals be scored in Cienciano vs Universitario match on Aug 2, 2026?",
+      "category": "sports",
+      "llmProbs": [
+        0.27,
+        0.73
+      ],
+      "confidence": 0.57,
+      "disagreement": null,
+      "bestIdx": 1,
+      "bestEdge": 0.02943285752602698,
+      "hasValidPrice": true,
+      "signaled": false,
+      "winningOutcomeIdx": 1,
+      "correct": null,
+      "tokensToSpend": 0,
+      "entryPriceUsed": 0.700567142473973
+    },
+    {
+      "id": "0x4de1fedc4bdd8a37ebbafcf3de46e22da1f803b4",
+      "question": "Will ETH be >$1,900 at 7:15pm PDT Wed Aug 5, 2026?",
+      "category": "crypto",
+      "llmProbs": [
+        0.58,
+        0.42
+      ],
+      "confidence": 0.46,
+      "disagreement": null,
+      "bestIdx": 1,
+      "bestEdge": 0.008690965129339312,
+      "hasValidPrice": true,
+      "signaled": false,
+      "winningOutcomeIdx": 0,
+      "correct": null,
+      "tokensToSpend": 0,
+      "entryPriceUsed": 0.4113090348706607
+    },
+    {
+      "id": "0x0856296e15954a3eb7ba7e26a5fbea0ae5568c0d",
+      "question": "Will ETH be >$1,900 at 6:45pm PDT Wed Aug 5, 2026?",
+      "category": "crypto",
+      "llmProbs": [
+        0.58,
+        0.42
+      ],
+      "confidence": 0.46,
+      "disagreement": null,
+      "bestIdx": 1,
+      "bestEdge": 0.011562199783962057,
+      "hasValidPrice": true,
+      "signaled": false,
+      "winningOutcomeIdx": 0,
+      "correct": null,
+      "tokensToSpend": 0,
+      "entryPriceUsed": 0.4084378002160379
+    },
+    {
+      "id": "0x242fdbf56005c370250d3d2ef1147eb43ffda020",
+      "question": "Will ETH be >$1,900 at 7:00pm PDT Wed Aug 5, 2026?",
+      "category": "crypto",
+      "llmProbs": [
+        0.58,
+        0.42
+      ],
+      "confidence": 0.52,
+      "disagreement": null,
+      "bestIdx": 0,
+      "bestEdge": 0.011960559421165473,
+      "hasValidPrice": true,
+      "signaled": false,
+      "winningOutcomeIdx": 0,
+      "correct": null,
+      "tokensToSpend": 0,
+      "entryPriceUsed": 0.5680394405788345
+    },
+    {
+      "id": "0x80cf5022d6bb845c96eee8be9aa74da0382cff66",
+      "question": "Will ETH be >$1,900 at 6:30pm PDT Wed Aug 5, 2026?",
+      "category": "crypto",
+      "llmProbs": [
+        0.58,
+        0.42
+      ],
+      "confidence": 0.46,
+      "disagreement": null,
+      "bestIdx": 1,
+      "bestEdge": 0.0037823106006337204,
+      "hasValidPrice": true,
+      "signaled": false,
+      "winningOutcomeIdx": 0,
+      "correct": null,
+      "tokensToSpend": 0,
+      "entryPriceUsed": 0.41621768939936626
+    },
+    {
+      "id": "0xe5aee3e4ec0d3923f62d49e66294e5751b3866b3",
+      "question": "Will ETH be >$1,900 at 6:15pm PDT Wed Aug 5, 2026?",
+      "category": "crypto",
+      "llmProbs": [
+        0.58,
+        0.42
+      ],
+      "confidence": 0.56,
+      "disagreement": null,
+      "bestIdx": 0,
+      "bestEdge": 0.10828491820751396,
+      "hasValidPrice": true,
+      "signaled": false,
+      "winningOutcomeIdx": 0,
+      "correct": null,
+      "tokensToSpend": 0,
+      "entryPriceUsed": 0.471715081792486
+    },
+    {
+      "id": "0xf3aaa9568f4018caec7d2c43c7ec66172f4c6126",
+      "question": "Will ETH be >$1,900 at 6:00pm PDT Wed Aug 5, 2026?",
+      "category": "crypto",
+      "llmProbs": [
+        0.62,
+        0.38
+      ],
+      "confidence": 0.56,
+      "disagreement": null,
+      "bestIdx": 0,
+      "bestEdge": 0.036217689399366315,
+      "hasValidPrice": true,
+      "signaled": false,
+      "winningOutcomeIdx": 0,
+      "correct": null,
+      "tokensToSpend": 0,
+      "entryPriceUsed": 0.5837823106006337
+    },
+    {
+      "id": "0xa3339fb5925243b6f145daf027ed70243acea06b",
+      "question": "Will ETH be >$1,900 at 5:45pm PDT Wed Aug 5, 2026?",
+      "category": "crypto",
+      "llmProbs": [
+        0.58,
+        0.42
+      ],
+      "confidence": 0.56,
+      "disagreement": null,
+      "bestIdx": 1,
+      "bestEdge": 0.030899070603956247,
+      "hasValidPrice": true,
+      "signaled": false,
+      "winningOutcomeIdx": 0,
+      "correct": null,
+      "tokensToSpend": 0,
+      "entryPriceUsed": 0.38910092939604374
+    },
+    {
+      "id": "0x04a132e9817a6ee1a65047ba8e4c714e7b15d9aa",
+      "question": "Will ETH be >$1,900 at 5:30pm PDT Wed Aug 5, 2026?",
+      "category": "crypto",
+      "llmProbs": [
+        0.62,
+        0.38
+      ],
+      "confidence": 0.56,
+      "disagreement": null,
+      "bestIdx": 0,
+      "bestEdge": 0.12,
+      "hasValidPrice": true,
+      "signaled": true,
+      "winningOutcomeIdx": 0,
+      "correct": true,
+      "tokensToSpend": 3.008,
+      "entryPriceUsed": 0.5
+    }
+  ]
+}

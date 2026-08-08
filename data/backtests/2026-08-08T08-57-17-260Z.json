@@ -1,0 +1,768 @@
+{
+  "result": {
+    "runAt": "2026-08-08T08:57:17.260Z",
+    "marketsEvaluated": 38,
+    "marketsFetched": 38,
+    "skippedNoWinner": 0,
+    "signaled": 3,
+    "correct": 0,
+    "hitRate": 0,
+    "hypotheticalPnl": -9.52860459772205,
+    "breakdowns": {
+      "byCategory": {
+        "sports": {
+          "n": 2,
+          "correct": 0,
+          "hitRate": 0
+        },
+        "politics": {
+          "n": 1,
+          "correct": 0,
+          "hitRate": 0
+        }
+      },
+      "byConfidenceBucket": {
+        "low(<0.4)": {
+          "n": 3,
+          "correct": 0,
+          "hitRate": 0
+        }
+      },
+      "bySyntheticPrice": {
+        "synthetic": {
+          "n": 0,
+          "hitRate": 0
+        },
+        "real": {
+          "n": 3,
+          "hitRate": 0
+        }
+      }
+    },
+    "logPath": "/Users/a0000/Desktop/delphi-agent/data/backtests/2026-08-08T08-57-17-260Z.json"
+  },
+  "rows": [
+    {
+      "id": "0x2a488b4bde1fb4bc09ffdeda137b60f7a552f060",
+      "question": "Will over 1.5 goals be scored in Utah Royals vs Portland Thorns match on Aug 2, 2026?",
+      "category": "sports",
+      "llmProbs": [
+        0.5,
+        0.5
+      ],
+      "confidence": 0.25,
+      "disagreement": null,
+      "bestIdx": 1,
+      "bestEdge": 0.3807970779778824,
+      "hasValidPrice": true,
+      "signaled": true,
+      "winningOutcomeIdx": 0,
+      "correct": false,
+      "tokensToSpend": 3.4279890424170594,
+      "entryPriceUsed": 0.11920292202211755
+    },
+    {
+      "id": "0xe297ae534cec5e24f248a5c6552b712d0efe39ed",
+      "question": "Will over 3.5 goals be scored in Cienciano vs Universitario match on Aug 2, 2026?",
+      "category": "sports",
+      "llmProbs": [
+        0.5,
+        0.5
+      ],
+      "confidence": 0.3,
+      "disagreement": null,
+      "bestIdx": 0,
+      "bestEdge": 0.20056714247397295,
+      "hasValidPrice": true,
+      "signaled": true,
+      "winningOutcomeIdx": 1,
+      "correct": false,
+      "tokensToSpend": 2.9025521411328783,
+      "entryPriceUsed": 0.29943285752602705
+    },
+    {
+      "id": "0x4de1fedc4bdd8a37ebbafcf3de46e22da1f803b4",
+      "question": "Will ETH be >$1,900 at 7:15pm PDT Wed Aug 5, 2026?",
+      "category": "crypto",
+      "llmProbs": [
+        0.5,
+        0.5
+      ],
+      "confidence": 0.3,
+      "disagreement": null,
+      "bestIdx": 1,
+      "bestEdge": 0.08869096512933933,
+      "hasValidPrice": true,
+      "signaled": false,
+      "winningOutcomeIdx": 0,
+      "correct": null,
+      "tokensToSpend": 0,
+      "entryPriceUsed": 0.4113090348706607
+    },
+    {
+      "id": "0x242fdbf56005c370250d3d2ef1147eb43ffda020",
+      "question": "Will ETH be >$1,900 at 7:00pm PDT Wed Aug 5, 2026?",
+      "category": "crypto",
+      "llmProbs": [
+        0.5,
+        0.5
+      ],
+      "confidence": 0.3,
+      "disagreement": null,
+      "bestIdx": 1,
+      "bestEdge": 0.06803944057883443,
+      "hasValidPrice": true,
+      "signaled": false,
+      "winningOutcomeIdx": 0,
+      "correct": null,
+      "tokensToSpend": 0,
+      "entryPriceUsed": 0.43196055942116557
+    },
+    {
+      "id": "0x0856296e15954a3eb7ba7e26a5fbea0ae5568c0d",
+      "question": "Will ETH be >$1,900 at 6:45pm PDT Wed Aug 5, 2026?",
+      "category": "crypto",
+      "llmProbs": [
+        0.5,
+        0.5
+      ],
+      "confidence": 0.3,
+      "disagreement": null,
+      "bestIdx": 1,
+      "bestEdge": 0.09156219978396207,
+      "hasValidPrice": true,
+      "signaled": false,
+      "winningOutcomeIdx": 0,
+      "correct": null,
+      "tokensToSpend": 0,
+      "entryPriceUsed": 0.4084378002160379
+    },
+    {
+      "id": "0x80cf5022d6bb845c96eee8be9aa74da0382cff66",
+      "question": "Will ETH be >$1,900 at 6:30pm PDT Wed Aug 5, 2026?",
+      "category": "crypto",
+      "llmProbs": [
+        0.5,
+        0.5
+      ],
+      "confidence": 0.3,
+      "disagreement": null,
+      "bestIdx": 1,
+      "bestEdge": 0.08378231060063374,
+      "hasValidPrice": true,
+      "signaled": false,
+      "winningOutcomeIdx": 0,
+      "correct": null,
+      "tokensToSpend": 0,
+      "entryPriceUsed": 0.41621768939936626
+    },
+    {
+      "id": "0xe5aee3e4ec0d3923f62d49e66294e5751b3866b3",
+      "question": "Will ETH be >$1,900 at 6:15pm PDT Wed Aug 5, 2026?",
+      "category": "crypto",
+      "llmProbs": [
+        0.5,
+        0.5
+      ],
+      "confidence": 0.3,
+      "disagreement": null,
+      "bestIdx": 0,
+      "bestEdge": 0.028284918207513998,
+      "hasValidPrice": true,
+      "signaled": false,
+      "winningOutcomeIdx": 0,
+      "correct": null,
+      "tokensToSpend": 0,
+      "entryPriceUsed": 0.471715081792486
+    },
+    {
+      "id": "0xf3aaa9568f4018caec7d2c43c7ec66172f4c6126",
+      "question": "Will ETH be >$1,900 at 6:00pm PDT Wed Aug 5, 2026?",
+      "category": "crypto",
+      "llmProbs": [
+        0.5,
+        0.5
+      ],
+      "confidence": 0.3,
+      "disagreement": null,
+      "bestIdx": 1,
+      "bestEdge": 0.08378231060063374,
+      "hasValidPrice": true,
+      "signaled": false,
+      "winningOutcomeIdx": 0,
+      "correct": null,
+      "tokensToSpend": 0,
+      "entryPriceUsed": 0.41621768939936626
+    },
+    {
+      "id": "0xa3339fb5925243b6f145daf027ed70243acea06b",
+      "question": "Will ETH be >$1,900 at 5:45pm PDT Wed Aug 5, 2026?",
+      "category": "crypto",
+      "llmProbs": [
+        0.5,
+        0.5
+      ],
+      "confidence": 0.3,
+      "disagreement": null,
+      "bestIdx": 1,
+      "bestEdge": 0.11089907060395626,
+      "hasValidPrice": true,
+      "signaled": false,
+      "winningOutcomeIdx": 0,
+      "correct": null,
+      "tokensToSpend": 0,
+      "entryPriceUsed": 0.38910092939604374
+    },
+    {
+      "id": "0x04a132e9817a6ee1a65047ba8e4c714e7b15d9aa",
+      "question": "Will ETH be >$1,900 at 5:30pm PDT Wed Aug 5, 2026?",
+      "category": "crypto",
+      "llmProbs": [
+        0.5,
+        0.5
+      ],
+      "confidence": 0.3,
+      "disagreement": null,
+      "bestIdx": -1,
+      "bestEdge": 0,
+      "hasValidPrice": true,
+      "signaled": false,
+      "winningOutcomeIdx": 0,
+      "correct": null,
+      "tokensToSpend": 0,
+      "entryPriceUsed": 0.5
+    },
+    {
+      "id": "0xef93b1c179767ce28553ed8fc888fd84e689125b",
+      "question": "Will ETH be >$1,900 at 5:15pm PDT Wed Aug 5, 2026?",
+      "category": "crypto",
+      "llmProbs": [
+        0.5,
+        0.5
+      ],
+      "confidence": 0.3,
+      "disagreement": null,
+      "bestIdx": -1,
+      "bestEdge": 0,
+      "hasValidPrice": true,
+      "signaled": false,
+      "winningOutcomeIdx": 0,
+      "correct": null,
+      "tokensToSpend": 0,
+      "entryPriceUsed": 0.5
+    },
+    {
+      "id": "0x319a441564728df237cdb6f7f247b2af3a55d754",
+      "question": "Was the high temperature at Los Angeles International Airport (KLAX) above 82°F on Aug 5, 2026 (Pacific time)?",
+      "category": "miscellaneous",
+      "llmProbs": [
+        0.5,
+        0.5
+      ],
+      "confidence": 0.3,
+      "disagreement": null,
+      "bestIdx": -1,
+      "bestEdge": 0,
+      "hasValidPrice": true,
+      "signaled": false,
+      "winningOutcomeIdx": 1,
+      "correct": null,
+      "tokensToSpend": 0,
+      "entryPriceUsed": 0.5
+    },
+    {
+      "id": "0xd154debacb314c26934bf03db103a9b0921c1394",
+      "question": "Leagues Cup Aug 5, 2026 (local kickoff): did both Inter Miami and Atlético San Luis score in regulation?",
+      "category": "sports",
+      "llmProbs": [
+        0.5,
+        0.5
+      ],
+      "confidence": 0.3,
+      "disagreement": null,
+      "bestIdx": -1,
+      "bestEdge": 0,
+      "hasValidPrice": true,
+      "signaled": false,
+      "winningOutcomeIdx": 0,
+      "correct": null,
+      "tokensToSpend": 0,
+      "entryPriceUsed": 0.5
+    },
+    {
+      "id": "0x3bb8c401ef1810366d5153d1d3b1f11dd2ce7232",
+      "question": "Will Jeanine Pirro's departure as U.S. Attorney for D.C. be announced by 11:59 PM ET on Aug 6, 2026?",
+      "category": "politics",
+      "llmProbs": [
+        0.5,
+        0.5
+      ],
+      "confidence": 0.3,
+      "disagreement": null,
+      "bestIdx": -1,
+      "bestEdge": 0,
+      "hasValidPrice": true,
+      "signaled": false,
+      "winningOutcomeIdx": 1,
+      "correct": null,
+      "tokensToSpend": 0,
+      "entryPriceUsed": 0.5
+    },
+    {
+      "id": "0x022c599e03a84cd422ba2e25e2ea683f939c0596",
+      "question": "Will Google release a model called Gemini 3.5 Pro (or higher) by 11:59 PM ET on August 6, 2026?",
+      "category": "tech",
+      "llmProbs": [
+        0.5,
+        0.5
+      ],
+      "confidence": 0.3,
+      "disagreement": null,
+      "bestIdx": -1,
+      "bestEdge": 0,
+      "hasValidPrice": true,
+      "signaled": false,
+      "winningOutcomeIdx": 1,
+      "correct": null,
+      "tokensToSpend": 0,
+      "entryPriceUsed": 0.5
+    },
+    {
+      "id": "0x2fd41430f41268a43930457504c8e21aa49f0f0e",
+      "question": "Will SpaceX launch the Dragon CRS-35 cargo mission by 11:59 PM ET on August 6, 2026?",
+      "category": "tech",
+      "llmProbs": [
+        0.5,
+        0.5
+      ],
+      "confidence": 0.3,
+      "disagreement": null,
+      "bestIdx": -1,
+      "bestEdge": 0,
+      "hasValidPrice": true,
+      "signaled": false,
+      "winningOutcomeIdx": 1,
+      "correct": null,
+      "tokensToSpend": 0,
+      "entryPriceUsed": 0.5
+    },
+    {
+      "id": "0x4de9db1b4c717cadc14b1001ea70f7f0bb9cf3c7",
+      "question": "Will U.S. initial jobless claims for the week ending August 1, 2026 come in at 210,000 or more?",
+      "category": "economics",
+      "llmProbs": [
+        0.5,
+        0.5
+      ],
+      "confidence": 0.3,
+      "disagreement": null,
+      "bestIdx": -1,
+      "bestEdge": 0,
+      "hasValidPrice": true,
+      "signaled": false,
+      "winningOutcomeIdx": 1,
+      "correct": null,
+      "tokensToSpend": 0,
+      "entryPriceUsed": 0.5
+    },
+    {
+      "id": "0x6b637ef551ba7f8c4accc45581b471615afe1074",
+      "question": "Will Banxico leave its policy interest rate unchanged at its Aug 6, 2026 Governing Board decision?",
+      "category": "economics",
+      "llmProbs": [
+        0.5,
+        0.5
+      ],
+      "confidence": 0.3,
+      "disagreement": null,
+      "bestIdx": -1,
+      "bestEdge": 0,
+      "hasValidPrice": true,
+      "signaled": false,
+      "winningOutcomeIdx": 0,
+      "correct": null,
+      "tokensToSpend": 0,
+      "entryPriceUsed": 0.5
+    },
+    {
+      "id": "0x5c53f3141eb4746d6de7b39d17ce0a3e1001ed28",
+      "question": "Will BTC spot be above $64,600 when this market closes?",
+      "category": "crypto",
+      "llmProbs": [
+        0.5,
+        0.5
+      ],
+      "confidence": 0.3,
+      "disagreement": null,
+      "bestIdx": -1,
+      "bestEdge": 0,
+      "hasValidPrice": true,
+      "signaled": false,
+      "winningOutcomeIdx": 1,
+      "correct": null,
+      "tokensToSpend": 0,
+      "entryPriceUsed": 0.5
+    },
+    {
+      "id": "0x0d5955ae85f922b8fe628a01e8052c8afbfafa4b",
+      "question": "Will BTC spot be above $64,600 when this market closes?",
+      "category": "crypto",
+      "llmProbs": [
+        0.5,
+        0.5
+      ],
+      "confidence": 0.3,
+      "disagreement": null,
+      "bestIdx": -1,
+      "bestEdge": 0,
+      "hasValidPrice": true,
+      "signaled": false,
+      "winningOutcomeIdx": 1,
+      "correct": null,
+      "tokensToSpend": 0,
+      "entryPriceUsed": 0.5
+    },
+    {
+      "id": "0x93de8b552455bbdfa331d3652a5378e01bec6d77",
+      "question": "Will BTC spot be above $64,600 when this market closes?",
+      "category": "crypto",
+      "llmProbs": [
+        0.5,
+        0.5
+      ],
+      "confidence": 0.3,
+      "disagreement": null,
+      "bestIdx": -1,
+      "bestEdge": 0,
+      "hasValidPrice": true,
+      "signaled": false,
+      "winningOutcomeIdx": 0,
+      "correct": null,
+      "tokensToSpend": 0,
+      "entryPriceUsed": 0.5
+    },
+    {
+      "id": "0x514392ab73a1c6222bc165f4b8b72b5be7e016ed",
+      "question": "Will BTC spot be above $64,600 when this market closes?",
+      "category": "crypto",
+      "llmProbs": [
+        0.5,
+        0.5
+      ],
+      "confidence": 0.3,
+      "disagreement": null,
+      "bestIdx": -1,
+      "bestEdge": 0,
+      "hasValidPrice": true,
+      "signaled": false,
+      "winningOutcomeIdx": 0,
+      "correct": null,
+      "tokensToSpend": 0,
+      "entryPriceUsed": 0.5
+    },
+    {
+      "id": "0xbaf1ac408d994d9f8dfddc31695a706d7bbe7d8c",
+      "question": "Will BTC spot be above $64,600 when this market closes?",
+      "category": "miscellaneous",
+      "llmProbs": [
+        0.5,
+        0.5
+      ],
+      "confidence": 0.3,
+      "disagreement": null,
+      "bestIdx": -1,
+      "bestEdge": 0,
+      "hasValidPrice": true,
+      "signaled": false,
+      "winningOutcomeIdx": 0,
+      "correct": null,
+      "tokensToSpend": 0,
+      "entryPriceUsed": 0.5
+    },
+    {
+      "id": "0xcd8ccf5fb2553d19116d383dce5f57403aff467d",
+      "question": "Will Coinbase BTC-USD spot be above $64,650 at 22:45 UTC on August 5, 2026?",
+      "category": "crypto",
+      "llmProbs": [
+        0.5,
+        0.5
+      ],
+      "confidence": 0.3,
+      "disagreement": null,
+      "bestIdx": -1,
+      "bestEdge": 0,
+      "hasValidPrice": true,
+      "signaled": false,
+      "winningOutcomeIdx": 1,
+      "correct": null,
+      "tokensToSpend": 0,
+      "entryPriceUsed": 0.5
+    },
+    {
+      "id": "0x6f8d71306277ff605f2355cc02624e5e19386986",
+      "question": "Will Coinbase BTC-USD spot be above $64,900 at 22:29 UTC on August 5, 2026?",
+      "category": "crypto",
+      "llmProbs": [
+        0.5,
+        0.5
+      ],
+      "confidence": 0.3,
+      "disagreement": null,
+      "bestIdx": -1,
+      "bestEdge": 0,
+      "hasValidPrice": true,
+      "signaled": false,
+      "winningOutcomeIdx": 1,
+      "correct": null,
+      "tokensToSpend": 0,
+      "entryPriceUsed": 0.5
+    },
+    {
+      "id": "0x046090e38c9b0efefde8cdcd91c9d44e80ad6a6d",
+      "question": "Will Coinbase BTC-USD spot be above $64,800 at 21:15 UTC on August 5, 2026?",
+      "category": "crypto",
+      "llmProbs": [
+        0.5,
+        0.5
+      ],
+      "confidence": 0.3,
+      "disagreement": null,
+      "bestIdx": -1,
+      "bestEdge": 0,
+      "hasValidPrice": true,
+      "signaled": false,
+      "winningOutcomeIdx": 1,
+      "correct": null,
+      "tokensToSpend": 0,
+      "entryPriceUsed": 0.5
+    },
+    {
+      "id": "0x5113f6f537c2231693e0de0a25faf54ac2e3aeba",
+      "question": "Will Team Falcons win Game 2 of the 1win Essence Dota 2 grand final vs Team Liquid on 5 Aug 2026?",
+      "category": "sports",
+      "llmProbs": [
+        0.5,
+        0.5
+      ],
+      "confidence": 0.3,
+      "disagreement": null,
+      "bestIdx": -1,
+      "bestEdge": 0,
+      "hasValidPrice": true,
+      "signaled": false,
+      "winningOutcomeIdx": 1,
+      "correct": null,
+      "tokensToSpend": 0,
+      "entryPriceUsed": 0.5
+    },
+    {
+      "id": "0x8a13ada2419b96a3cee2f35556733085d7f2be81",
+      "question": "Will BTC spot price be above $64,500 USD when this market closes?",
+      "category": "crypto",
+      "llmProbs": [
+        0.5,
+        0.5
+      ],
+      "confidence": 0.3,
+      "disagreement": null,
+      "bestIdx": -1,
+      "bestEdge": 0,
+      "hasValidPrice": true,
+      "signaled": false,
+      "winningOutcomeIdx": 1,
+      "correct": null,
+      "tokensToSpend": 0,
+      "entryPriceUsed": 0.5
+    },
+    {
+      "id": "0x1115090b43191c7f6ae7c3ff4371cb8d1373ccff",
+      "question": "Will Tesla (TSLA) close above $390 at the end of July 2026?",
+      "category": "finance",
+      "llmProbs": [
+        0.5,
+        0.5
+      ],
+      "confidence": 0.3,
+      "disagreement": null,
+      "bestIdx": -1,
+      "bestEdge": 0,
+      "hasValidPrice": true,
+      "signaled": false,
+      "winningOutcomeIdx": 1,
+      "correct": null,
+      "tokensToSpend": 0,
+      "entryPriceUsed": 0.5
+    },
+    {
+      "id": "0xfc3b67240ba6e13ed096945b54f8247bdd9f422a",
+      "question": "Will Donald Trump post 180-199 Truth Social posts July 24-31, 2026?",
+      "category": "politics",
+      "llmProbs": [
+        0.5,
+        0.5
+      ],
+      "confidence": 0.3,
+      "disagreement": null,
+      "bestIdx": -1,
+      "bestEdge": 0,
+      "hasValidPrice": true,
+      "signaled": false,
+      "winningOutcomeIdx": 1,
+      "correct": null,
+      "tokensToSpend": 0,
+      "entryPriceUsed": 0.5
+    },
+    {
+      "id": "0xda3f0fec66ea2e98cf9c41431c6f853038ef148d",
+      "question": "Who will win, BC.Game Esports or Trainwrecks eSports, in the Elisa BreakOut Series?",
+      "category": "sports",
+      "llmProbs": [
+        0.5,
+        0.5
+      ],
+      "confidence": 0.3,
+      "disagreement": null,
+      "bestIdx": -1,
+      "bestEdge": 0,
+      "hasValidPrice": true,
+      "signaled": false,
+      "winningOutcomeIdx": 0,
+      "correct": null,
+      "tokensToSpend": 0,
+      "entryPriceUsed": 0.5
+    },
+    {
+      "id": "0x1a316f135bab3ec017fa9712aed3aa3ad51e5375",
+      "question": "Who will win the Rakuten Monkeys vs. Fubon Guardians game on July 25?",
+      "category": "sports",
+      "llmProbs": [
+        0.5,
+        0.5
+      ],
+      "confidence": 0.3,
+      "disagreement": null,
+      "bestIdx": -1,
+      "bestEdge": 0,
+      "hasValidPrice": true,
+      "signaled": false,
+      "winningOutcomeIdx": 0,
+      "correct": null,
+      "tokensToSpend": 0,
+      "entryPriceUsed": 0.5
+    },
+    {
+      "id": "0x866d980c122e2c7a7f555451655556d554a53056",
+      "question": "Will Glean's valuation hit $5.5B by July 31, 2026?",
+      "category": "finance",
+      "llmProbs": [
+        0.5,
+        0.5
+      ],
+      "confidence": 0.3,
+      "disagreement": null,
+      "bestIdx": -1,
+      "bestEdge": 0,
+      "hasValidPrice": true,
+      "signaled": false,
+      "winningOutcomeIdx": 0,
+      "correct": null,
+      "tokensToSpend": 0,
+      "entryPriceUsed": 0.5
+    },
+    {
+      "id": "0xf8169656f9fbb3bde4e0bfa9ba6661db56d8c77b",
+      "question": "Will the ADP employment change exceed 75000 in July 2026?",
+      "category": "economics",
+      "llmProbs": [
+        0.5,
+        0.5
+      ],
+      "confidence": 0.3,
+      "disagreement": null,
+      "bestIdx": 1,
+      "bestEdge": 0.024979187478939957,
+      "hasValidPrice": true,
+      "signaled": false,
+      "winningOutcomeIdx": 1,
+      "correct": null,
+      "tokensToSpend": 0,
+      "entryPriceUsed": 0.47502081252106004
+    },
+    {
+      "id": "0x18669f3aaf07d8c2bb8b3bfe53d7dc82819dacc8",
+      "question": "Will Joseph Chaplik win the AZ-01 Republican primary by less than 5%?",
+      "category": "politics",
+      "llmProbs": [
+        0.5,
+        0.5
+      ],
+      "confidence": 0.3,
+      "disagreement": null,
+      "bestIdx": 0,
+      "bestEdge": 0.26623631426046923,
+      "hasValidPrice": true,
+      "signaled": true,
+      "winningOutcomeIdx": 1,
+      "correct": false,
+      "tokensToSpend": 3.198063414172111,
+      "entryPriceUsed": 0.2337636857395308
+    },
+    {
+      "id": "0x1de09da44b436abd977b67a3011adae1d11ca1d0",
+      "question": "Will fewer than 25 ships transit the Strait of Hormuz July 27-August 2?",
+      "category": "economics",
+      "llmProbs": [
+        0.5,
+        0.5
+      ],
+      "confidence": 0.3,
+      "disagreement": null,
+      "bestIdx": -1,
+      "bestEdge": 0,
+      "hasValidPrice": true,
+      "signaled": false,
+      "winningOutcomeIdx": 1,
+      "correct": null,
+      "tokensToSpend": 0,
+      "entryPriceUsed": 0.5
+    },
+    {
+      "id": "0x39d7c329d718f375dd5d58389c9253c72dc35167",
+      "question": "Will Palantir Technologies Inc. (PLTR) hit $144 in July 2026?",
+      "category": "finance",
+      "llmProbs": [
+        0.5,
+        0.5
+      ],
+      "confidence": 0.3,
+      "disagreement": null,
+      "bestIdx": -1,
+      "bestEdge": 0,
+      "hasValidPrice": true,
+      "signaled": false,
+      "winningOutcomeIdx": 1,
+      "correct": null,
+      "tokensToSpend": 0,
+      "entryPriceUsed": 0.5
+    },
+    {
+      "id": "0xf6021c1d2430e7a351dba56c8c641b7776d53a09",
+      "question": "Will the United States send warships through the Strait of Hormuz by July 31, 2026?",
+      "category": "politics",
+      "llmProbs": [
+        0.5,
+        0.5
+      ],
+      "confidence": 0.3,
+      "disagreement": null,
+      "bestIdx": -1,
+      "bestEdge": 0,
+      "hasValidPrice": true,
+      "signaled": false,
+      "winningOutcomeIdx": 0,
+      "correct": null,
+      "tokensToSpend": 0,
+      "entryPriceUsed": 0.5
+    }
+  ]
+}

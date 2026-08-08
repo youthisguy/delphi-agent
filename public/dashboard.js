@@ -41,7 +41,6 @@ function statusDot(status) {
           <span class="k">${esc(n.label)} <span style="color:var(--text-muted)">${esc(n.provider)}</span></span>
           <span class="v">
             <span class="dot ${statusDot(n.status)}"></span>${statusLabel(n.status)}
-            ${n.lastError ? `<span style="color:var(--text-muted);font-size:9px;"> ${esc(String(n.lastError).slice(0,40))}</span>` : ""}
           </span>
         </div>`).join("");
       $("#configHealth").innerHTML = html;
@@ -66,7 +65,7 @@ function statusDot(status) {
       });
       const sum = r.summary || {};
       if (out) {
-        out.innerHTML = `OpenAI ${sum.openaiOk}/${sum.openaiTotal} OK · Gemini ${sum.geminiOk}/${sum.geminiTotal} OK`;
+        out.innerHTML = `OpenAI ${sum.openaiOk}/${sum.openaiTotal} OK | Gemini ${sum.geminiOk}/${sum.geminiTotal} OK`;
       }
       // reuse same renderer
       const fake = { nodes: r.nodes, summary: r.summary };
