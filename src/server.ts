@@ -8,6 +8,7 @@ import { readReceipts, readPinnedSummary } from "./journal.js";
 import { runBacktest, listBacktestRuns, readBacktestRun } from "./backtest.js";
 import { getAllNodesView, getPoolSummary, runHealthCheck } from "./keyPool.js";
 import { getNativeBalance, getErc20Balance, getErc20Decimals, hasContractCode, getChainId } from "./chainRead.js";
+import { getOpenPositions } from "./positions.js";
 
 const app = express();
 app.use(express.json());
@@ -179,6 +180,21 @@ app.post("/api/nodes/health-check", async (_req: any, res: any) => {
   try {
     const result = await runHealthCheck();
     res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: err instanceof Error ? err.message : String(err) });
+  }
+});
+
+// --- positions (mark-to-market) --------------------------------------------
+
+// Computed on demand from the journal + a fresh market fetch per open
+// trade — not cached, not part of the trading loop. See positions.ts for
+// why this stays separate from index.ts's cycle.
+app.get("/api/positions", async (_req: any, res: any) => {
+  try {
+    const positions = await getOpenPositions(client);
+    const totalUnrealizedPnl = positions.reduce((sum, p) => sum + (p.unrealizedPnl ?? 0), 0);
+    res.json({ positions, count: positions.length, totalUnrealizedPnl });
   } catch (err) {
     res.status(500).json({ error: err instanceof Error ? err.message : String(err) });
   }

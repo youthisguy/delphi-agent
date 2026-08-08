@@ -17,6 +17,20 @@ import { CONFIG, getDryRun } from "./config.js";
 
 const client = new DelphiClient();
 
+// Last line of defense: runCycle() already catches everything it knows
+// about, but if something outside that (a genuinely unexpected bug)
+// throws or rejects unhandled, log it loudly instead of letting Node kill
+// the whole process. A silently-dead loop process looks identical, from
+// the dashboard's side, to a stuck "running: true" cycle — this makes
+// sure that failure mode is at least visible in the console instead of
+// just... stopping.
+process.on("unhandledRejection", (reason) => {
+  console.error("[fatal-guard] unhandled rejection:", reason);
+});
+process.on("uncaughtException", (err) => {
+  console.error("[fatal-guard] uncaught exception:", err);
+});
+
 interface TradeDecision {
   outcomeIdx: number;
   tokensToSpend: number;
@@ -215,65 +229,76 @@ async function runCycle() {
   writeLoopStatus({ dryRun, running: true, intervalMs: CONFIG.loopIntervalMs, nextRunAt, startedAt: new Date(cycleStartedAt).toISOString() });
 
   let errors: string[] = [];
-
-  // 0. Redeem any settled winning positions from prior loops first, so
-  // collateral is freed up before we size new trades this loop.
-  try {
-    const redemptions = await checkAndRedeemSettledPositions(client, dryRun);
-    if (redemptions.length) console.log(`  Redemption check: ${JSON.stringify(redemptions)}`);
-  } catch (err) {
-    const msg = `redemption check failed: ${err instanceof Error ? err.message : err}`;
-    console.error(" ", msg);
-    errors.push(msg);
-  }
-
-  const openStatus = "open" as any;
   let markets: Market[] = [];
+  let traded = 0;
+  let skipped = 0;
+
   try {
-    const res = await client.listMarkets({ status: openStatus, limit: CONFIG.maxMarketsPerLoop, pricesAndImpliedProbabilities: true });
-    markets = res.markets ?? [];
-  } catch (err) {
-    const msg = `listMarkets failed: ${err instanceof Error ? err.message : err}`;
-    console.error(" ", msg);
-    errors.push(msg);
-    lastCycleStats = { openMarkets: 0, evaluated: 0, traded: 0, skipped: 0, errors };
-    writeLoopStatus({ dryRun, running: false, intervalMs: CONFIG.loopIntervalMs, nextRunAt });
-    return;
-  }
-
-  console.log(`Evaluating ${markets.length} market(s)`);
-  let traded = 0,
-    skipped = 0;
-
-  for (const market of markets) {
+    // 0. Redeem any settled winning positions from prior loops first, so
+    // collateral is freed up before we size new trades this loop.
     try {
-      const { decision, receipt } = await decide(market);
-      if (!decision) {
-        appendReceipt(receipt);
-        skipped++;
-        continue;
-      }
-
-      let execution: Receipt["execution"] = null;
-      try {
-        execution = await tradeOnMarket(market, decision, dryRun);
-        traded++;
-      } catch (err) {
-        const msg = `trade failed for ${market.id}: ${err instanceof Error ? err.message : err}`;
-        console.error(" ", msg);
-        errors.push(msg);
-      }
-      appendReceipt({ ...receipt, execution });
+      const redemptions = await checkAndRedeemSettledPositions(client, dryRun);
+      if (redemptions.length) console.log(`  Redemption check: ${JSON.stringify(redemptions)}`);
     } catch (err) {
-      const msg = `decide() failed for ${market.id}: ${err instanceof Error ? err.message : err}`;
+      const msg = `redemption check failed: ${err instanceof Error ? err.message : err}`;
       console.error(" ", msg);
       errors.push(msg);
     }
-  }
 
-  await recomputeSummary();
-  lastCycleStats = { openMarkets: markets.length, evaluated: markets.length, traded, skipped, errors };
-  writeLoopStatus({ dryRun, running: false, intervalMs: CONFIG.loopIntervalMs, nextRunAt });
+    const openStatus = "open" as any;
+    try {
+      const res = await client.listMarkets({ status: openStatus, limit: CONFIG.maxMarketsPerLoop, pricesAndImpliedProbabilities: true });
+      markets = res.markets ?? [];
+    } catch (err) {
+      const msg = `listMarkets failed: ${err instanceof Error ? err.message : err}`;
+      console.error(" ", msg);
+      errors.push(msg);
+      return; // status still gets written correctly by the finally block below
+    }
+
+    console.log(`Evaluating ${markets.length} market(s)`);
+
+    for (const market of markets) {
+      try {
+        const { decision, receipt } = await decide(market);
+        if (!decision) {
+          appendReceipt(receipt);
+          skipped++;
+          continue;
+        }
+
+        let execution: Receipt["execution"] = null;
+        try {
+          execution = await tradeOnMarket(market, decision, dryRun);
+          traded++;
+        } catch (err) {
+          const msg = `trade failed for ${market.id}: ${err instanceof Error ? err.message : err}`;
+          console.error(" ", msg);
+          errors.push(msg);
+        }
+        appendReceipt({ ...receipt, execution });
+      } catch (err) {
+        const msg = `decide() failed for ${market.id}: ${err instanceof Error ? err.message : err}`;
+        console.error(" ", msg);
+        errors.push(msg);
+      }
+    }
+
+    // Best-effort: recomputeSummary() touches the same journal file the
+    // loop above just wrote to, and any hiccup here (malformed line,
+    // transient fs error, concurrent write from a backtest run) must not
+    // swallow the real evaluation counts we already have in hand.
+    try {
+      await recomputeSummary();
+    } catch (err) {
+      const msg = `recomputeSummary failed: ${err instanceof Error ? err.message : err}`;
+      console.error(" ", msg);
+      errors.push(msg);
+    }
+  } finally {
+    lastCycleStats = { openMarkets: markets.length, evaluated: markets.length, traded, skipped, errors };
+    writeLoopStatus({ dryRun, running: false, intervalMs: CONFIG.loopIntervalMs, nextRunAt });
+  }
 }
 
 async function main() {

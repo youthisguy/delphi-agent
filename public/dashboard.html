@@ -467,6 +467,30 @@
     </div>
   </div>
 
+  <!-- Open Positions (Mark-to-Market) -->
+  <div class="panel">
+    <div class="panel-head">
+      <h2>Open Positions // Mark-to-Market</h2>
+      <span class="panel-sub" id="positionsPnlSummary">0 OPEN</span>
+    </div>
+    <div class="scroll-y">
+      <table>
+        <thead>
+          <tr>
+            <th>MARKET QUESTION</th>
+            <th>SIDE</th>
+            <th>SIZE</th>
+            <th>ENTRY</th>
+            <th>CURRENT</th>
+            <th>UNREALIZED P&amp;L</th>
+            <th>STATUS</th>
+          </tr>
+        </thead>
+        <tbody id="positionsBody"></tbody>
+      </table>
+    </div>
+  </div>
+
   <!-- Real-Time Decision Journal -->
   <div class="panel">
     <div class="panel-head">
@@ -486,6 +510,7 @@
             <th>MARKET QUESTION</th>
             <th>CAT</th>
             <th>SIGNAL</th>
+            <th>BOUGHT</th>
             <th>EDGE</th>
             <th>CONF</th>
             <th>SIZE</th>
@@ -701,6 +726,51 @@ async function loadBalance() {
   }
 }
 
+// ---- Open Positions (Mark-to-Market) ----
+async function loadPositions() {
+  try {
+    const r = await j('/api/positions');
+    const positions = r.positions || [];
+
+    const total = r.totalUnrealizedPnl ?? 0;
+    const totalClass = total > 0 ? 'good' : (total < 0 ? 'bad' : '');
+    const totalSign = total > 0 ? '+' : '';
+    $('#positionsPnlSummary').innerHTML = positions.length
+      ? `${positions.length} OPEN &middot; <span class="${totalClass}">${totalSign}${fmtNum(total, 2)} TOK</span>`
+      : '0 OPEN';
+
+    if (!positions.length) {
+      $('#positionsBody').innerHTML = `<tr><td colspan="7"><div class="empty">no open positions</div></td></tr>`;
+      return;
+    }
+
+    $('#positionsBody').innerHTML = positions.map(p => {
+      const hasPnl = p.unrealizedPnl !== null && p.unrealizedPnl !== undefined;
+      const pnlClass = !hasPnl ? '' : (p.unrealizedPnl > 0 ? 'good' : (p.unrealizedPnl < 0 ? 'bad' : ''));
+      const pnlSign = hasPnl && p.unrealizedPnl > 0 ? '+' : '';
+      const pnlText = hasPnl
+        ? `${pnlSign}${fmtNum(p.unrealizedPnl, 2)} <span style="color:var(--text-muted)">(${pnlSign}${fmtNum((p.unrealizedPnlPct ?? 0) * 100, 1)}%)</span>`
+        : 'N/A';
+      return `
+        <tr>
+          <td class="q-cell" title="${esc(p.question)}">${esc(p.question)}</td>
+          <td>${esc(p.outcomeLabel)}</td>
+          <td>${fmtNum(p.size, 2)}</td>
+          <td>${fmtNum(p.entryPrice, 3)}</td>
+          <td>${p.currentPrice !== null ? fmtNum(p.currentPrice, 3) : 'N/A'}</td>
+          <td class="${pnlClass}">${pnlText}</td>
+          <td>
+            ${p.isDryRun ? '<span class="pill synth">DRY</span>' : '<span class="pill trade">LIVE</span>'}
+            ${p.marketStatus ? `<span style="color:var(--text-muted); font-size:9px;"> ${esc(p.marketStatus)}</span>` : ''}
+          </td>
+        </tr>
+      `;
+    }).join('');
+  } catch (e) {
+    $('#positionsBody').innerHTML = `<tr><td colspan="7"><div class="empty">positions unavailable &mdash; ${esc(e.message)}</div></td></tr>`;
+  }
+}
+
 // ---- Summary ----
 async function loadSummary() {
   try {
@@ -792,10 +862,16 @@ async function loadReceipts() {
     const rows = r.receipts || [];
     $('#receiptCount').textContent = rows.length + ' SIGNALS LOGGED';
     if (!rows.length) {
-      $('#receiptsBody').innerHTML = `<tr><td colspan="8"><div class="empty">no strategy decisions recorded</div></td></tr>`;
+      $('#receiptsBody').innerHTML = `<tr><td colspan="9"><div class="empty">no strategy decisions recorded</div></td></tr>`;
       return;
     }
-    $('#receiptsBody').innerHTML = rows.map(r => `
+    $('#receiptsBody').innerHTML = rows.map(r => {
+      // outcomeIdx + outcomes are both already in the receipt — just
+      // wasn't being rendered. Only meaningful for trade rows.
+      const bought = (r.decision === 'trade' && r.outcomeIdx !== null && r.outcomeIdx !== undefined && r.outcomes?.[r.outcomeIdx] !== undefined)
+        ? r.outcomes[r.outcomeIdx]
+        : '—';
+      return `
       <tr>
         <td>${timeAgo(r.ts)}</td>
         <td class="q-cell" title="${esc(r.question)}">${esc(r.question)}</td>
@@ -804,14 +880,16 @@ async function loadReceipts() {
           <span class="pill ${r.decision}">${r.decision}</span>
           ${r.syntheticPrice ? '<span class="pill synth">SYNTH</span>' : ''}
         </td>
+        <td class="q-cell" style="max-width:140px;" title="${esc(bought)}">${esc(bought)}</td>
         <td>${fmtNum(r.edge, 3)}</td>
         <td>${fmtNum(r.confidence, 2)}</td>
         <td>${r.size ? fmtNum(r.size, 2) : '—'}</td>
         <td>${r.rawPrice ? r.rawPrice.map(p=>fmtNum(p,2)).join('/') : 'SYNTH'}</td>
       </tr>
-    `).join('');
+    `;
+    }).join('');
   } catch (e) {
-    $('#receiptsBody').innerHTML = `<tr><td colspan="8"><div class="empty">signal log unreachable</div></td></tr>`;
+    $('#receiptsBody').innerHTML = `<tr><td colspan="9"><div class="empty">signal log unreachable</div></td></tr>`;
   }
 }
 
@@ -849,6 +927,7 @@ async function loadMarkets() {
 async function refreshAll() {
   loadStatus();
   loadBalance();
+  loadPositions();
   loadSummary();
   loadReceipts();
   loadMarkets();
