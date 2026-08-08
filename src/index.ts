@@ -15,6 +15,7 @@ import { appendReceipt, patchReceiptExecution, recomputeSummary, type Receipt } 
 import { checkAndRedeemSettledPositions } from "./redeem.js";
 import { getOpenPositions } from "./positions.js";
 import { getErc20Balance, getErc20Decimals, hasContractCode, resolveWalletAddress } from "./chainRead.js";
+import { getCachedForecast, setCachedForecast, pruneForecastCache } from "./forecastCache.js";
 import { CONFIG, getDryRun, getCompetitionTokenAddress } from "./config.js";
 
 const client = new DelphiClient();
@@ -139,21 +140,55 @@ async function decide(
     console.log(`  Polymarket lookup failed for ${market.id}:`, err instanceof Error ? err.message : err);
   }
 
-  // 2. Primary OPENAI_MODEL 
-  const { probs: llmProbs, confidence } = await getLlmForecast(question, outcomes);
+  // 2. Primary LLM forecast + 3. Gemini — cached per market for
+  // CONFIG.forecastCacheTtlMs (default 20 min) so a small open-market
+  // pool getting re-evaluated every loop tick doesn't burn a fresh
+  // OpenAI + Gemini call on an unchanged question every single cycle.
+  // Cache is invalidated early if the market's price has moved
+  // meaningfully (see forecastCache.ts) since that's new information the
+  // cached forecast never saw. Polymarket lookup above stays uncached —
+  // it's a live external feed, not a model opinion.
+  const currentMarketProbsForCache = hasValidPrice ? rawProbs : null;
+  const cached = getCachedForecast(market.id, currentMarketProbsForCache);
+
+  let llmProbs: number[];
+  let confidence: number;
+  let geminiSignal: Awaited<ReturnType<typeof getGeminiForecast>> = null;
+
+  if (cached) {
+    llmProbs = cached.llm.probs;
+    confidence = cached.llm.confidence;
+    geminiSignal = cached.gemini;
+    console.log(`  [cache] reusing forecast for ${market.id} (age<${CONFIG.forecastCacheTtlMs / 60000}m, price unchanged)`);
+  } else {
+    const llmResult = await getLlmForecast(question, outcomes);
+    llmProbs = llmResult.probs;
+    confidence = llmResult.confidence;
+
+    // Gemini — blended for every market (was previously gated to only
+    // isTimeSensitive() questions). Grounding (Google Search) stays
+    // limited to time-sensitive questions since that's specifically
+    // where a stale training cutoff hurts — no reason to pay the extra
+    // grounding latency/cost on a static question like "who wins this
+    // golf tournament in 3 months."
+    if (CONFIG.geminiEnabled) {
+      const grounded = isTimeSensitive(question);
+      geminiSignal = await getGeminiForecast(question, outcomes, { grounded });
+    }
+
+    setCachedForecast(market.id, {
+      llm: { probs: llmProbs, confidence, reasoning: llmResult.reasoning },
+      gemini: geminiSignal,
+      marketProbsAtCache: currentMarketProbsForCache,
+    });
+  }
 
   const signals: Signal[] = [{ name: "llm", probs: llmProbs, weight: 1.0 }];
   if (external && external.similarity > 0.65) {
     signals.push({ name: "polymarket", probs: external.probs, weight: Math.min(0.6, external.similarity) });
   }
-
-  // 3. Gemini — only for time-sensitive markets, grounded with search.
-  let geminiSignal: Awaited<ReturnType<typeof getGeminiForecast>> = null;
-  if (CONFIG.geminiEnabled && isTimeSensitive(question)) {
-    geminiSignal = await getGeminiForecast(question, outcomes, { grounded: true });
-    if (geminiSignal) {
-      signals.push({ name: "gemini", probs: geminiSignal.probs, weight: geminiSignal.confidence });
-    }
+  if (geminiSignal) {
+    signals.push({ name: "gemini", probs: geminiSignal.probs, weight: geminiSignal.confidence });
   }
 
   // 4. Blend + disagreement-aware edge bar
@@ -421,6 +456,8 @@ async function runCycle() {
       console.error(" ", msg);
       errors.push(msg);
     }
+
+    pruneForecastCache();
   } finally {
     lastCycleStats = { openMarkets: markets.length, evaluated: markets.length, traded, skipped, errors };
     writeLoopStatus({

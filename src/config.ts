@@ -108,6 +108,19 @@ export const CONFIG = {
   // exercise realistically instead of silently sizing against 0.
   dryRunVirtualBankroll: Number(process.env.DRY_RUN_VIRTUAL_BANKROLL ?? 1000),
 
+  // --- Forecast cache ---
+  // How long an LLM/Gemini forecast for a given market stays valid before
+  // it's re-fetched, even if the loop re-evaluates that market again
+  // (e.g. a small open-market pool getting re-scanned every cycle).
+  // Default 20 min — comfortably longer than the 5 min loopIntervalMs
+  // default, so a market only gets re-forecast every ~4th cycle instead
+  // of every single one, unless its price actually moves.
+  forecastCacheTtlMs: Number(process.env.FORECAST_CACHE_TTL_MS ?? 20 * 60 * 1000),
+  // Absolute implied-probability movement (0-1 scale) on any outcome that
+  // forces a re-forecast even within the TTL — a real price move is new
+  // information the cached forecast never saw.
+  forecastCachePriceMoveThreshold: Number(process.env.FORECAST_CACHE_PRICE_MOVE_THRESHOLD ?? 0.03),
+
   // Optional manual override for the competition token's decimals. The
   // on-chain decimals() call (see chainRead.ts) silently falls back to 18
   // on any failure — fine for a normal 18-decimal token, but if the real
