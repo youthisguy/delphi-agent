@@ -13,6 +13,7 @@ import { getGeminiForecast } from "./geminiForecast.js";
 import { blendSignals, isTimeSensitive, type Signal } from "./blend.js";
 import { appendReceipt, patchReceiptExecution, recomputeSummary, type Receipt } from "./journal.js";
 import { checkAndRedeemSettledPositions } from "./redeem.js";
+import { getOpenPositions } from "./positions.js";
 import { CONFIG, getDryRun } from "./config.js";
 
 const client = new DelphiClient();
@@ -41,7 +42,49 @@ interface TradeDecision {
   disagreement: number | null;
 }
 
-async function decide(market: Market): Promise<{ decision: TradeDecision | null; receipt: Receipt }> {
+interface CycleBudget {
+  total: number;
+  source: "on-chain" | "virtual (dry-run fallback)";
+}
+
+/**
+ * Resolves how much capital this cycle is allowed to deploy, computed
+ * ONCE at the top of runCycle (not per-market). available = live token
+ * balance − tokens already committed to open (unresolved) positions −
+ * a fixed reserve buffer. Markets are then sized as a fraction of this,
+ * decremented as each signal is queued (see runCycle), so trade #20 in
+ * a cycle sizes against what #1–19 already claimed rather than the same
+ * starting balance.
+ *
+ * In dryRun, a failure to read a live balance (e.g. wallet not wired up
+ * yet) falls back to a configured virtual bankroll so sizing logic can
+ * still be exercised realistically. Outside dryRun, a balance-read
+ * failure propagates — sizing against an unknown balance isn't safe.
+ */
+async function getCycleBudget(dryRun: boolean): Promise<CycleBudget> {
+  try {
+    const { balance, decimals } = await client.getErc20BalanceWithDecimals();
+    const humanBalance = Number(balance) / 10 ** decimals;
+    const openPositions = await getOpenPositions(client);
+    const openExposure = openPositions.reduce((sum, p) => sum + p.size, 0);
+    const available = Math.max(0, humanBalance - openExposure - CONFIG.bankrollReserveTokens);
+    return { total: available, source: "on-chain" };
+  } catch (err) {
+    if (dryRun) {
+      console.warn(
+        "  [budget] couldn't read live balance in dry-run — using virtual bankroll:",
+        err instanceof Error ? err.message : err
+      );
+      return { total: CONFIG.dryRunVirtualBankroll, source: "virtual (dry-run fallback)" };
+    }
+    throw err;
+  }
+}
+
+async function decide(
+  market: Market,
+  remainingBudget: number
+): Promise<{ decision: TradeDecision | null; receipt: Receipt }> {
   const question = (market as any).question || (market as any).metadata?.question || "";
   const outcomes: string[] =
     (market as any).outcomes || (market as any).metadata?.outcomes || ["Yes", "No"];
@@ -119,10 +162,12 @@ async function decide(market: Market): Promise<{ decision: TradeDecision | null;
     confidence,
   };
 
-  if (blend.skip || bestIdx === -1 || bestEdge < minEdge) {
+  if (blend.skip || bestIdx === -1 || bestEdge < minEdge || remainingBudget <= 0) {
     const skipReason = blend.skip
       ? blend.skipReason!
-      : `bestEdge=${bestEdge.toFixed(3)} < minEdge=${minEdge.toFixed(2)}`;
+      : remainingBudget <= 0
+        ? `cycle budget exhausted (remaining=${remainingBudget.toFixed(2)})`
+        : `bestEdge=${bestEdge.toFixed(3)} < minEdge=${minEdge.toFixed(2)}`;
     console.log(`  SKIP ${market.id}: ${skipReason}`);
     return {
       decision: null,
@@ -130,14 +175,21 @@ async function decide(market: Market): Promise<{ decision: TradeDecision | null;
     };
   }
 
+  // Conviction: how far past the edge bar this signal cleared, scaled by
+  // confidence — 1x at exactly the threshold, capped at
+  // maxConvictionMultiplier for signals that clear it by a wide margin.
+  // Synthetic-price markets keep the existing 0.7x haircut on top.
   const sizeMultiplier = hasValidPrice ? 1.0 : 0.7;
-  const tokensToSpend = Math.min(
-    CONFIG.maxTokensPerTrade,
-    (2 + bestEdge * 15 * confidence) * sizeMultiplier
+  const convictionScore = Math.min(
+    CONFIG.maxConvictionMultiplier,
+    (bestEdge / minEdge) * confidence
   );
+  const desiredSize = remainingBudget * CONFIG.bankrollFractionPerTrade * convictionScore * sizeMultiplier;
+  const tokensToSpend = Math.max(0, Math.min(desiredSize, CONFIG.maxTokensPerTrade, remainingBudget));
 
   console.log(
-    `  BUY signal ${market.id}: outcome=${bestIdx} edge=${bestEdge.toFixed(3)} size≈${tokensToSpend.toFixed(2)} ` +
+    `  BUY signal ${market.id}: outcome=${bestIdx} edge=${bestEdge.toFixed(3)} conviction=${convictionScore.toFixed(2)} ` +
+      `size≈${tokensToSpend.toFixed(2)} (of ${remainingBudget.toFixed(2)} remaining) ` +
       `disagreement=${blend.disagreement?.toFixed(2) ?? "n/a"}`
   );
 
@@ -232,6 +284,8 @@ async function runCycle() {
   let markets: Market[] = [];
   let traded = 0;
   let skipped = 0;
+  let cycleBudget: CycleBudget = { total: 0, source: "on-chain" };
+  let remainingBudget = 0;
 
   try {
     // 0. Redeem any settled winning positions from prior loops first, so
@@ -243,6 +297,19 @@ async function runCycle() {
       const msg = `redemption check failed: ${err instanceof Error ? err.message : err}`;
       console.error(" ", msg);
       errors.push(msg);
+    }
+
+    // 0.5 Resolve this cycle's deployable capital ONCE — every market
+    // evaluated below sizes against what's left of it, not a fresh read.
+    try {
+      cycleBudget = await getCycleBudget(dryRun);
+      remainingBudget = cycleBudget.total;
+      console.log(`  Cycle budget: ${cycleBudget.total.toFixed(2)} tokens (${cycleBudget.source})`);
+    } catch (err) {
+      const msg = `budget resolution failed: ${err instanceof Error ? err.message : err}`;
+      console.error(" ", msg);
+      errors.push(msg);
+      return; // can't size safely without a known live balance
     }
 
     const openStatus = "open" as any;
@@ -260,12 +327,19 @@ async function runCycle() {
 
     for (const market of markets) {
       try {
-        const { decision, receipt } = await decide(market);
+        const { decision, receipt } = await decide(market, remainingBudget);
         if (!decision) {
           appendReceipt(receipt);
           skipped++;
           continue;
         }
+
+        // Reserve the capital the moment it's decided, not after execution
+        // fires — so the next market in this same loop, evaluated
+        // microseconds later, sees the reduced remainder. This holds even
+        // in dryRun: paper sizing should still reflect realistic
+        // within-cycle capital constraints.
+        remainingBudget -= decision.tokensToSpend;
 
         let execution: Receipt["execution"] = null;
         try {
@@ -297,7 +371,15 @@ async function runCycle() {
     }
   } finally {
     lastCycleStats = { openMarkets: markets.length, evaluated: markets.length, traded, skipped, errors };
-    writeLoopStatus({ dryRun, running: false, intervalMs: CONFIG.loopIntervalMs, nextRunAt });
+    writeLoopStatus({
+      dryRun,
+      running: false,
+      intervalMs: CONFIG.loopIntervalMs,
+      nextRunAt,
+      cycleBudget: cycleBudget.total,
+      cycleBudgetSource: cycleBudget.source,
+      remainingBudget,
+    });
   }
 }
 
