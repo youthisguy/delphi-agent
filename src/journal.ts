@@ -40,7 +40,13 @@ export interface Receipt {
     redeemedTxHash?: string;
     redeemedAmount?: string;
     resolved?: boolean; 
-    won?: boolean;  
+    won?: boolean;
+    /** True for markets that settled "failed" (void/undecided) and were
+     * liquidated rather than redeemed against a winning outcome — see
+     * redeem.ts. These never resolved to an actual right-or-wrong
+     * forecast, so recomputeSummary excludes them from the accuracy
+     * denominator entirely (not just from the `correct` count). */
+    void?: boolean;
   } | null;
 
   skipReason?: string;
@@ -122,6 +128,11 @@ function bucketFor(conf: number): string {
  * For a more precise picture, the backtest job (which matches receipts
  * against actual resolved markets) periodically overwrites the accuracy
  * fields with ground truth — see backtest.ts.
+ *
+ * Receipts patched with execution.void (failed/void markets liquidated
+ * via redeem.ts, not redeemed against a winner) are excluded from the
+ * accuracy denominator entirely — they never resolved to a right-or-
+ * wrong forecast, so folding them in as misses would understate hit rate.
  */
 export async function recomputeSummary(
   groundTruth?: { winRate: number; n: number }
@@ -143,11 +154,17 @@ export async function recomputeSummary(
     byBucket[bucket] ??= { n: 0, correct: 0 };
   
     if (r.execution?.resolved) {
-      byBucket[bucket].n += 1;
-      byCategory[cat].n += 1;
-      if (r.execution.won) {
-        byBucket[bucket].correct += 1;
-        byCategory[cat].correct += 1;
+      // Void/failed markets (liquidated, not redeemed against a winner —
+      // see redeem.ts) never resolved to an actual right-or-wrong
+      // forecast, so they're excluded from the accuracy denominator
+      // entirely rather than counted as a miss.
+      if (!r.execution.void) {
+        byBucket[bucket].n += 1;
+        byCategory[cat].n += 1;
+        if (r.execution.won) {
+          byBucket[bucket].correct += 1;
+          byCategory[cat].correct += 1;
+        }
       }
     } else if (r.size) {
       // still open / unresolved — counts toward exposure, not accuracy yet
