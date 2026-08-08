@@ -31,7 +31,11 @@ export interface BacktestRow {
 
 export interface BacktestOptions {
   maxMarkets?: number;
-  /** Default false for backtests — avoids burning Gemini quota and extra latency. */
+  /** Defaults to true, matching index.ts's live behavior — Gemini is
+   * blended for every market now, not just isTimeSensitive() ones (that
+   * gate now only controls *grounding*, not whether Gemini is called at
+   * all — see evaluateForBacktest below). Pass `false` explicitly if you
+   * want a cheaper/faster backtest run that skips Gemini entirely. */
   useGemini?: boolean;
 }
 
@@ -125,8 +129,16 @@ async function evaluateForBacktest(
       weight: Math.min(0.6, external.similarity),
     });
   }
-  if (useGemini && isTimeSensitive(question)) {
-    const gem = await getGeminiForecast(question, outcomes, { grounded: true });
+  // Gemini — blended for every market when useGemini is on, matching
+  // index.ts's live behavior (previously gated to only isTimeSensitive()
+  // questions, which made backtest hit-rate not representative of what
+  // the live loop actually does). Grounding (Google Search) stays
+  // limited to time-sensitive questions since that's specifically where
+  // a stale training cutoff hurts — no reason to pay the extra
+  // grounding latency/cost on a static question.
+  if (useGemini) {
+    const grounded = isTimeSensitive(question);
+    const gem = await getGeminiForecast(question, outcomes, { grounded });
     if (gem) {
       signals.push({ name: "gemini", probs: gem.probs, weight: gem.confidence });
     }
@@ -189,14 +201,15 @@ function bucketFor(conf: number): string {
 
 /**
  * Callable entry point — CLI (`npx tsx src/backtest.ts`) and
- * HTTP (`POST /api/backtest/run`). Gemini defaults OFF for backtests.
+ * HTTP (`POST /api/backtest/run`). Gemini defaults ON, matching live.
  */
 export async function runBacktest(
   opts: BacktestOptions = {}
 ): Promise<BacktestResult> {
   const client = new DelphiClient();
   const maxMarkets = opts.maxMarkets ?? 10;
-  // Default false: backtests should not burn Gemini free-tier quota
+  // Defaults to true — matches index.ts's live behavior (Gemini blended
+  // for every market). Pass useGemini: false for a cheaper/faster run.
   const useGemini = opts.useGemini ?? true;
 
   console.log(
