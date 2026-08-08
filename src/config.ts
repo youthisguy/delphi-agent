@@ -29,10 +29,6 @@ function readRuntimeConfig(): RuntimeConfig {
   ensureDataDir();
   if (!fs.existsSync(RUNTIME_CONFIG_PATH)) {
     const initial: RuntimeConfig = {
-      // Default is dry-run ON. This is a safety default: the scope calls
-      // for keeping dry-run on until the receipt ledger + settled win-rate
-      // pipeline + dashboard are producing stable numbers. Flip explicitly
-      // via the dashboard or DRY_RUN=false once you're ready.
       dryRun: process.env.DRY_RUN !== "false",
       competitionTokenAddress: process.env.COMPETITION_TOKEN_ADDRESS || null,
     };
@@ -94,6 +90,17 @@ export const CONFIG = {
   disagreementSoftThreshold: Number(process.env.DISAGREEMENT_SOFT ?? 0.15), // raise edge bar
   disagreementHardThreshold: Number(process.env.DISAGREEMENT_HARD ?? 0.30), // skip entirely
   disagreementEdgeMultiplier: Number(process.env.DISAGREEMENT_EDGE_MULT ?? 1.5),
+
+  // Optional manual override for the competition token's decimals. The
+  // on-chain decimals() call (see chainRead.ts) silently falls back to 18
+  // on any failure — fine for a normal 18-decimal token, but if the real
+  // token uses something else (e.g. 6) and the call fails for any reason
+  // on this chain, that fallback silently produces a balance that's off
+  // by a factor of 10^12. Set this once you know the real value and it's
+  // used directly instead of trusting the on-chain call.
+  competitionTokenDecimals: process.env.COMPETITION_TOKEN_DECIMALS
+    ? Number(process.env.COMPETITION_TOKEN_DECIMALS)
+    : null,
 
   dataDir: DATA_DIR,
   journalPath: path.join(DATA_DIR, "journal.jsonl"),

@@ -26,10 +26,28 @@ async function rpcCall(method: string, params: unknown[]): Promise<any> {
   return data.result;
 }
 
+export async function getChainId(): Promise<number> {
+  const hex = await rpcCall("eth_chainId", []);
+  return parseInt(hex, 16);
+}
+
 export async function getNativeBalance(address: string): Promise<{ wei: bigint; human: number }> {
   const hex = await rpcCall("eth_getBalance", [address, "latest"]);
   const wei = BigInt(hex);
   return { wei, human: Number(wei) / 1e18 };
+}
+
+/**
+ * Checks whether an address has contract bytecode deployed. eth_call
+ * against an address with no code doesn't revert — it just returns empty
+ * bytes, which balanceOf()/decimals() below silently read as "0". This
+ * makes it possible to tell "confirmed zero balance" apart from
+ * "this CA has no contract deployed yet" (e.g. a competition token
+ * address announced ahead of launch, before it's actually live).
+ */
+export async function hasContractCode(address: string): Promise<boolean> {
+  const code = await rpcCall("eth_getCode", [address, "latest"]);
+  return typeof code === "string" && code !== "0x" && code.length > 2;
 }
 
 function encodeAddressParam(address: string): string {
@@ -40,18 +58,38 @@ function encodeAddressParam(address: string): string {
 export async function getErc20Balance(tokenAddress: string, walletAddress: string): Promise<bigint> {
   const data = "0x70a08231" + encodeAddressParam(walletAddress);
   const result = await rpcCall("eth_call", [{ to: tokenAddress, data }, "latest"]);
-  if (!result || result === "0x") return 0n;
+  if (!result || result === "0x") {
+    const hasCode = await hasContractCode(tokenAddress).catch(() => null);
+    if (hasCode === false) {
+      const chainId = await rpcCall("eth_chainId", []).catch(() => null);
+      throw new Error(
+        `no contract found at ${tokenAddress} on chainId=${chainId ?? "unknown"} — ` +
+          `DELPHI_RPC_URL is likely pointing at a different network than the one this token ` +
+          `lives on. Check DELPHI_RPC_URL's chain against the network MetaMask is showing the balance on.`
+      );
+    }
+    return 0n; // contract confirmed present, balance genuinely 0
+  }
   return BigInt(result);
 }
 
 /** decimals() — selector 0x313ce567. Falls back to 18 (the overwhelming
- * norm) if the call fails rather than blowing up the whole balances panel. */
+ * norm) if the call fails, but logs it — a silent fallback here previously
+ * masked real decimals mismatches (e.g. a 6-decimal token silently read
+ * as 18, understating the balance by a factor of 10^12). */
 export async function getErc20Decimals(tokenAddress: string): Promise<number> {
   try {
     const result = await rpcCall("eth_call", [{ to: tokenAddress, data: "0x313ce567" }, "latest"]);
-    if (!result || result === "0x") return 18;
+    if (!result || result === "0x") {
+      console.warn(`[chainRead] decimals() on ${tokenAddress} returned empty — falling back to 18`);
+      return 18;
+    }
     return parseInt(result, 16);
-  } catch {
+  } catch (err) {
+    console.warn(
+      `[chainRead] decimals() call failed on ${tokenAddress} — falling back to 18:`,
+      err instanceof Error ? err.message : err
+    );
     return 18;
   }
 }

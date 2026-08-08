@@ -7,7 +7,7 @@ import { CONFIG, getDryRun, setDryRun, getCompetitionTokenAddress, setCompetitio
 import { readReceipts, readPinnedSummary } from "./journal.js";
 import { runBacktest, listBacktestRuns, readBacktestRun } from "./backtest.js";
 import { getAllNodesView, getPoolSummary, runHealthCheck } from "./keyPool.js";
-import { getNativeBalance, getErc20Balance, getErc20Decimals } from "./chainRead.js";
+import { getNativeBalance, getErc20Balance, getErc20Decimals, hasContractCode, getChainId } from "./chainRead.js";
 
 const app = express();
 app.use(express.json());
@@ -119,11 +119,29 @@ app.get("/api/balances", async (_req: any, res: any) => {
       };
     } else {
       try {
-        const [raw, decimals] = await Promise.all([
-          getErc20Balance(tokenAddress, walletAddress),
-          getErc20Decimals(tokenAddress),
-        ]);
-        result.competitionToken = { balance: raw.toString(), decimals, human: Number(raw) / 10 ** decimals };
+        const codeExists = await hasContractCode(tokenAddress);
+        if (!codeExists) {
+          const chainId = await getChainId().catch(() => null);
+          result.competitionToken = {
+            error:
+              `no contract found at ${tokenAddress} on chainId=${chainId ?? "unknown"} — ` +
+              `DELPHI_RPC_URL is likely pointing at a different network than where this token lives. ` +
+              `Compare it against the network MetaMask shows a balance for this token on.`,
+            noContractOnThisChain: true,
+          };
+        } else {
+          const [raw, onChainDecimals] = await Promise.all([
+            getErc20Balance(tokenAddress, walletAddress),
+            CONFIG.competitionTokenDecimals !== null ? Promise.resolve(null) : getErc20Decimals(tokenAddress),
+          ]);
+          const decimals = CONFIG.competitionTokenDecimals ?? onChainDecimals ?? 18;
+          result.competitionToken = {
+            balance: raw.toString(),
+            decimals,
+            human: Number(raw) / 10 ** decimals,
+            decimalsSource: CONFIG.competitionTokenDecimals !== null ? "env override" : "on-chain",
+          };
+        }
       } catch (err) {
         result.competitionToken = { error: err instanceof Error ? err.message : String(err) };
       }

@@ -423,10 +423,6 @@
         <span class="panel-sub" id="loopRunState">CYCLE METRICS</span>
       </div>
       <div class="panel-body">
-        <div class="stat-row" style="margin-bottom:8px; border-bottom:1px dashed var(--border-dim); padding-bottom:8px;">
-          <span class="k">Next fetch cycle</span>
-          <span class="v cyan" id="loopCountdown">&mdash;</span>
-        </div>
         <div id="loopPanel">
           <div class="empty">awaiting signal tick&hellip;</div>
         </div>
@@ -563,48 +559,6 @@ async function j(url, opts) {
 let currentTab = '';
 let dryRunState = true;
 let loopRunning = false;
-let nextRunAtMs = null;
-let runningSinceMs = null;
-
-function fmtCountdown(ms) {
-  const totalSec = Math.max(0, Math.floor(ms / 1000));
-  const m = Math.floor(totalSec / 60);
-  const s = totalSec % 60;
-  return `${m}:${String(s).padStart(2, '0')}`;
-}
-
-function tickCountdown() {
-  const el = $('#loopCountdown');
-  if (!el) return;
-  if (loopRunning) {
-    // A cycle normally finishes in well under a minute per market now that
-    // every network call is timeout-bounded. If it's been running far
-    // longer than that, surface it as a stall rather than staying silent.
-    const runningForMs = runningSinceMs ? Date.now() - runningSinceMs : 0;
-    if (runningForMs > 10 * 60 * 1000) {
-      el.className = 'v warn';
-      el.textContent = 'RUNNING LONGER THAN EXPECTED (' + fmtCountdown(runningForMs) + ')';
-    } else {
-      el.className = 'v good';
-      el.textContent = 'FETCHING NOW…';
-    }
-    return;
-  }
-  if (!nextRunAtMs) {
-    el.className = 'v';
-    el.textContent = '—';
-    return;
-  }
-  const remaining = nextRunAtMs - Date.now();
-  if (remaining <= 0) {
-    el.className = 'v warn';
-    el.textContent = 'DUE NOW';
-    return;
-  }
-  el.className = 'v cyan';
-  el.textContent = fmtCountdown(remaining);
-}
-setInterval(tickCountdown, 1000);
 
 // ---- Status & Mode Controls ----
 async function loadStatus() {
@@ -615,22 +569,17 @@ async function loadStatus() {
 
     const ls = s.loopStatus;
     loopRunning = !!ls?.running;
-    nextRunAtMs = ls?.nextRunAt ? Number(ls.nextRunAt) : null;
-    runningSinceMs = (loopRunning && ls?.startedAt) ? new Date(ls.startedAt).getTime() : null;
-    tickCountdown();
 
     const pulse = $('#pulse'), label = $('#pulseLabel');
-    if (loopRunning) {
-      pulse.className = 'pulse live';
-      label.textContent = 'LOOP RUNNING';
-    } else if (ls?.updatedAt) {
+    if (ls?.updatedAt) {
       const staleMs = Date.now() - new Date(ls.updatedAt).getTime();
       // Idle-but-healthy: last update happened within one interval (+ slack).
-      // Only flag stale if a full cycle interval has clearly been missed.
+      // Only flag stale if a full cycle interval has clearly been missed
+      // — and never while a cycle is actively running.
       const intervalMs = Number(ls.intervalMs) || (15 * 60 * 1000);
-      const stale = staleMs > intervalMs * 2;
+      const stale = !loopRunning && staleMs > intervalMs * 2;
       pulse.className = 'pulse ' + (stale ? 'stale' : 'live');
-      label.textContent = stale ? 'STALLED — LAST RUN ' + timeAgo(ls.updatedAt).toUpperCase() : 'IDLE — LAST RUN ' + timeAgo(ls.updatedAt).toUpperCase();
+      label.textContent = 'LAST RUN ' + timeAgo(ls.updatedAt).toUpperCase();
     } else {
       pulse.className = 'pulse stale';
       label.textContent = 'NO_DATA';
@@ -704,25 +653,30 @@ function shortAddr(a) {
 async function loadBalance() {
   try {
     const b = await j('/api/balances');
-
-    // SDK / TST test token
     let html = '';
-    if (b.sdkToken && !b.sdkToken.error) {
+
+    // Competition token — the number that actually matters once the CA
+    // is live. Leads the panel as the headline stat.
+    if (b.competitionTokenAddress && b.competitionToken && !b.competitionToken.error) {
       html += `
         <div class="stat-card" style="margin-bottom:8px;">
-          <span class="k">TST TOKEN BALANCE</span>
-          <span class="v good">${fmtNum(b.sdkToken.human, 3)}</span>
+          <span class="k">COMPETITION TOKEN BALANCE</span>
+          <span class="v good">${fmtNum(b.competitionToken.human, 3)}</span>
         </div>`;
+    } else if (b.competitionTokenAddress) {
+      html += `
+        <div class="stat-card" style="margin-bottom:4px;">
+          <span class="k">COMPETITION TOKEN BALANCE</span>
+          <span class="v bad">UNAVAILABLE</span>
+        </div>
+        <div class="empty" style="padding:2px 0 8px; text-align:left; font-size:9px;">${esc(b.competitionToken?.error || '')}</div>`;
     } else {
       html += `
         <div class="stat-card" style="margin-bottom:8px;">
-          <span class="k">TST TOKEN BALANCE</span>
-          <span class="v bad">UNAVAILABLE</span>
-        </div>
-        <div class="empty" style="padding:2px 0 8px; text-align:left; font-size:9px;">${esc(b.sdkToken?.error || '')}</div>`;
+          <span class="k">COMPETITION TOKEN BALANCE</span>
+          <span class="v bad">NOT CONFIGURED</span>
+        </div>`;
     }
-
-    html += `<div class="stat-row"><span class="k">Wallet</span><span class="v" style="font-size:9px;" title="${esc(b.walletAddress || '')}">${esc(shortAddr(b.walletAddress))}</span></div>`;
 
     // Native gas balance — surface the actual reason inline (missing
     // WALLET_ADDRESS or DELPHI_RPC_URL are the two usual causes) rather
@@ -736,24 +690,9 @@ async function loadBalance() {
       }
     }
 
-    // Competition token — CA is configured server-side via env / prior
-    // /api/token-address call, read-only here.
-    html += `<div class="panel-sub" style="margin:10px 0 4px;">COMPETITION TOKEN</div>`;
-    if (b.competitionTokenAddress && b.competitionToken && !b.competitionToken.error) {
-      html += `
-        <div class="stat-card" style="margin-bottom:6px;">
-          <span class="k">BALANCE</span>
-          <span class="v good">${fmtNum(b.competitionToken.human, 3)}</span>
-        </div>
-        <div class="stat-row"><span class="k">CA</span><span class="v" style="font-size:9px;" title="${esc(b.competitionTokenAddress)}">${esc(shortAddr(b.competitionTokenAddress))}</span></div>
-      `;
-    } else if (b.competitionTokenAddress) {
-      html += `
-        <div class="stat-row"><span class="k">CA</span><span class="v" style="font-size:9px;" title="${esc(b.competitionTokenAddress)}">${esc(shortAddr(b.competitionTokenAddress))}</span></div>
-        <div class="empty" style="padding:4px 0; text-align:left; font-size:9px;">balance unavailable${b.competitionToken?.error ? ': ' + esc(b.competitionToken.error) : ''}</div>
-      `;
-    } else {
-      html += `<div class="empty" style="padding:6px 0;">CA not configured — set COMPETITION_TOKEN_ADDRESS in .env</div>`;
+    html += `<div class="stat-row"><span class="k">Wallet</span><span class="v" style="font-size:9px;" title="${esc(b.walletAddress || '')}">${esc(shortAddr(b.walletAddress))}</span></div>`;
+    if (b.competitionTokenAddress) {
+      html += `<div class="stat-row"><span class="k">Token CA</span><span class="v" style="font-size:9px;" title="${esc(b.competitionTokenAddress)}">${esc(shortAddr(b.competitionTokenAddress))}</span></div>`;
     }
 
     $('#balancePanel').innerHTML = html;
