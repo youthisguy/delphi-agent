@@ -69,11 +69,13 @@ export async function getOpenPositions(client: DelphiClient): Promise<OpenPositi
     let currentPrice: number | null = null;
     let marketStatus: string | null = null;
     try {
-      // NOTE ON SDK METHOD NAME: same caveat as redeem.ts's TODO — the
-      // exact single-market getter wasn't in what you shared. If this
-      // isn't the real method name, positions will just show "N/A" for
-      // current price/P&L rather than break anything else on the page.
-      const market: Market | undefined = await (client as any).getMarket?.(r.marketId);
+      // getMarket() takes an options object (not a bare address string),
+      // and — same as listMarkets() — only returns spotImpliedProbabilities
+      // when pricesAndImpliedProbabilities is explicitly requested.
+      const market: Market | undefined = await client.getMarket({
+        id: r.marketId,
+        pricesAndImpliedProbabilities: true,
+      } as any);
       if (market) {
         marketStatus = (market as any).status ?? null;
         const rawProbs = (market as any).spotImpliedProbabilities as unknown[] | undefined;

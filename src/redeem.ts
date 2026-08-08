@@ -8,13 +8,12 @@ import { readReceipts, patchReceiptExecution, type Receipt } from "./journal.js"
  *  - If we're on the LOSING side, there's nothing to do — losing shares
  *    are simply worthless, no on-chain action required.
  *
- * NOTE ON SDK METHOD NAMES: the exact redeem/liquidate call wasn't
- * included in what you shared, so this file assumes a shape like
- * `client.redeemWinningShares({ marketAddress, outcomeIdx })` returning
- * `{ transactionHash, amount }`. Check @gensyn-ai/gensyn-delphi-sdk's
- * actual exports and swap in the real method + args below (marked TODO).
- * Everything else — matching journal receipts to settled winners,
- * skip-on-loss, patching the ledger with the redemption tx — is complete.
+ * NOTE ON SDK METHOD NAMES: the redeem/liquidate call still assumes a
+ * shape like `client.redeemWinningShares({ marketAddress, outcomeIdx })`
+ * returning `{ transactionHash, amount }` — that one's still unverified
+ * against @gensyn-ai/gensyn-delphi-sdk's actual exports (marked TODO
+ * below). getMarket() itself is now confirmed: it takes an options
+ * object (`{ id }`), not a bare address string.
  */
 
 export interface RedeemResult {
@@ -43,8 +42,9 @@ export async function checkAndRedeemSettledPositions(
   for (const receipt of openTrades) {
     let market: Market | undefined;
     try {
-      // TODO: confirm the SDK's single-market getter name/signature.
-      market = await (client as any).getMarket?.(receipt.marketId);
+      // getMarket() takes an options object (not a bare address string) —
+      // same shape as listMarkets(). Confirmed against SDK docs.
+      market = await client.getMarket({ id: receipt.marketId } as any);
     } catch (err) {
       console.warn(`  [redeem] couldn't fetch market ${receipt.marketId}:`, err);
       continue;

@@ -328,7 +328,31 @@ async function tradeOnMarket(market: Market, decision: TradeDecision, dryRun: bo
 // Last completed cycle's counters, kept in memory so a "running: true"
 // status write mid-cycle doesn't have to blank out the previous numbers
 // the dashboard is already showing.
-let lastCycleStats = { openMarkets: 0, evaluated: 0, traded: 0, skipped: 0, errors: [] as string[] };
+//
+// Seeded from the existing loop-status.json on disk (if any) rather than
+// hardcoded zeros — otherwise every process restart (redeploy, crash
+// recovery, manual bounce) makes the dashboard show "0/0/0/0" for cycle
+// metrics even though the journal already has real trading history,
+// until an entirely new cycle completes (up to loopIntervalMs later).
+function loadLastCycleStats(): { openMarkets: number; evaluated: number; traded: number; skipped: number; errors: string[] } {
+  try {
+    if (fs.existsSync(CONFIG.loopStatusPath)) {
+      const prev = JSON.parse(fs.readFileSync(CONFIG.loopStatusPath, "utf8"));
+      return {
+        openMarkets: Number(prev.openMarkets) || 0,
+        evaluated: Number(prev.evaluated) || 0,
+        traded: Number(prev.traded) || 0,
+        skipped: Number(prev.skipped) || 0,
+        errors: Array.isArray(prev.errors) ? prev.errors : [],
+      };
+    }
+  } catch (err) {
+    console.warn("[loop] couldn't read existing loop-status.json, starting from zeros:", err instanceof Error ? err.message : err);
+  }
+  return { openMarkets: 0, evaluated: 0, traded: 0, skipped: 0, errors: [] };
+}
+
+let lastCycleStats = loadLastCycleStats();
 let cycleInFlight = false;
 
 function writeLoopStatus(status: Record<string, unknown>) {
