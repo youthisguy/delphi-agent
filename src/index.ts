@@ -176,6 +176,7 @@ async function tradeOnMarket(market: Market, decision: TradeDecision, dryRun: bo
 // status write mid-cycle doesn't have to blank out the previous numbers
 // the dashboard is already showing.
 let lastCycleStats = { openMarkets: 0, evaluated: 0, traded: 0, skipped: 0, errors: [] as string[] };
+let cycleInFlight = false;
 
 function writeLoopStatus(status: Record<string, unknown>) {
   fs.writeFileSync(
@@ -185,6 +186,23 @@ function writeLoopStatus(status: Record<string, unknown>) {
 }
 
 async function runOnce() {
+  if (cycleInFlight) {
+    // Every network call in the pipeline is now timeout-bounded, so this
+    // should be rare — but if a cycle somehow does run long, letting a
+    // second one start on top of it would interleave writeLoopStatus()
+    // calls and corrupt running/nextRunAt. Skip the tick instead.
+    console.warn("[loop] previous cycle still in flight — skipping this tick");
+    return;
+  }
+  cycleInFlight = true;
+  try {
+    await runCycle();
+  } finally {
+    cycleInFlight = false;
+  }
+}
+
+async function runCycle() {
   const dryRun = getDryRun();
   // Fixed at the top of the cycle so "next run" reflects the loop's actual
   // cadence (setInterval fires on a fixed period from when this cycle

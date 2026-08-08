@@ -564,6 +564,7 @@ let currentTab = '';
 let dryRunState = true;
 let loopRunning = false;
 let nextRunAtMs = null;
+let runningSinceMs = null;
 
 function fmtCountdown(ms) {
   const totalSec = Math.max(0, Math.floor(ms / 1000));
@@ -576,8 +577,17 @@ function tickCountdown() {
   const el = $('#loopCountdown');
   if (!el) return;
   if (loopRunning) {
-    el.className = 'v good';
-    el.textContent = 'FETCHING NOW…';
+    // A cycle normally finishes in well under a minute per market now that
+    // every network call is timeout-bounded. If it's been running far
+    // longer than that, surface it as a stall rather than staying silent.
+    const runningForMs = runningSinceMs ? Date.now() - runningSinceMs : 0;
+    if (runningForMs > 10 * 60 * 1000) {
+      el.className = 'v warn';
+      el.textContent = 'RUNNING LONGER THAN EXPECTED (' + fmtCountdown(runningForMs) + ')';
+    } else {
+      el.className = 'v good';
+      el.textContent = 'FETCHING NOW…';
+    }
     return;
   }
   if (!nextRunAtMs) {
@@ -606,6 +616,7 @@ async function loadStatus() {
     const ls = s.loopStatus;
     loopRunning = !!ls?.running;
     nextRunAtMs = ls?.nextRunAt ? Number(ls.nextRunAt) : null;
+    runningSinceMs = (loopRunning && ls?.startedAt) ? new Date(ls.startedAt).getTime() : null;
     tickCountdown();
 
     const pulse = $('#pulse'), label = $('#pulseLabel');
@@ -631,6 +642,10 @@ async function loadStatus() {
       runStateEl.className = 'panel-sub' + (loopRunning ? '' : '');
       runStateEl.style.color = loopRunning ? 'var(--green)' : '';
     }
+
+    // Note: #configHealth is owned by loadNodes() (dashboard.js), which
+    // renders the live node matrix. Nothing here writes to it anymore —
+    // see loadNodes() for OpenAI/Gemini pool status.
 
     // Last Loop
     if (ls) {
@@ -690,8 +705,7 @@ async function loadBalance() {
   try {
     const b = await j('/api/balances');
 
-    // SDK / TST test token (always present while the real competition
-    // token CA is unknown)
+    // SDK / TST test token
     let html = '';
     if (b.sdkToken && !b.sdkToken.error) {
       html += `
@@ -703,20 +717,27 @@ async function loadBalance() {
       html += `
         <div class="stat-card" style="margin-bottom:8px;">
           <span class="k">TST TOKEN BALANCE</span>
-          <span class="v bad" title="${esc(b.sdkToken?.error || '')}">UNAVAILABLE</span>
-        </div>`;
+          <span class="v bad">UNAVAILABLE</span>
+        </div>
+        <div class="empty" style="padding:2px 0 8px; text-align:left; font-size:9px;">${esc(b.sdkToken?.error || '')}</div>`;
     }
 
     html += `<div class="stat-row"><span class="k">Wallet</span><span class="v" style="font-size:9px;" title="${esc(b.walletAddress || '')}">${esc(shortAddr(b.walletAddress))}</span></div>`;
 
-    // Native gas balance
+    // Native gas balance — surface the actual reason inline (missing
+    // WALLET_ADDRESS or DELPHI_RPC_URL are the two usual causes) rather
+    // than hiding it behind a hover tooltip.
     if (b.gas && !b.gas.error) {
       html += `<div class="stat-row"><span class="k">Gas (ETH)</span><span class="v ${b.gas.human < 0.005 ? 'bad' : 'good'}">${fmtNum(b.gas.human, 5)}</span></div>`;
     } else {
-      html += `<div class="stat-row"><span class="k">Gas (ETH)</span><span class="v bad" title="${esc(b.gas?.error || '')}">UNAVAILABLE</span></div>`;
+      html += `<div class="stat-row"><span class="k">Gas (ETH)</span><span class="v bad">UNAVAILABLE</span></div>`;
+      if (b.gas?.error) {
+        html += `<div class="empty" style="padding:2px 0 6px; text-align:left; font-size:9px;">${esc(b.gas.error)}</div>`;
+      }
     }
 
-    // Competition token — CA may not be announced yet
+    // Competition token — CA is configured server-side via env / prior
+    // /api/token-address call, read-only here.
     html += `<div class="panel-sub" style="margin:10px 0 4px;">COMPETITION TOKEN</div>`;
     if (b.competitionTokenAddress && b.competitionToken && !b.competitionToken.error) {
       html += `
@@ -727,45 +748,17 @@ async function loadBalance() {
         <div class="stat-row"><span class="k">CA</span><span class="v" style="font-size:9px;" title="${esc(b.competitionTokenAddress)}">${esc(shortAddr(b.competitionTokenAddress))}</span></div>
       `;
     } else if (b.competitionTokenAddress) {
-      html += `<div class="empty" style="padding:6px 0;">CA set, balance unavailable${b.competitionToken?.error ? ': ' + esc(b.competitionToken.error) : ''}</div>`;
+      html += `
+        <div class="stat-row"><span class="k">CA</span><span class="v" style="font-size:9px;" title="${esc(b.competitionTokenAddress)}">${esc(shortAddr(b.competitionTokenAddress))}</span></div>
+        <div class="empty" style="padding:4px 0; text-align:left; font-size:9px;">balance unavailable${b.competitionToken?.error ? ': ' + esc(b.competitionToken.error) : ''}</div>
+      `;
     } else {
-      html += `<div class="empty" style="padding:6px 0;">CA not announced yet — set it below once live</div>`;
+      html += `<div class="empty" style="padding:6px 0;">CA not configured — set COMPETITION_TOKEN_ADDRESS in .env</div>`;
     }
 
-    html += `
-      <div style="display:flex; gap:4px; margin-top:6px;">
-        <input type="text" id="caInput" placeholder="0x contract address" style="flex:1; width:auto; font-size:9px;" value="${b.competitionTokenAddress ? esc(b.competitionTokenAddress) : ''}" />
-        <button class="primary" id="caSetBtn" style="font-size:9px; padding:4px 8px;">SET</button>
-        ${b.competitionTokenAddress ? '<button id="caClearBtn" style="font-size:9px; padding:4px 8px;">CLEAR</button>' : ''}
-      </div>
-      <div id="caResult" class="panel-sub" style="margin-top:4px;"></div>
-    `;
-
     $('#balancePanel').innerHTML = html;
-    $('#caSetBtn')?.addEventListener('click', () => setTokenAddress($('#caInput').value.trim()));
-    $('#caClearBtn')?.addEventListener('click', () => setTokenAddress(null));
   } catch (e) {
     $('#balancePanel').innerHTML = `<div class="empty">UNAVAILABLE &mdash; ${esc(e.message)}</div>`;
-  }
-}
-
-async function setTokenAddress(address) {
-  const out = $('#caResult');
-  if (address && !/^0x[a-fA-F0-9]{40}$/.test(address)) {
-    if (out) out.innerHTML = `<span style="color:var(--red)">invalid address — expected 0x + 40 hex chars</span>`;
-    return;
-  }
-  try {
-    if (out) out.textContent = 'updating…';
-    await j('/api/token-address', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ address: address || null }),
-    });
-    if (out) out.textContent = address ? 'CA set — fetching balance…' : 'CA cleared.';
-    loadBalance();
-  } catch (e) {
-    if (out) out.innerHTML = `<span style="color:var(--red)">ERR: ${esc(e.message)}</span>`;
   }
 }
 

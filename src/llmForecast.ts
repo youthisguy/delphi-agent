@@ -20,7 +20,7 @@ async function callOpenAi(
   question: string,
   outcomes: string[]
 ): Promise<{ probs: number[]; confidence: number; reasoning?: string }> {
-  const openai = new OpenAI({ apiKey: node.apiKey });
+  const openai = new OpenAI({ apiKey: node.apiKey, timeout: 30_000, maxRetries: 1 });
 
   const system = `You are a careful probabilistic forecaster for prediction markets.
 You estimate probabilities from public historical patterns, base rates, and current context.

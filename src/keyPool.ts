@@ -1,5 +1,6 @@
 import "dotenv/config";
 import OpenAI from "openai";
+import { fetchWithTimeout } from "./fetchWithTimeout.js";
 
 export type Provider = "openai" | "gemini";
 export type NodeStatus = "ok" | "cooldown" | "dead" | "untested";
@@ -169,7 +170,7 @@ export function getAllNodesView(): NodeView[] {
 
 async function healthCheckOpenAiNode(n: NodeState): Promise<void> {
   try {
-    const client = new OpenAI({ apiKey: n.apiKey });
+    const client = new OpenAI({ apiKey: n.apiKey, timeout: 15_000, maxRetries: 1 });
     // Cheapest possible call that still proves the key is live & has access.
     await client.models.list();
     markSuccess(n);
@@ -181,7 +182,7 @@ async function healthCheckOpenAiNode(n: NodeState): Promise<void> {
 async function healthCheckGeminiNode(n: NodeState): Promise<void> {
   try {
     const url = `https://generativelanguage.googleapis.com/v1beta/models?key=${n.apiKey}`;
-    const res = await fetch(url);
+    const res = await fetchWithTimeout(url, {}, 10_000);
     if (!res.ok) {
       const dead = res.status === 401 || res.status === 403;
       markFailure(n, new Error(`HTTP ${res.status}`), { dead });

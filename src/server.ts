@@ -16,21 +16,28 @@ app.use(express.static(path.resolve(process.cwd(), "public")));
 const client = new DelphiClient();
 
 /**
- * NOTE ON SDK FIELD NAME: the exact property the SDK exposes the trading
- * wallet's address under wasn't included in what you shared, so this
- * tries a few common shapes and falls back to an explicit WALLET_ADDRESS
- * env var. Same caveat as redeem.ts's TODO on the SDK's redeem method —
- * check @gensyn-ai/gensyn-delphi-sdk's actual exports and, if none of
- * these match, just set WALLET_ADDRESS in .env.
+ * Wallet address resolution. check-setup.ts shows the SDK exposes
+ * client.getSigner() -> { address, ... } directly — prefer that. The old
+ * guesswork against (client as any).walletAddress/.address/etc. is kept
+ * only as a last-resort fallback in case getSigner() isn't available on
+ * whatever SDK version is installed, plus an explicit WALLET_ADDRESS env
+ * override for manual pinning.
  */
-function resolveWalletAddress(): string | null {
+async function resolveWalletAddress(): Promise<string | null> {
+  if (process.env.WALLET_ADDRESS) return process.env.WALLET_ADDRESS;
+  try {
+    const signer = await (client as any).getSigner?.();
+    if (signer?.address) return signer.address;
+  } catch {
+    /* fall through to legacy guesses */
+  }
   const fromClient =
     (client as any).walletAddress ??
     (client as any).address ??
     (client as any).account?.address ??
     (client as any).signer?.address ??
     null;
-  return process.env.WALLET_ADDRESS || fromClient || null;
+  return fromClient;
 }
 
 // --- status / config health ---------------------------------------------
@@ -72,24 +79,45 @@ app.get("/api/balances", async (_req: any, res: any) => {
     result.sdkToken = { error: err instanceof Error ? err.message : String(err) };
   }
 
-  const walletAddress = resolveWalletAddress();
+  const walletAddress = await resolveWalletAddress();
   result.walletAddress = walletAddress;
 
-  if (!walletAddress) {
-    result.gas = { error: "wallet address unresolved — set WALLET_ADDRESS in .env" };
-  } else if (!process.env.DELPHI_RPC_URL) {
-    result.gas = { error: "DELPHI_RPC_URL not configured" };
-  } else {
-    try {
-      const gas = await getNativeBalance(walletAddress);
-      result.gas = { wei: gas.wei.toString(), human: gas.human };
-    } catch (err) {
-      result.gas = { error: err instanceof Error ? err.message : String(err) };
+  // Gas (native ETH) — per check-setup.ts, client.getEthBalance() works
+  // straight out of the SDK's own RPC connection, no separate
+  // DELPHI_RPC_URL needed. Only fall back to the raw JSON-RPC path in
+  // chainRead.ts if that SDK method isn't available for some reason.
+  try {
+    const wei: bigint = await (client as any).getEthBalance();
+    result.gas = { wei: wei.toString(), human: Number(wei) / 1e18 };
+  } catch (sdkErr) {
+    if (walletAddress && process.env.DELPHI_RPC_URL) {
+      try {
+        const gas = await getNativeBalance(walletAddress);
+        result.gas = { wei: gas.wei.toString(), human: gas.human };
+      } catch (err) {
+        result.gas = { error: err instanceof Error ? err.message : String(err) };
+      }
+    } else {
+      result.gas = {
+        error: `client.getEthBalance() failed (${sdkErr instanceof Error ? sdkErr.message : sdkErr}) and no DELPHI_RPC_URL fallback configured`,
+      };
     }
+  }
 
-    const tokenAddress = getCompetitionTokenAddress();
-    result.competitionTokenAddress = tokenAddress;
-    if (tokenAddress) {
+  // Competition token, once its CA is known. The SDK's
+  // getErc20BalanceWithDecimals() only reads whatever token it's
+  // internally wired to (no address param) — reading an arbitrary CA
+  // still requires a raw eth_call, which needs DELPHI_RPC_URL.
+  const tokenAddress = getCompetitionTokenAddress();
+  result.competitionTokenAddress = tokenAddress;
+  if (tokenAddress) {
+    if (!walletAddress) {
+      result.competitionToken = { error: "wallet address unresolved" };
+    } else if (!process.env.DELPHI_RPC_URL) {
+      result.competitionToken = {
+        error: "DELPHI_RPC_URL not configured — needed to read an arbitrary token contract's balance",
+      };
+    } else {
       try {
         const [raw, decimals] = await Promise.all([
           getErc20Balance(tokenAddress, walletAddress),

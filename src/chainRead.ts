@@ -3,18 +3,23 @@
  * doesn't expose directly:
  *  - native gas (ETH) balance of the trading wallet
  *  - balance/decimals of the competition token, once its contract address
- *    is known (it isn't yet — see config.ts's competitionTokenAddress)
+ *    is known (see config.ts's competitionTokenAddress)
  */
+import { fetchWithTimeout } from "./fetchWithTimeout.js";
 
 const RPC_URL = process.env.DELPHI_RPC_URL;
 
 async function rpcCall(method: string, params: unknown[]): Promise<any> {
   if (!RPC_URL) throw new Error("DELPHI_RPC_URL not configured");
-  const res = await fetch(RPC_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }),
-  });
+  const res = await fetchWithTimeout(
+    RPC_URL,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }),
+    },
+    15_000
+  );
   if (!res.ok) throw new Error(`RPC HTTP ${res.status}`);
   const data: any = await res.json();
   if (data.error) throw new Error(`RPC error: ${data.error?.message ?? JSON.stringify(data.error)}`);

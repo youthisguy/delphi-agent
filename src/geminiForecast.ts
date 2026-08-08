@@ -6,6 +6,7 @@ import {
   isDeadKeyError,
   type NodeState,
 } from "./keyPool.js";
+import { fetchWithTimeout } from "./fetchWithTimeout.js";
 
 /**
  * Selective backup forecaster. Only called for markets flagged
@@ -58,11 +59,15 @@ Return ONLY this JSON object, no markdown fences, no extra text:
     body.tools = [{ google_search: {} }];
   }
 
-  const res = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
-  });
+  const res = await fetchWithTimeout(
+    url,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    },
+    25_000
+  );
 
   if (!res.ok) {
     const text = await res.text().catch(() => "");
@@ -138,7 +143,7 @@ export async function getGeminiForecast(
     "  [Gemini] all candidate nodes failed this request:",
     lastErr instanceof Error ? lastErr.message : lastErr
   );
-  return null; // soft-fail — caller just proceeds without the Gemini signal
+  return null; 
 }
 
 export default getGeminiForecast;

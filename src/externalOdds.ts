@@ -1,4 +1,5 @@
 import stringSimilarity from "string-similarity";
+import { fetchWithTimeout } from "./fetchWithTimeout.js";
 
 export interface ExternalOdds {
   source: "polymarket";
@@ -18,7 +19,7 @@ export async function fetchPolymarketMarkets(limit = 50): Promise<any[]> {
   url.searchParams.set("active", "true");
   url.searchParams.set("limit", String(limit));
 
-  const res = await fetch(url.toString());
+  const res = await fetchWithTimeout(url.toString(), {}, 15_000);
   if (!res.ok) throw new Error(`Polymarket Gamma ${res.status}`);
   const data: any = await res.json();
   return Array.isArray(data) ? data : data.markets ?? [];
