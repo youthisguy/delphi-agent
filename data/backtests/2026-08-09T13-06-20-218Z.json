@@ -1,0 +1,323 @@
+{
+  "result": {
+    "runAt": "2026-08-09T13:06:20.218Z",
+    "marketsEvaluated": 14,
+    "marketsFetched": 14,
+    "skippedNoWinner": 0,
+    "signaled": 4,
+    "correct": 2,
+    "hitRate": 0.5,
+    "hypotheticalPnl": 1.8371813075526413,
+    "breakdowns": {
+      "byCategory": {
+        "sports": {
+          "n": 2,
+          "correct": 0,
+          "hitRate": 0
+        },
+        "crypto": {
+          "n": 2,
+          "correct": 2,
+          "hitRate": 1
+        }
+      },
+      "byConfidenceBucket": {
+        "high(0.6-0.8)": {
+          "n": 1,
+          "correct": 0,
+          "hitRate": 0
+        },
+        "low(<0.4)": {
+          "n": 1,
+          "correct": 0,
+          "hitRate": 0
+        },
+        "mid(0.4-0.6)": {
+          "n": 2,
+          "correct": 2,
+          "hitRate": 1
+        }
+      },
+      "bySyntheticPrice": {
+        "synthetic": {
+          "n": 0,
+          "hitRate": 0
+        },
+        "real": {
+          "n": 4,
+          "hitRate": 0.5
+        }
+      }
+    },
+    "logPath": "/opt/render/project/src/data/backtests/2026-08-09T13-06-20-218Z.json"
+  },
+  "rows": [
+    {
+      "id": "0x2a488b4bde1fb4bc09ffdeda137b60f7a552f060",
+      "question": "Will over 1.5 goals be scored in Utah Royals vs Portland Thorns match on Aug 2, 2026?",
+      "category": "sports",
+      "llmProbs": [
+        0.72,
+        0.28
+      ],
+      "confidence": 0.62,
+      "disagreement": 0.06000000000000005,
+      "bestIdx": 1,
+      "bestEdge": 0.14079707797788252,
+      "hasValidPrice": true,
+      "signaled": true,
+      "winningOutcomeIdx": 0,
+      "correct": false,
+      "tokensToSpend": 3.3094128251943076,
+      "entryPriceUsed": 0.11920292202211755
+    },
+    {
+      "id": "0xe297ae534cec5e24f248a5c6552b712d0efe39ed",
+      "question": "Will over 3.5 goals be scored in Cienciano vs Universitario match on Aug 2, 2026?",
+      "category": "sports",
+      "llmProbs": [
+        0.24,
+        0.76
+      ],
+      "confidence": 0.58,
+      "disagreement": 0.020000000000000018,
+      "bestIdx": 1,
+      "bestEdge": 0.06731164540481482,
+      "hasValidPrice": true,
+      "signaled": false,
+      "winningOutcomeIdx": 1,
+      "correct": null,
+      "tokensToSpend": 0,
+      "entryPriceUsed": 0.700567142473973
+    },
+    {
+      "id": "0xe2aaa52b3924f0dab7f779212bb67728535d61d7",
+      "question": "Will Game 1 of the Weibo Gaming vs. LNG Esports LPL match on August 8, 2026 (UTC) finish with 28 or more total kills?",
+      "category": "sports",
+      "llmProbs": [
+        0.56,
+        0.44
+      ],
+      "confidence": 0.58,
+      "disagreement": 0.040000000000000036,
+      "bestIdx": 0,
+      "bestEdge": 0.04962962962962969,
+      "hasValidPrice": true,
+      "signaled": false,
+      "winningOutcomeIdx": 0,
+      "correct": null,
+      "tokensToSpend": 0,
+      "entryPriceUsed": 0.5
+    },
+    {
+      "id": "0x162d69ea35c96ab74f93c57fd3ab3b574fe70c7a",
+      "question": "Will both Paris Saint-Germain and Manchester United score in the first half of their August 8, 2026 friendly?",
+      "category": "sports",
+      "llmProbs": [
+        0.18000000000000002,
+        0.7200000000000001,
+        0.10000000000000002
+      ],
+      "confidence": 0.42,
+      "disagreement": 0.9,
+      "bestIdx": 2,
+      "bestEdge": 0.20512820512820512,
+      "hasValidPrice": true,
+      "signaled": false,
+      "winningOutcomeIdx": 0,
+      "correct": null,
+      "tokensToSpend": 0,
+      "entryPriceUsed": 0.3333333333333333
+    },
+    {
+      "id": "0xc34bae2e1c8cf2dd8ba1a711a07bce3634f1dbf3",
+      "question": "Will LGD Gaming defeat Anyone's Legend in their LPL Group Ascend Bo3, completed and reported by Aug 8, 2026 16:00 UTC?",
+      "category": "sports",
+      "llmProbs": [
+        0.5,
+        0.5
+      ],
+      "confidence": 0.25,
+      "disagreement": 0.15000000000000002,
+      "bestIdx": 0,
+      "bestEdge": 0.25583202526593257,
+      "hasValidPrice": true,
+      "signaled": true,
+      "winningOutcomeIdx": 1,
+      "correct": false,
+      "tokensToSpend": 2.959370094747247,
+      "entryPriceUsed": 0.2013108318769246
+    },
+    {
+      "id": "0x7aa83666ee231272c8f6a1fd68e08b8c181df4cb",
+      "question": "Will the Chainlink ETH/USD TWAP for 20:15–20:30 UTC on Aug 8, 2026 be at or above the 20:15 UTC price?",
+      "category": "crypto",
+      "llmProbs": [
+        0.52,
+        0.48
+      ],
+      "confidence": 0.34,
+      "disagreement": 0.020000000000000018,
+      "bestIdx": 0,
+      "bestEdge": 0.015384615384615441,
+      "hasValidPrice": true,
+      "signaled": false,
+      "winningOutcomeIdx": 0,
+      "correct": null,
+      "tokensToSpend": 0,
+      "entryPriceUsed": 0.5
+    },
+    {
+      "id": "0x198f39e5eec17be0f34de2ef8154076560aa626a",
+      "question": "Will Binance ETH/USDT 1h candle close at 16:00 UTC (12:00 PM ET) Aug 8, 2026 be $1,400-$1,500 inclusive?",
+      "category": "crypto",
+      "llmProbs": [
+        0.03,
+        0.97
+      ],
+      "confidence": 0.42,
+      "disagreement": 0,
+      "bestIdx": 1,
+      "bestEdge": 0.47,
+      "hasValidPrice": true,
+      "signaled": true,
+      "winningOutcomeIdx": 1,
+      "correct": true,
+      "tokensToSpend": 4.961,
+      "entryPriceUsed": 0.5
+    },
+    {
+      "id": "0x4de1fedc4bdd8a37ebbafcf3de46e22da1f803b4",
+      "question": "Will ETH be >$1,900 at 7:15pm PDT Wed Aug 5, 2026?",
+      "category": "crypto",
+      "llmProbs": [
+        0.58,
+        0.42
+      ],
+      "confidence": 0.46,
+      "disagreement": 0.07000000000000006,
+      "bestIdx": 0,
+      "bestEdge": 0.013033172801695248,
+      "hasValidPrice": true,
+      "signaled": false,
+      "winningOutcomeIdx": 0,
+      "correct": null,
+      "tokensToSpend": 0,
+      "entryPriceUsed": 0.5886909651293393
+    },
+    {
+      "id": "0x242fdbf56005c370250d3d2ef1147eb43ffda020",
+      "question": "Will ETH be >$1,900 at 7:00pm PDT Wed Aug 5, 2026?",
+      "category": "crypto",
+      "llmProbs": [
+        0.58,
+        0.42
+      ],
+      "confidence": 0.56,
+      "disagreement": 0.07000000000000006,
+      "bestIdx": 0,
+      "bestEdge": 0.03196055942116549,
+      "hasValidPrice": true,
+      "signaled": false,
+      "winningOutcomeIdx": 0,
+      "correct": null,
+      "tokensToSpend": 0,
+      "entryPriceUsed": 0.5680394405788345
+    },
+    {
+      "id": "0x0856296e15954a3eb7ba7e26a5fbea0ae5568c0d",
+      "question": "Will ETH be >$1,900 at 6:45pm PDT Wed Aug 5, 2026?",
+      "category": "crypto",
+      "llmProbs": [
+        0.58,
+        0.42
+      ],
+      "confidence": 0.46,
+      "disagreement": 0.07000000000000006,
+      "bestIdx": 0,
+      "bestEdge": 0.010161938147072558,
+      "hasValidPrice": true,
+      "signaled": false,
+      "winningOutcomeIdx": 0,
+      "correct": null,
+      "tokensToSpend": 0,
+      "entryPriceUsed": 0.591562199783962
+    },
+    {
+      "id": "0x80cf5022d6bb845c96eee8be9aa74da0382cff66",
+      "question": "Will ETH be >$1,900 at 6:30pm PDT Wed Aug 5, 2026?",
+      "category": "crypto",
+      "llmProbs": [
+        0.58,
+        0.42
+      ],
+      "confidence": 0.46,
+      "disagreement": 0.07000000000000006,
+      "bestIdx": 0,
+      "bestEdge": 0.016217689399366297,
+      "hasValidPrice": true,
+      "signaled": false,
+      "winningOutcomeIdx": 0,
+      "correct": null,
+      "tokensToSpend": 0,
+      "entryPriceUsed": 0.5837823106006337
+    },
+    {
+      "id": "0xe5aee3e4ec0d3923f62d49e66294e5751b3866b3",
+      "question": "Will ETH be >$1,900 at 6:15pm PDT Wed Aug 5, 2026?",
+      "category": "crypto",
+      "llmProbs": [
+        0.58,
+        0.42
+      ],
+      "confidence": 0.42,
+      "disagreement": 0.07000000000000006,
+      "bestIdx": 0,
+      "bestEdge": 0.12828491820751398,
+      "hasValidPrice": true,
+      "signaled": true,
+      "winningOutcomeIdx": 0,
+      "correct": true,
+      "tokensToSpend": 2.808194984707338,
+      "entryPriceUsed": 0.471715081792486
+    },
+    {
+      "id": "0xf3aaa9568f4018caec7d2c43c7ec66172f4c6126",
+      "question": "Will ETH be >$1,900 at 6:00pm PDT Wed Aug 5, 2026?",
+      "category": "crypto",
+      "llmProbs": [
+        0.62,
+        0.38
+      ],
+      "confidence": 0.55,
+      "disagreement": 0.030000000000000027,
+      "bestIdx": 0,
+      "bestEdge": 0.04478911797079499,
+      "hasValidPrice": true,
+      "signaled": false,
+      "winningOutcomeIdx": 0,
+      "correct": null,
+      "tokensToSpend": 0,
+      "entryPriceUsed": 0.5837823106006337
+    },
+    {
+      "id": "0xa3339fb5925243b6f145daf027ed70243acea06b",
+      "question": "Will ETH be >$1,900 at 5:45pm PDT Wed Aug 5, 2026?",
+      "category": "crypto",
+      "llmProbs": [
+        0.62,
+        0.38
+      ],
+      "confidence": 0.46,
+      "disagreement": 0.030000000000000027,
+      "bestIdx": 0,
+      "bestEdge": 0.017672357967472352,
+      "hasValidPrice": true,
+      "signaled": false,
+      "winningOutcomeIdx": 0,
+      "correct": null,
+      "tokensToSpend": 0,
+      "entryPriceUsed": 0.6108990706039563
+    }
+  ]
+}
