@@ -1,7 +1,7 @@
 {
-  "updatedAt": "2026-08-09T21:06:54.403Z",
-  "totalReceipts": 117,
-  "totalTrades": 74,
+  "updatedAt": "2026-08-09T21:12:25.506Z",
+  "totalReceipts": 118,
+  "totalTrades": 75,
   "totalSkips": 43,
   "rollingAccuracy": {
     "n": 0,
@@ -25,7 +25,7 @@
     "politics": {
       "n": 0,
       "hitRate": null,
-      "trades": 25
+      "trades": 26
     },
     "tech": {
       "n": 0,
@@ -48,7 +48,7 @@
       "trades": 9
     }
   },
-  "openExposureTokens": 730.7712214034268,
+  "openExposureTokens": 745.7712214034268,
   "tradePerformance": {
     "settled": 0,
     "wins": 0,
@@ -56,7 +56,7 @@
     "winRate": null,
     "voidTrades": 0,
     "totalPnl": 0,
-    "openTrades": 74
+    "openTrades": 75
   },
   "skipCalibration": {
     "settled": 0,
@@ -65,6 +65,51 @@
     "voidSkips": 0
   },
   "lastNDecisions": [
+    {
+      "ts": "2026-08-09T21:12:25.304Z",
+      "marketId": "0xbc54636b1804f09f8dcc373c14e470a5a7e12a66",
+      "question": "Will Donald Trump post 180–199 times on Truth Social between Aug 4, 2026 at 12:00 pm ET and Aug 11, 2026 at 12:00 pm ET?",
+      "category": "politics",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.5,
+        0.5
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.27,
+            0.73
+          ],
+          "confidence": 0.58
+        },
+        "gemini": {
+          "probs": [
+            0.18,
+            0.82
+          ],
+          "confidence": 0.4,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.09000000000000002,
+      "blendedProbs": [
+        0.24428571428571433,
+        0.7557142857142858
+      ],
+      "confidence": 0.58,
+      "decision": "trade",
+      "outcomeIdx": 1,
+      "edge": 0.2557142857142858,
+      "thresholdUsed": 0.12,
+      "size": 15,
+      "execution": null
+    },
     {
       "ts": "2026-08-09T21:06:54.347Z",
       "marketId": "0xbc54636b1804f09f8dcc373c14e470a5a7e12a66",
@@ -1153,51 +1198,6 @@
       "size": null,
       "execution": null,
       "skipReason": "bestEdge=0.000 < minEdge=0.12"
-    },
-    {
-      "ts": "2026-08-09T16:28:32.427Z",
-      "marketId": "0x6792b211ef9123819527ca397be3c533a6b8ead2",
-      "question": "Will an ISW daily map by 23:59 UTC Aug 30, 2026 show part of Moskovka, Kharkiv Oblast, as Russian advance/control?",
-      "category": "politics",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.5,
-        0.5
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.18,
-            0.82
-          ],
-          "confidence": 0.55
-        },
-        "gemini": {
-          "probs": [
-            0.05,
-            0.95
-          ],
-          "confidence": 0.7,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.13,
-      "blendedProbs": [
-        0.12647058823529414,
-        0.8735294117647059
-      ],
-      "confidence": 0.55,
-      "decision": "trade",
-      "outcomeIdx": 1,
-      "edge": 0.3735294117647059,
-      "thresholdUsed": 0.12,
-      "size": 9.898938069570276,
-      "execution": null
     }
   ]
 }
