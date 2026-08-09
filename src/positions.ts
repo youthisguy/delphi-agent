@@ -72,72 +72,66 @@ export async function getOpenPositions(client: DelphiClient): Promise<OpenPositi
   );
   if (openTrades.length === 0) return [];
 
-  const positions: OpenPosition[] = [];
+  const positions = await Promise.all(
+    openTrades.map(async (r) => {
+      const outcomeIdx = r.outcomeIdx as number;
+      const entryPrice = entryPriceFor(r);
+      const outcomeLabel = r.outcomes?.[outcomeIdx] ?? `outcome #${outcomeIdx}`;
 
-  for (const r of openTrades) {
-    const outcomeIdx = r.outcomeIdx as number;
-    const entryPrice = entryPriceFor(r);
-    const outcomeLabel = r.outcomes?.[outcomeIdx] ?? `outcome #${outcomeIdx}`;
-
-    let currentPrice: number | null = null;
-    let marketStatus: string | null = null;
-    let liquidityTokens: number | null = null;
-    let volumeTokens: number | null = null;
-    try {
-      // getMarket() takes an options object (not a bare address string),
-      // and — same as listMarkets() — only returns spotImpliedProbabilities
-      // when pricesAndImpliedProbabilities is explicitly requested.
-      const market: Market | undefined = await withDelphiRetry(
-        () =>
-          client.getMarket({
-            id: r.marketId,
-            pricesAndImpliedProbabilities: true,
-          } as any),
-        { label: `getMarket(${r.marketId})` }
-      );
-      if (market) {
-        marketStatus = (market as any).status ?? null;
-        liquidityTokens = extractLiquidity(market);
-        volumeTokens = extractVolume(market);
-        const rawProbs = (market as any).spotImpliedProbabilities as unknown[] | undefined;
-        if (rawProbs && rawProbs[outcomeIdx] !== undefined) {
-          currentPrice = normalizeProb(rawProbs[outcomeIdx]);
+      let currentPrice: number | null = null;
+      let marketStatus: string | null = null;
+      let liquidityTokens: number | null = null;
+      let volumeTokens: number | null = null;
+      try {
+        const market: Market | undefined = await withDelphiRetry(
+          () =>
+            client.getMarket({
+              id: r.marketId,
+              pricesAndImpliedProbabilities: true,
+            } as any),
+          { label: `getMarket(${r.marketId})`, maxRetries: 2 } // dashboard read on a 15s poll — fail fast
+        );
+        if (market) {
+          marketStatus = (market as any).status ?? null;
+          liquidityTokens = extractLiquidity(market);
+          volumeTokens = extractVolume(market);
+          const rawProbs = (market as any).spotImpliedProbabilities as unknown[] | undefined;
+          if (rawProbs && rawProbs[outcomeIdx] !== undefined) {
+            currentPrice = normalizeProb(rawProbs[outcomeIdx]);
+          }
         }
+      } catch (err) {
+        console.warn(`  [positions] couldn't fetch market ${r.marketId}:`, err instanceof Error ? err.message : err);
       }
-    } catch (err) {
-      console.warn(`  [positions] couldn't fetch market ${r.marketId}:`, err instanceof Error ? err.message : err);
-    }
 
-    const size = r.size ?? 0;
-    let unrealizedPnl: number | null = null;
-    let unrealizedPnlPct: number | null = null;
-    if (currentPrice !== null && entryPrice > 0) {
-      // 1 share pays out 1 token if this outcome wins, 0 otherwise, so a
-      // share's fair value tracks its implied probability directly —
-      // P&L% is just how much that probability has moved since entry.
-      unrealizedPnlPct = (currentPrice - entryPrice) / entryPrice;
-      unrealizedPnl = size * unrealizedPnlPct;
-    }
+      const size = r.size ?? 0;
+      let unrealizedPnl: number | null = null;
+      let unrealizedPnlPct: number | null = null;
+      if (currentPrice !== null && entryPrice > 0) {
+        unrealizedPnlPct = (currentPrice - entryPrice) / entryPrice;
+        unrealizedPnl = size * unrealizedPnlPct;
+      }
 
-    positions.push({
-      marketId: r.marketId,
-      question: r.question,
-      category: r.category,
-      outcomeIdx,
-      outcomeLabel,
-      size,
-      entryPrice,
-      currentPrice,
-      unrealizedPnl,
-      unrealizedPnlPct,
-      priceImpactPct: r.execution?.priceImpactPct ?? null,
-      marketStatus,
-      liquidityTokens,
-      volumeTokens,
-      isDryRun: !r.execution,
-      ts: r.ts,
-    });
-  }
+      return {
+        marketId: r.marketId,
+        question: r.question,
+        category: r.category,
+        outcomeIdx,
+        outcomeLabel,
+        size,
+        entryPrice,
+        currentPrice,
+        unrealizedPnl,
+        unrealizedPnlPct,
+        priceImpactPct: r.execution?.priceImpactPct ?? null,
+        marketStatus,
+        liquidityTokens,
+        volumeTokens,
+        isDryRun: !r.execution,
+        ts: r.ts,
+      } satisfies OpenPosition;
+    })
+  );
 
   return positions;
 }

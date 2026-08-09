@@ -75,8 +75,8 @@ export function setCompetitionTokenAddress(address: string | null): RuntimeConfi
 
 export const CONFIG = {
   loopIntervalMs: Number(process.env.LOOP_INTERVAL_MS ?? 5 * 60 * 1000),
-  maxTokensPerTrade: Number(process.env.MAX_TOKENS_PER_TRADE ?? 10),
-  maxMarketsPerLoop: Number(process.env.MAX_MARKETS_PER_LOOP ?? 50),
+  maxTokensPerTrade: Number(process.env.MAX_TOKENS_PER_TRADE ?? 15),
+  maxMarketsPerLoop: Number(process.env.MAX_MARKETS_PER_LOOP ?? 75),
 
   // Server
   port: Number(process.env.PORT ?? 8787),
