@@ -1,18 +1,18 @@
 {
-  "updatedAt": "2026-08-09T20:04:57.090Z",
-  "totalReceipts": 108,
-  "totalTrades": 65,
+  "updatedAt": "2026-08-09T20:07:26.013Z",
+  "totalReceipts": 109,
+  "totalTrades": 66,
   "totalSkips": 43,
   "rollingAccuracy": {
     "n": 0,
     "hitRate": null
   },
   "calibrationByConfidenceBucket": {
-    "high(0.6-0.8)": {
+    "mid(0.4-0.6)": {
       "n": 0,
       "hitRate": null
     },
-    "mid(0.4-0.6)": {
+    "high(0.6-0.8)": {
       "n": 0,
       "hitRate": null
     },
@@ -25,7 +25,7 @@
     "politics": {
       "n": 0,
       "hitRate": null,
-      "trades": 16
+      "trades": 17
     },
     "tech": {
       "n": 0,
@@ -48,7 +48,7 @@
       "trades": 9
     }
   },
-  "openExposureTokens": 625.7712214034268,
+  "openExposureTokens": 635.7712214034268,
   "tradePerformance": {
     "settled": 0,
     "wins": 0,
@@ -56,7 +56,7 @@
     "winRate": null,
     "voidTrades": 0,
     "totalPnl": 0,
-    "openTrades": 65
+    "openTrades": 66
   },
   "skipCalibration": {
     "settled": 0,
@@ -65,6 +65,51 @@
     "voidSkips": 0
   },
   "lastNDecisions": [
+    {
+      "ts": "2026-08-09T20:07:26.003Z",
+      "marketId": "0xbc54636b1804f09f8dcc373c14e470a5a7e12a66",
+      "question": "Will Donald Trump post 180–199 times on Truth Social between Aug 4, 2026 at 12:00 pm ET and Aug 11, 2026 at 12:00 pm ET?",
+      "category": "politics",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.5,
+        0.5
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.18,
+            0.82
+          ],
+          "confidence": 0.56
+        },
+        "gemini": {
+          "probs": [
+            0.18,
+            0.82
+          ],
+          "confidence": 0.4,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0,
+      "blendedProbs": [
+        0.18000000000000002,
+        0.82
+      ],
+      "confidence": 0.56,
+      "decision": "trade",
+      "outcomeIdx": 1,
+      "edge": 0.31999999999999995,
+      "thresholdUsed": 0.12,
+      "size": 10,
+      "execution": null
+    },
     {
       "ts": "2026-08-09T20:04:57.072Z",
       "marketId": "0xbc54636b1804f09f8dcc373c14e470a5a7e12a66",
@@ -1161,51 +1206,6 @@
       "edge": 0.20714285714285718,
       "thresholdUsed": 0.12,
       "size": 6.021362351190479,
-      "execution": null
-    },
-    {
-      "ts": "2026-08-09T16:22:57.242Z",
-      "marketId": "0x5c7110011e6eeb8c09566d782b2cd125ef7c1e3a",
-      "question": "Will \"A Quiet Place: Day One\" top Netflix's US Films (English) Top 10 in the Aug 11, 2026 update?",
-      "category": "culture",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.5,
-        0.5
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.12,
-            0.88
-          ],
-          "confidence": 0.46
-        },
-        "gemini": {
-          "probs": [
-            0.01,
-            0.99
-          ],
-          "confidence": 0.85,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.11,
-      "blendedProbs": [
-        0.06945945945945947,
-        0.9305405405405406
-      ],
-      "confidence": 0.46,
-      "decision": "trade",
-      "outcomeIdx": 1,
-      "edge": 0.4305405405405406,
-      "thresholdUsed": 0.12,
-      "size": 10,
       "execution": null
     }
   ]
