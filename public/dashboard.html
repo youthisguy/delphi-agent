@@ -485,6 +485,8 @@
             <th>CURRENT</th>
             <th>UNREALIZED P&amp;L</th>
             <th>IMPACT</th>
+            <th>LIQUIDITY</th>
+            <th>VOLUME</th>
             <th>STATUS</th>
           </tr>
         </thead>
@@ -540,6 +542,7 @@
             <th>OUTCOMES</th>
             <th>IMPLIED PROBS</th>
             <th>LIQUIDITY</th>
+            <th>VOLUME</th>
             <th>STATUS</th>
           </tr>
         </thead>
@@ -755,7 +758,7 @@ async function loadPositions() {
       : '0 OPEN';
 
     if (!positions.length) {
-      $('#positionsBody').innerHTML = `<tr><td colspan="8"><div class="empty">no open positions</div></td></tr>`;
+      $('#positionsBody').innerHTML = `<tr><td colspan="10"><div class="empty">no open positions</div></td></tr>`;
       return;
     }
 
@@ -772,6 +775,11 @@ async function loadPositions() {
       const hasImpact = p.priceImpactPct !== null && p.priceImpactPct !== undefined;
       const impactClass = !hasImpact ? '' : (p.priceImpactPct > 0.02 ? 'bad' : (p.priceImpactPct > 0.005 ? 'warn' : 'good'));
       const impactText = hasImpact ? `${fmtNum(p.priceImpactPct * 100, 1)}%` : '—';
+      // Liquidity/volume, in tokens — null means the API didn't expose a
+      // field this build recognizes (see marketFields.ts), not that the
+      // market actually has zero.
+      const liqText = (p.liquidityTokens !== null && p.liquidityTokens !== undefined) ? fmtNum(p.liquidityTokens, 2) : '—';
+      const volText = (p.volumeTokens !== null && p.volumeTokens !== undefined) ? fmtNum(p.volumeTokens, 2) : '—';
       return `
         <tr>
           <td class="q-cell" title="${esc(p.question)}">${esc(p.question)}</td>
@@ -781,6 +789,8 @@ async function loadPositions() {
           <td>${p.currentPrice !== null ? fmtNum(p.currentPrice, 3) : 'N/A'}</td>
           <td class="${pnlClass}">${pnlText}</td>
           <td class="${impactClass}">${impactText}</td>
+          <td>${liqText}</td>
+          <td>${volText}</td>
           <td>
             ${p.isDryRun ? '<span class="pill synth">DRY</span>' : '<span class="pill trade">LIVE</span>'}
             ${p.marketStatus ? `<span style="color:var(--text-muted); font-size:9px;"> ${esc(p.marketStatus)}</span>` : ''}
@@ -789,7 +799,7 @@ async function loadPositions() {
       `;
     }).join('');
   } catch (e) {
-    $('#positionsBody').innerHTML = `<tr><td colspan="8"><div class="empty">positions unavailable &mdash; ${esc(e.message)}</div></td></tr>`;
+    $('#positionsBody').innerHTML = `<tr><td colspan="10"><div class="empty">positions unavailable &mdash; ${esc(e.message)}</div></td></tr>`;
   }
 }
 
@@ -960,7 +970,7 @@ async function loadMarkets() {
     const markets = r.markets || [];
     $('#marketCount').textContent = markets.length + ' ACTIVE';
     if (!markets.length) {
-      $('#marketsBody').innerHTML = `<tr><td colspan="6"><div class="empty">no active market order books</div></td></tr>`;
+      $('#marketsBody').innerHTML = `<tr><td colspan="7"><div class="empty">no active market order books</div></td></tr>`;
       return;
     }
     $('#marketsBody').innerHTML = markets.map(m => {
@@ -969,11 +979,17 @@ async function loadMarkets() {
       const cat = m.category ?? '—';
       const probs = (m.spotImpliedProbabilities || []).map(p => fmtNum(Number(p), 2)).join(' / ');
       // Fetch order is already liquidity-ranked (server pins orderBy:
-      // "liquidity") — liquidityRank/isThinMarket are computed server-side
-      // as a relative, per-batch heuristic, not an absolute liquidity unit.
-      const liqCell = m.liquidityRank
-        ? `#${m.liquidityRank}${m.liquidityRankOf ? '/' + m.liquidityRankOf : ''} ${m.isThinMarket ? '<span class="pill synth" title="Bottom of this batch by liquidity rank">THIN</span>' : ''}`
-        : '—';
+      // "liquidity"). liquidityTokens/volumeTokens are the actual token
+      // figures when the API exposes a recognizable field (see
+      // marketFields.ts — unverified field names/scaling, hence the
+      // fallback to the rank badge when null rather than showing "0").
+      const hasLiq = m.liquidityTokens !== null && m.liquidityTokens !== undefined;
+      const liqCell = hasLiq
+        ? `${fmtNum(m.liquidityTokens, 2)} ${m.isThinMarket ? '<span class="pill synth" title="Bottom of this batch by liquidity rank">THIN</span>' : ''}`
+        : (m.liquidityRank
+          ? `#${m.liquidityRank}${m.liquidityRankOf ? '/' + m.liquidityRankOf : ''} ${m.isThinMarket ? '<span class="pill synth" title="Bottom of this batch by liquidity rank">THIN</span>' : ''}`
+          : '—');
+      const volCell = (m.volumeTokens !== null && m.volumeTokens !== undefined) ? fmtNum(m.volumeTokens, 2) : '—';
       return `
         <tr>
           <td class="q-cell" title="${esc(q)}">${esc(q)}</td>
@@ -981,6 +997,7 @@ async function loadMarkets() {
           <td>${esc(outcomes.join('/'))}</td>
           <td class="v cyan">${probs || 'NO_BOOK'}</td>
           <td>${liqCell}</td>
+          <td>${volCell}</td>
           <td><span class="pill trade">${esc(m.status)}</span></td>
         </tr>
       `;

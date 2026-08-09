@@ -11,6 +11,7 @@ import { getNativeBalance, getErc20Balance, getErc20Decimals, hasContractCode, g
 import { getOpenPositions } from "./positions.js";
 import { checkSettledOutcomes } from "./settlement.js";
 import { runCheckpointScript } from "./checkpoint.js";
+import { extractLiquidity, extractVolume } from "./marketFields.js";
 
 const app = express();
 app.use(express.json());
@@ -212,6 +213,12 @@ app.get("/api/markets/open", async (req, res) => {
       liquidityRank: i + 1,
       liquidityRankOf: list.length,
       isThinMarket: list.length > 0 && i >= thinCutoff,
+      // Actual token amounts, when the API exposes them — see
+      // marketFields.ts's header comment for the "unverified field
+      // name/scaling" caveat. null means this build couldn't find a
+      // recognizable field, not that the market has zero liquidity.
+      liquidityTokens: extractLiquidity(m),
+      volumeTokens: extractVolume(m),
     }));
 
     res.json({ markets: withLiquidity });

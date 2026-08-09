@@ -1,5 +1,6 @@
 import type { DelphiClient, Market } from "@gensyn-ai/gensyn-delphi-sdk";
 import { readReceipts, type Receipt } from "./journal.js";
+import { extractLiquidity, extractVolume } from "./marketFields.js";
 
 /**
  * Mark-to-market for still-open trades — deliberately NOT part of the
@@ -28,6 +29,11 @@ export interface OpenPosition {
    * before this field existed. */
   priceImpactPct: number | null;
   marketStatus: string | null;
+  /** Current liquidity/volume for this market, in tokens (or null if the
+   * API doesn't expose a field this build recognizes — see
+   * marketFields.ts's header comment; unverified field names/scaling). */
+  liquidityTokens: number | null;
+  volumeTokens: number | null;
   isDryRun: boolean;
   ts: string;
 }
@@ -74,6 +80,8 @@ export async function getOpenPositions(client: DelphiClient): Promise<OpenPositi
 
     let currentPrice: number | null = null;
     let marketStatus: string | null = null;
+    let liquidityTokens: number | null = null;
+    let volumeTokens: number | null = null;
     try {
       // getMarket() takes an options object (not a bare address string),
       // and — same as listMarkets() — only returns spotImpliedProbabilities
@@ -84,6 +92,8 @@ export async function getOpenPositions(client: DelphiClient): Promise<OpenPositi
       } as any);
       if (market) {
         marketStatus = (market as any).status ?? null;
+        liquidityTokens = extractLiquidity(market);
+        volumeTokens = extractVolume(market);
         const rawProbs = (market as any).spotImpliedProbabilities as unknown[] | undefined;
         if (rawProbs && rawProbs[outcomeIdx] !== undefined) {
           currentPrice = normalizeProb(rawProbs[outcomeIdx]);
@@ -117,6 +127,8 @@ export async function getOpenPositions(client: DelphiClient): Promise<OpenPositi
       unrealizedPnlPct,
       priceImpactPct: r.execution?.priceImpactPct ?? null,
       marketStatus,
+      liquidityTokens,
+      volumeTokens,
       isDryRun: !r.execution,
       ts: r.ts,
     });
