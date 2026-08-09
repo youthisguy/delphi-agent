@@ -559,6 +559,8 @@
 </div>
 
 <footer>
+  <span>LAZY FALCON</span>
+  <span class="panel-sub">checkpoints save automatically after trades</span>
 </footer>
 
 <script src="dashboard.js"></script>
@@ -800,14 +802,32 @@ async function loadSummary() {
       return;
     }
     $('#summaryUpdated').textContent = 'SYNCED ' + timeAgo(s.updatedAt).toUpperCase();
+    const tp = s.tradePerformance;
+    const sc = s.skipCalibration;
     let html = `
       <div class="stat-grid" style="margin-bottom:10px;">
         <div class="stat-card"><span class="k">Accuracy Rate</span><span class="v ${s.rollingAccuracy.hitRate >= 0.55 ? 'good' : 'bad'}">${fmtPct(s.rollingAccuracy.hitRate)}</span></div>
         <div class="stat-card"><span class="k">Exposure Tokens</span><span class="v warn">${fmtNum(s.openExposureTokens)}</span></div>
-      </div>
+      </div>`;
+    if (tp) {
+      const pnlClass = tp.totalPnl > 0 ? 'good' : (tp.totalPnl < 0 ? 'bad' : '');
+      const pnlSign = tp.totalPnl > 0 ? '+' : '';
+      html += `
+      <div class="panel-sub" style="margin: 8px 0 4px 0;">SETTLED TRADES — WIN / LOSS / P&amp;L</div>
+      <div class="stat-grid" style="margin-bottom:10px;">
+        <div class="stat-card"><span class="k">Win Rate</span><span class="v ${tp.winRate === null ? '' : (tp.winRate >= 0.5 ? 'good' : 'bad')}">${fmtPct(tp.winRate)}</span></div>
+        <div class="stat-card"><span class="k">Record</span><span class="v"><span class="good">${tp.wins}W</span> / <span class="bad">${tp.losses}L</span>${tp.voidTrades ? ` <span style="color:var(--text-muted)">(${tp.voidTrades} void)</span>` : ''}</span></div>
+        <div class="stat-card"><span class="k">Total P&amp;L</span><span class="v ${pnlClass}">${pnlSign}${fmtNum(tp.totalPnl, 2)} TOK</span></div>
+        <div class="stat-card"><span class="k">Open (unsettled)</span><span class="v">${tp.openTrades}</span></div>
+      </div>`;
+    }
+    html += `
       <div class="stat-row"><span class="k">Total Trades executed</span><span class="v">${s.totalTrades}</span></div>
       <div class="stat-row"><span class="k">Total Skips</span><span class="v">${s.totalSkips}</span></div>
     `;
+    if (sc && sc.settled) {
+      html += `<div class="stat-row"><span class="k">Skip calibration (would've won)</span><span class="v">${fmtPct(sc.wouldHaveWonRate)} <span style="color:var(--text-muted)">(n=${sc.settled}${sc.voidSkips ? `, ${sc.voidSkips} void` : ''})</span></span></div>`;
+    }
     const buckets = Object.entries(s.calibrationByConfidenceBucket || {});
     if (buckets.length) {
       html += `<div class="panel-sub" style="margin: 8px 0 4px 0;">CONFIDENCE CALIBRATION</div>`;

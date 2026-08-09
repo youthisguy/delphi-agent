@@ -56,14 +56,41 @@ export interface Receipt {
     void?: boolean;
   } | null;
 
+  /** Ground-truth settlement result, filled in by settlement.ts's
+   * checkSettledOutcomes() once the underlying market resolves — for
+   * BOTH decision types, not just trades. A skip never risked capital,
+   * so its settlement.pnl is always null; what it DOES record is
+   * whether the model's own favorite outcome would have been right,
+   * for calibration. Absent/undefined means "market hasn't settled yet
+   * (or hasn't been checked yet)" — never overwritten once set. */
+  settlement?: ReceiptSettlement | null;
+
   skipReason?: string;
+}
+
+export interface ReceiptSettlement {
+  settledAt: string; // ISO timestamp this was recorded, not when the market itself settled
+  winningOutcomeIdx: number | null; // null for a void/failed market
+  void: boolean; // true = market settled "failed" (no single winner) — see redeem.ts's liquidate() path
+  /** trade: outcomeIdx === winningOutcomeIdx. skip: argmax(blendedProbs)
+   * === winningOutcomeIdx (i.e. "would the model's own favorite pick
+   * have been right"). null when void, or when there's nothing to
+   * compare (e.g. an empty blend). */
+  correct: boolean | null;
+  /** Realized (live, from execution.redeemedAmount) or hypothetical
+   * (dry-run, from size ÷ entryPrice) P&L in tokens. Always null for
+   * skip receipts — capital was never risked, there's nothing to P&L —
+   * and null for void trades, since a dry-run void has no reliable
+   * recovery estimate absent an actual liquidate() call. */
+  pnl: number | null;
 }
 
 export function appendReceipt(r: Receipt) {
   fs.appendFileSync(CONFIG.journalPath, JSON.stringify(r) + "\n");
 }
 
-/** Patch an existing receipt (used when a winning position is later redeemed). */
+/** Patch an existing receipt's execution block (used when a winning
+ * position is later redeemed). Trade receipts only. */
 export function patchReceiptExecution(
   marketId: string,
   patch: Partial<NonNullable<Receipt["execution"]>>
@@ -75,6 +102,29 @@ export function patchReceiptExecution(
     const r: Receipt = JSON.parse(line);
     if (r.marketId === marketId && r.decision === "trade") {
       r.execution = { ...(r.execution ?? {}), ...patch };
+      changed = true;
+    }
+    return JSON.stringify(r);
+  });
+  if (changed) fs.writeFileSync(CONFIG.journalPath, out.join("\n") + "\n");
+}
+
+/** Patch every not-yet-settled receipt for a market with its ground-truth
+ * settlement result — trade AND skip receipts alike, live and dry-run.
+ * Unlike patchReceiptExecution this isn't decision-gated: every past
+ * evaluation of a market (it may have been skipped several cycles, then
+ * traded once, or vice versa) gets the same settlement outcome recorded
+ * once it's known. Idempotent — a receipt that already has `settlement`
+ * set is left untouched, so re-running the check never overwrites a
+ * recorded result. */
+export function patchReceiptSettlement(marketId: string, settlement: ReceiptSettlement) {
+  if (!fs.existsSync(CONFIG.journalPath)) return;
+  const lines = fs.readFileSync(CONFIG.journalPath, "utf8").split("\n").filter(Boolean);
+  let changed = false;
+  const out = lines.map((line) => {
+    const r: Receipt = JSON.parse(line);
+    if (r.marketId === marketId && !r.settlement) {
+      r.settlement = settlement;
       changed = true;
     }
     return JSON.stringify(r);
@@ -110,6 +160,28 @@ export interface Summary {
   calibrationByConfidenceBucket: Record<string, { n: number; hitRate: number | null }>;
   perCategory: Record<string, { n: number; hitRate: number | null; trades: number }>;
   openExposureTokens: number;
+  /** Ground-truth win/loss/P&L, sourced from settlement.ts's
+   * checkSettledOutcomes() — covers BOTH live and dry-run trades (unlike
+   * the older execution-only bookkeeping, which only ever saw live
+   * redemptions). This is what the dashboard's win-rate/P&L panel reads. */
+  tradePerformance: {
+    settled: number; // non-void trades with a recorded settlement
+    wins: number;
+    losses: number;
+    winRate: number | null;
+    voidTrades: number; // settled "failed"/void — excluded from win/loss and winRate
+    totalPnl: number; // tokens; sums every trade with a non-null settlement.pnl, including void recoveries
+    openTrades: number; // no settlement recorded yet (still open, or not yet checked)
+  };
+  /** Same idea for skips — calibration only, never P&L (a skip risks
+   * nothing). wouldHaveWon compares the model's own favorite outcome
+   * (argmax of the blend) against the actual winner. */
+  skipCalibration: {
+    settled: number;
+    wouldHaveWon: number;
+    wouldHaveWonRate: number | null;
+    voidSkips: number;
+  };
   lastNDecisions: Receipt[];
 }
 
@@ -128,18 +200,18 @@ function bucketFor(conf: number): string {
 }
 
 /**
- * Recompute the pinned summary from the full journal. Settled outcomes are
- * pulled in by cross-referencing execution.redeemedTxHash presence (a
- * trade only gets redeemed once the market has settled AND we won) plus
- * receipts whose skipReason indicates the market later settled losing.
- * For a more precise picture, the backtest job (which matches receipts
- * against actual resolved markets) periodically overwrites the accuracy
- * fields with ground truth — see backtest.ts.
+ * Recompute the pinned summary from the full journal. Win/loss/P&L now
+ * come from each receipt's `settlement` block (see settlement.ts's
+ * checkSettledOutcomes(), which patches it in once a market's market
+ * resolves) — that covers dry-run trades and skips too, not just live
+ * on-chain redemptions the way the old execution-only bookkeeping did.
  *
- * Receipts patched with execution.void (failed/void markets liquidated
- * via redeem.ts, not redeemed against a winner) are excluded from the
- * accuracy denominator entirely — they never resolved to a right-or-
- * wrong forecast, so folding them in as misses would understate hit rate.
+ * Void/failed markets (settlement.void — liquidated rather than
+ * resolved to a winning outcome, see redeem.ts) are excluded from the
+ * win/loss and accuracy denominators entirely: they never resolved to
+ * an actual right-or-wrong forecast, so folding them in as a miss would
+ * understate hit rate. Their P&L (recovered collateral minus size, when
+ * known) still counts toward totalPnl.
  */
 export async function recomputeSummary(
   groundTruth?: { winRate: number; n: number }
@@ -152,30 +224,43 @@ export async function recomputeSummary(
   const byCategory: Record<string, { n: number; correct: number; trades: number }> = {};
 
   let openExposureTokens = 0;
+  let wins = 0,
+    losses = 0,
+    voidTrades = 0,
+    openTrades = 0,
+    totalPnl = 0;
+
   for (const r of trades) {
     const cat = r.category ?? "uncategorized";
     byCategory[cat] ??= { n: 0, correct: 0, trades: 0 };
     byCategory[cat].trades += 1;
-  
+
     const bucket = bucketFor(r.confidence);
     byBucket[bucket] ??= { n: 0, correct: 0 };
-  
-    if (r.execution?.resolved) {
-      // Void/failed markets (liquidated, not redeemed against a winner —
-      // see redeem.ts) never resolved to an actual right-or-wrong
-      // forecast, so they're excluded from the accuracy denominator
-      // entirely rather than counted as a miss.
-      if (!r.execution.void) {
-        byBucket[bucket].n += 1;
-        byCategory[cat].n += 1;
-        if (r.execution.won) {
-          byBucket[bucket].correct += 1;
-          byCategory[cat].correct += 1;
-        }
-      }
-    } else if (r.size) {
-      // still open / unresolved — counts toward exposure, not accuracy yet
-      openExposureTokens += r.size;
+
+    if (!r.settlement) {
+      openTrades += 1;
+      if (r.size) openExposureTokens += r.size; // still open — counts toward exposure, not accuracy yet
+      continue;
+    }
+
+    if (r.settlement.pnl !== null && r.settlement.pnl !== undefined) {
+      totalPnl += r.settlement.pnl;
+    }
+
+    if (r.settlement.void) {
+      voidTrades += 1;
+      continue; // never resolved to a right-or-wrong forecast
+    }
+
+    byBucket[bucket].n += 1;
+    byCategory[cat].n += 1;
+    if (r.settlement.correct) {
+      wins += 1;
+      byBucket[bucket].correct += 1;
+      byCategory[cat].correct += 1;
+    } else if (r.settlement.correct === false) {
+      losses += 1;
     }
   }
 
@@ -186,6 +271,21 @@ export async function recomputeSummary(
   const perCategory: Summary["perCategory"] = {};
   for (const [k, v] of Object.entries(byCategory)) {
     perCategory[k] = { n: v.n, hitRate: v.n ? v.correct / v.n : null, trades: v.trades };
+  }
+
+  const settledTradeCount = wins + losses;
+
+  let skipsSettled = 0,
+    skipsWouldHaveWon = 0,
+    voidSkips = 0;
+  for (const r of skips) {
+    if (!r.settlement) continue;
+    if (r.settlement.void) {
+      voidSkips += 1;
+      continue;
+    }
+    skipsSettled += 1;
+    if (r.settlement.correct) skipsWouldHaveWon += 1;
   }
 
   const overallN = Object.values(byBucket).reduce((a, b) => a + b.n, 0);
@@ -202,6 +302,21 @@ export async function recomputeSummary(
     calibrationByConfidenceBucket,
     perCategory,
     openExposureTokens,
+    tradePerformance: {
+      settled: settledTradeCount,
+      wins,
+      losses,
+      winRate: settledTradeCount ? wins / settledTradeCount : null,
+      voidTrades,
+      totalPnl: Number(totalPnl.toFixed(4)),
+      openTrades,
+    },
+    skipCalibration: {
+      settled: skipsSettled,
+      wouldHaveWon: skipsWouldHaveWon,
+      wouldHaveWonRate: skipsSettled ? skipsWouldHaveWon / skipsSettled : null,
+      voidSkips,
+    },
     lastNDecisions: receipts.slice(0, 25),
   };
 

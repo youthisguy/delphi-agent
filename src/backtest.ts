@@ -31,11 +31,6 @@ export interface BacktestRow {
 
 export interface BacktestOptions {
   maxMarkets?: number;
-  /** Defaults to true, matching index.ts's live behavior — Gemini is
-   * blended for every market now, not just isTimeSensitive() ones (that
-   * gate now only controls *grounding*, not whether Gemini is called at
-   * all — see evaluateForBacktest below). Pass `false` explicitly if you
-   * want a cheaper/faster backtest run that skips Gemini entirely. */
   useGemini?: boolean;
 }
 
@@ -70,7 +65,7 @@ function normalizeProbs(raw: unknown[]): number[] {
   return nums.map((p) => (Number.isFinite(p) ? p : 0));
 }
 
-function extractWinningIdx(market: Market): number | null {
+export function extractWinningIdx(market: Market): number | null {
   const m = market as any;
   const candidates = [
     m.winningOutcomeIdx,

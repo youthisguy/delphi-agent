@@ -4,11 +4,12 @@ import fs from "node:fs";
 import path from "node:path";
 import { DelphiClient } from "@gensyn-ai/gensyn-delphi-sdk";
 import { CONFIG, getDryRun, setDryRun, getCompetitionTokenAddress, setCompetitionTokenAddress } from "./config.js";
-import { readReceipts, readPinnedSummary } from "./journal.js";
+import { readReceipts, readPinnedSummary, recomputeSummary } from "./journal.js";
 import { runBacktest, listBacktestRuns, readBacktestRun } from "./backtest.js";
 import { getAllNodesView, getPoolSummary, runHealthCheck } from "./keyPool.js";
 import { getNativeBalance, getErc20Balance, getErc20Decimals, hasContractCode, getChainId, resolveWalletAddress } from "./chainRead.js";
 import { getOpenPositions } from "./positions.js";
+import { checkSettledOutcomes } from "./settlement.js";
 import { runCheckpointScript } from "./checkpoint.js";
 
 const app = express();
@@ -233,6 +234,22 @@ app.get("/api/receipts", async (req, res) => {
 
 app.get("/api/summary", (_req, res) => {
   res.json(readPinnedSummary() ?? { note: "no summary yet — run the loop or a backtest first" });
+});
+
+// Manual trigger for the same settlement pass runCycle() runs
+// automatically at the top of every cycle (see index.ts) — mainly for
+// testing without waiting on the next loop tick. Patches win/loss/void +
+// pnl onto any receipt (trade or skip, live or dry-run) whose market has
+// resolved, then recomputes the pinned summary so /api/summary reflects
+// it immediately.
+app.post("/api/settlement/check", async (_req: any, res: any) => {
+  try {
+    const result = await checkSettledOutcomes(client);
+    const summary = await recomputeSummary();
+    res.json({ ...result, summary });
+  } catch (err) {
+    res.status(500).json({ error: err instanceof Error ? err.message : String(err) });
+  }
 });
 
 // --- backtest ---------------------------------------------------------------

@@ -2,7 +2,6 @@
  * Lazy Falcon — closed loop: forecast -> blend -> risk check -> journal ->
  * (maybe) trade -> redeem settled winners -> repeat.
  *
- * Run with: npx tsx src/index.ts
  */
 import "dotenv/config";
 import fs from "node:fs";
@@ -13,6 +12,7 @@ import { getGeminiForecast } from "./geminiForecast.js";
 import { blendSignals, isTimeSensitive, type Signal } from "./blend.js";
 import { appendReceipt, patchReceiptExecution, recomputeSummary, type Receipt } from "./journal.js";
 import { checkAndRedeemSettledPositions } from "./redeem.js";
+import { checkSettledOutcomes } from "./settlement.js";
 import { getOpenPositions } from "./positions.js";
 import { getErc20Balance, getErc20Decimals, hasContractCode, resolveWalletAddress } from "./chainRead.js";
 import { getCachedForecast, setCachedForecast, pruneForecastCache } from "./forecastCache.js";
@@ -172,8 +172,8 @@ async function decide(
     llmProbs = llmResult.probs;
     confidence = llmResult.confidence;
 
-    // Gemini — blended for every market 
-    // Grounding (Google Search)
+    // Gemini — blended for every market (was previously gated to only
+    // isTimeSensitive() questions). Grounding (Google Search) stays
     // limited to time-sensitive questions since that's specifically
     // where a stale training cutoff hurts — no reason to pay the extra
     // grounding latency/cost on a static question like "who wins this
@@ -308,17 +308,6 @@ async function tradeOnMarket(market: Market, decision: TradeDecision, dryRun: bo
     return null;
   }
 
-  // ⚠️ UNVERIFIED: quoteBuy / ensureTokenApproval / buyShares below are
-  // opaque SDK calls that take no token-address parameter — they rely on
-  // whatever collateral token the SDK itself resolves per market
-  // internally. The balance check above now correctly confirms you HOLD
-  // enough of the real competition token, but that does NOT guarantee
-  // these calls will actually spend that same token. Before trusting
-  // this live, confirm with the SDK docs/source (or a single small live
-  // test trade) that the market's collateral token matches
-  // COMPETITION_TOKEN_ADDRESS — otherwise approval/spend could target a
-  // different contract than the balance you just checked.
-  //
   // sharesOut is priced on a fixed 1e18 basis regardless of the
   // collateral token's own decimals (e.g. a 6-decimal competition token
   // still buys shares denominated in 1e18 units) — it must NOT be
@@ -464,6 +453,20 @@ async function runCycle() {
       if (redemptions.length) console.log(`  Redemption check: ${JSON.stringify(redemptions)}`);
     } catch (err) {
       const msg = `redemption check failed: ${err instanceof Error ? err.message : err}`;
+      console.error(" ", msg);
+      errors.push(msg);
+    }
+
+    // 0.4 Record win/loss/void + P&L for every receipt whose market has
+    // settled since it was last checked — trade AND skip, live AND
+    // dry-run (redemption above only ever touches live trades). Runs
+    // right after redemption so a live trade just redeemed above already
+    // has its execution.redeemedAmount available for this pass to read.
+    try {
+      const settled = await checkSettledOutcomes(client);
+      if (settled.settled) console.log(`  Settlement check: ${settled.settled}/${settled.checked} newly settled`);
+    } catch (err) {
+      const msg = `settlement check failed: ${err instanceof Error ? err.message : err}`;
       console.error(" ", msg);
       errors.push(msg);
     }
