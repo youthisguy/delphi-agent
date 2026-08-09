@@ -1,8 +1,8 @@
 {
-  "updatedAt": "2026-08-09T16:17:55.437Z",
-  "totalReceipts": 79,
-  "totalTrades": 45,
-  "totalSkips": 34,
+  "updatedAt": "2026-08-09T16:22:58.036Z",
+  "totalReceipts": 90,
+  "totalTrades": 51,
+  "totalSkips": 39,
   "rollingAccuracy": {
     "n": 0,
     "hitRate": null
@@ -25,31 +25,536 @@
     "culture": {
       "n": 0,
       "hitRate": null,
-      "trades": 13
+      "trades": 15
     },
     "sports": {
       "n": 0,
       "hitRate": null,
-      "trades": 9
+      "trades": 10
     },
     "politics": {
       "n": 0,
       "hitRate": null,
-      "trades": 7
+      "trades": 8
     },
     "tech": {
       "n": 0,
       "hitRate": null,
-      "trades": 9
+      "trades": 10
     },
     "crypto": {
       "n": 0,
       "hitRate": null,
-      "trades": 7
+      "trades": 8
     }
   },
-  "openExposureTokens": 448.3375,
+  "openExposureTokens": 504.3588623511905,
   "lastNDecisions": [
+    {
+      "ts": "2026-08-09T16:22:57.970Z",
+      "marketId": "0x6b1c259726e1968217150da895536e28570fae60",
+      "question": "Will Donald Trump post 180–199 times on Truth Social between Aug 4, 2026 at 12:00 pm ET and Aug 11, 2026 at 12:00 pm ET?",
+      "category": "politics",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.22525501578276363,
+        0.7747449842172364
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.24,
+            0.76
+          ],
+          "confidence": 0.58
+        },
+        "gemini": {
+          "probs": [
+            0.08,
+            0.92
+          ],
+          "confidence": 0.8,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.16000000000000003,
+      "blendedProbs": [
+        0.1688888888888889,
+        0.8311111111111111
+      ],
+      "confidence": 0.58,
+      "decision": "skip",
+      "outcomeIdx": 1,
+      "edge": 0.05636612689387477,
+      "thresholdUsed": 0.18,
+      "size": null,
+      "execution": null,
+      "skipReason": "bestEdge=0.056 < minEdge=0.18"
+    },
+    {
+      "ts": "2026-08-09T16:22:57.940Z",
+      "marketId": "0x14fbecee81b6578347790c12e518fd8ba88e982e",
+      "question": "Will Tencent hold Lab Rank #3 on arena.ai Text Arena Overall (no style control) at close Sep 1, 2026?",
+      "category": "tech",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.5332840382511312,
+        0.46671596174886876
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.5,
+            0.5
+          ],
+          "confidence": 0.25
+        },
+        "gemini": {
+          "probs": [
+            0.35,
+            0.65
+          ],
+          "confidence": 0.4,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.15000000000000002,
+      "blendedProbs": [
+        0.4571428571428572,
+        0.5428571428571429
+      ],
+      "confidence": 0.25,
+      "decision": "skip",
+      "outcomeIdx": 1,
+      "edge": 0.07614118110827417,
+      "thresholdUsed": 0.18,
+      "size": null,
+      "execution": null,
+      "skipReason": "bestEdge=0.076 < minEdge=0.18"
+    },
+    {
+      "ts": "2026-08-09T16:22:57.741Z",
+      "marketId": "0x2103135668dab0bf66ac4f4729c4b16c32ba4160",
+      "question": "Will \"Voicemails for Isabelle\" rank #2 on Netflix's global films Top 10 (Eng or Non-Eng) for week ending Aug 9, 2026?",
+      "category": "culture",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.5,
+        0.5
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.08,
+            0.92
+          ],
+          "confidence": 0.42
+        },
+        "gemini": {
+          "probs": [
+            0.02,
+            0.98
+          ],
+          "confidence": 0.85,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.06,
+      "blendedProbs": [
+        0.05243243243243243,
+        0.9475675675675675
+      ],
+      "confidence": 0.42,
+      "decision": "trade",
+      "outcomeIdx": 1,
+      "edge": 0.44756756756756755,
+      "thresholdUsed": 0.12,
+      "size": 10,
+      "execution": null
+    },
+    {
+      "ts": "2026-08-09T16:22:57.665Z",
+      "marketId": "0x2dd954b126d4e04193c3ec0e15ef7151efc6e962",
+      "question": "Will HK Observatory HQ's daily minimum temperature on 9 Aug 2026 be 24.0°C or below?",
+      "category": "miscellaneous",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.5,
+        0.5
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.72,
+            0.28
+          ],
+          "confidence": 0.58
+        },
+        "gemini": {
+          "probs": [
+            0.03,
+            0.97
+          ],
+          "confidence": 0.85,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.69,
+      "blendedProbs": [
+        0.4029729729729729,
+        0.597027027027027
+      ],
+      "confidence": 0.58,
+      "decision": "skip",
+      "outcomeIdx": 1,
+      "edge": 0.09702702702702704,
+      "thresholdUsed": 0.12,
+      "size": null,
+      "execution": null,
+      "skipReason": "models disagree sharply (spread=0.69 >= hard threshold 0.3)"
+    },
+    {
+      "ts": "2026-08-09T16:22:57.639Z",
+      "marketId": "0x8a2ab5676360b033cea839e13d6c8b1ab6237bea",
+      "question": "Who will win the Metro Bank One Day Cup match between Northamptonshire and Somerset on August 9, 2026?",
+      "category": "sports",
+      "outcomes": [
+        "Northamptonshire",
+        "Somerset",
+        "No result"
+      ],
+      "rawPrice": [
+        0.3333333333333333,
+        0.3333333333333333,
+        0.3333333333333333
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.36,
+            0.42,
+            0.22
+          ],
+          "confidence": 0.46
+        },
+        "gemini": {
+          "probs": [
+            0.42,
+            0.53,
+            0.05
+          ],
+          "confidence": 0.4,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.16999999999999998,
+      "blendedProbs": [
+        0.37714285714285717,
+        0.45142857142857146,
+        0.17142857142857143
+      ],
+      "confidence": 0.46,
+      "decision": "skip",
+      "outcomeIdx": 1,
+      "edge": 0.11809523809523814,
+      "thresholdUsed": 0.18,
+      "size": null,
+      "execution": null,
+      "skipReason": "bestEdge=0.118 < minEdge=0.18"
+    },
+    {
+      "ts": "2026-08-09T16:22:57.443Z",
+      "marketId": "0xdf5787efac5e0e2b008d436b3c345807ef5fc493",
+      "question": "Will NRG beat Evil Geniuses by 2+ maps in their VCT Americas Stage 2 Group Alpha match on Aug 9, 2026 (PT)?",
+      "category": "sports",
+      "outcomes": [
+        "NRG wins by 2+ maps",
+        "Any other result"
+      ],
+      "rawPrice": [
+        0.5,
+        0.5
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.27,
+            0.73
+          ],
+          "confidence": 0.46
+        },
+        "gemini": {
+          "probs": [
+            0.35,
+            0.65
+          ],
+          "confidence": 0.4,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.07999999999999996,
+      "blendedProbs": [
+        0.29285714285714287,
+        0.7071428571428572
+      ],
+      "confidence": 0.46,
+      "decision": "trade",
+      "outcomeIdx": 1,
+      "edge": 0.20714285714285718,
+      "thresholdUsed": 0.12,
+      "size": 6.021362351190479,
+      "execution": null
+    },
+    {
+      "ts": "2026-08-09T16:22:57.242Z",
+      "marketId": "0x5c7110011e6eeb8c09566d782b2cd125ef7c1e3a",
+      "question": "Will \"A Quiet Place: Day One\" top Netflix's US Films (English) Top 10 in the Aug 11, 2026 update?",
+      "category": "culture",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.5,
+        0.5
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.12,
+            0.88
+          ],
+          "confidence": 0.46
+        },
+        "gemini": {
+          "probs": [
+            0.01,
+            0.99
+          ],
+          "confidence": 0.85,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.11,
+      "blendedProbs": [
+        0.06945945945945947,
+        0.9305405405405406
+      ],
+      "confidence": 0.46,
+      "decision": "trade",
+      "outcomeIdx": 1,
+      "edge": 0.4305405405405406,
+      "thresholdUsed": 0.12,
+      "size": 10,
+      "execution": null
+    },
+    {
+      "ts": "2026-08-09T16:22:57.137Z",
+      "marketId": "0x253822484643fa368e555eafb1ea25f694f8cc01",
+      "question": "Will Hamilton Tiger-Cats and BC Lions combine for 56+ points in their Aug 8, 2026 (UTC) CFL game?",
+      "category": "sports",
+      "outcomes": [
+        "Over",
+        "Under"
+      ],
+      "rawPrice": [
+        0.5,
+        0.5
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.54,
+            0.46
+          ],
+          "confidence": 0.58
+        },
+        "gemini": {
+          "probs": [
+            0.49,
+            0.51
+          ],
+          "confidence": 0.35,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.050000000000000044,
+      "blendedProbs": [
+        0.527037037037037,
+        0.472962962962963
+      ],
+      "confidence": 0.58,
+      "decision": "skip",
+      "outcomeIdx": 0,
+      "edge": 0.02703703703703697,
+      "thresholdUsed": 0.12,
+      "size": null,
+      "execution": null,
+      "skipReason": "bestEdge=0.027 < minEdge=0.12"
+    },
+    {
+      "ts": "2026-08-09T16:22:56.718Z",
+      "marketId": "0x6792b211ef9123819527ca397be3c533a6b8ead2",
+      "question": "Will an ISW daily map by 23:59 UTC Aug 30, 2026 show part of Moskovka, Kharkiv Oblast, as Russian advance/control?",
+      "category": "politics",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.5,
+        0.5
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.18,
+            0.82
+          ],
+          "confidence": 0.55
+        },
+        "gemini": {
+          "probs": [
+            0.05,
+            0.95
+          ],
+          "confidence": 0.8,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.13,
+      "blendedProbs": [
+        0.12222222222222222,
+        0.8777777777777778
+      ],
+      "confidence": 0.55,
+      "decision": "trade",
+      "outcomeIdx": 1,
+      "edge": 0.37777777777777777,
+      "thresholdUsed": 0.12,
+      "size": 10,
+      "execution": null
+    },
+    {
+      "ts": "2026-08-09T16:22:56.526Z",
+      "marketId": "0xb7179df1afd814960210c8c0b46d18575a768b98",
+      "question": "Will Elon Musk post 300-319 times on X (posts, quotes, reposts) from 12PM ET Aug 7 to 12PM ET Aug 14, 2026?",
+      "category": "tech",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.5,
+        0.5
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.18,
+            0.82
+          ],
+          "confidence": 0.55
+        },
+        "gemini": {
+          "probs": [
+            0.08,
+            0.92
+          ],
+          "confidence": 0.4,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.10000000000000009,
+      "blendedProbs": [
+        0.15142857142857144,
+        0.8485714285714285
+      ],
+      "confidence": 0.55,
+      "decision": "trade",
+      "outcomeIdx": 1,
+      "edge": 0.34857142857142853,
+      "thresholdUsed": 0.12,
+      "size": 10,
+      "execution": null
+    },
+    {
+      "ts": "2026-08-09T16:22:56.334Z",
+      "marketId": "0x1145e7365947a50d8cd741e0c8c21036a1fec4cb",
+      "question": "Will Ethereum (ETH/USDT on Binance) trade at or above $2,200 at any point between August 3 and August 9, 2026 (ET)?",
+      "category": "crypto",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.025806489035847473,
+        0.9741935109641526
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.62,
+            0.38
+          ],
+          "confidence": 0.46
+        },
+        "gemini": {
+          "probs": [
+            0.65,
+            0.35
+          ],
+          "confidence": 0.4,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.030000000000000027,
+      "blendedProbs": [
+        0.6285714285714287,
+        0.37142857142857144
+      ],
+      "confidence": 0.46,
+      "decision": "trade",
+      "outcomeIdx": 0,
+      "edge": 0.6027649395355812,
+      "thresholdUsed": 0.12,
+      "size": 10,
+      "execution": null
+    },
     {
       "ts": "2026-08-09T16:17:55.435Z",
       "marketId": "0x6b1c259726e1968217150da895536e28570fae60",
@@ -649,511 +1154,6 @@
     },
     {
       "ts": "2026-08-09T16:12:53.839Z",
-      "marketId": "0x2103135668dab0bf66ac4f4729c4b16c32ba4160",
-      "question": "Will \"Voicemails for Isabelle\" rank #2 on Netflix's global films Top 10 (Eng or Non-Eng) for week ending Aug 9, 2026?",
-      "category": "culture",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.5,
-        0.5
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.08,
-            0.92
-          ],
-          "confidence": 0.42
-        },
-        "gemini": {
-          "probs": [
-            0.02,
-            0.98
-          ],
-          "confidence": 0.85,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.06,
-      "blendedProbs": [
-        0.05243243243243243,
-        0.9475675675675675
-      ],
-      "confidence": 0.42,
-      "decision": "trade",
-      "outcomeIdx": 1,
-      "edge": 0.44756756756756755,
-      "thresholdUsed": 0.12,
-      "size": 10,
-      "execution": null
-    },
-    {
-      "ts": "2026-08-09T16:12:53.758Z",
-      "marketId": "0x2dd954b126d4e04193c3ec0e15ef7151efc6e962",
-      "question": "Will HK Observatory HQ's daily minimum temperature on 9 Aug 2026 be 24.0°C or below?",
-      "category": "miscellaneous",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.5,
-        0.5
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.72,
-            0.28
-          ],
-          "confidence": 0.58
-        },
-        "gemini": {
-          "probs": [
-            0.03,
-            0.97
-          ],
-          "confidence": 0.85,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.69,
-      "blendedProbs": [
-        0.4029729729729729,
-        0.597027027027027
-      ],
-      "confidence": 0.58,
-      "decision": "skip",
-      "outcomeIdx": 1,
-      "edge": 0.09702702702702704,
-      "thresholdUsed": 0.12,
-      "size": null,
-      "execution": null,
-      "skipReason": "models disagree sharply (spread=0.69 >= hard threshold 0.3)"
-    },
-    {
-      "ts": "2026-08-09T16:12:53.709Z",
-      "marketId": "0x8a2ab5676360b033cea839e13d6c8b1ab6237bea",
-      "question": "Who will win the Metro Bank One Day Cup match between Northamptonshire and Somerset on August 9, 2026?",
-      "category": "sports",
-      "outcomes": [
-        "Northamptonshire",
-        "Somerset",
-        "No result"
-      ],
-      "rawPrice": [
-        0.3333333333333333,
-        0.3333333333333333,
-        0.3333333333333333
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.36,
-            0.42,
-            0.22
-          ],
-          "confidence": 0.46
-        },
-        "gemini": {
-          "probs": [
-            0.42,
-            0.53,
-            0.05
-          ],
-          "confidence": 0.4,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.16999999999999998,
-      "blendedProbs": [
-        0.37714285714285717,
-        0.45142857142857146,
-        0.17142857142857143
-      ],
-      "confidence": 0.46,
-      "decision": "skip",
-      "outcomeIdx": 1,
-      "edge": 0.11809523809523814,
-      "thresholdUsed": 0.18,
-      "size": null,
-      "execution": null,
-      "skipReason": "bestEdge=0.118 < minEdge=0.18"
-    },
-    {
-      "ts": "2026-08-09T16:12:53.515Z",
-      "marketId": "0xdf5787efac5e0e2b008d436b3c345807ef5fc493",
-      "question": "Will NRG beat Evil Geniuses by 2+ maps in their VCT Americas Stage 2 Group Alpha match on Aug 9, 2026 (PT)?",
-      "category": "sports",
-      "outcomes": [
-        "NRG wins by 2+ maps",
-        "Any other result"
-      ],
-      "rawPrice": [
-        0.5,
-        0.5
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.27,
-            0.73
-          ],
-          "confidence": 0.46
-        },
-        "gemini": {
-          "probs": [
-            0.35,
-            0.65
-          ],
-          "confidence": 0.4,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.07999999999999996,
-      "blendedProbs": [
-        0.29285714285714287,
-        0.7071428571428572
-      ],
-      "confidence": 0.46,
-      "decision": "trade",
-      "outcomeIdx": 1,
-      "edge": 0.20714285714285718,
-      "thresholdUsed": 0.12,
-      "size": 10,
-      "execution": null
-    },
-    {
-      "ts": "2026-08-09T16:12:53.335Z",
-      "marketId": "0x5c7110011e6eeb8c09566d782b2cd125ef7c1e3a",
-      "question": "Will \"A Quiet Place: Day One\" top Netflix's US Films (English) Top 10 in the Aug 11, 2026 update?",
-      "category": "culture",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.5,
-        0.5
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.12,
-            0.88
-          ],
-          "confidence": 0.46
-        },
-        "gemini": {
-          "probs": [
-            0.01,
-            0.99
-          ],
-          "confidence": 0.85,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.11,
-      "blendedProbs": [
-        0.06945945945945947,
-        0.9305405405405406
-      ],
-      "confidence": 0.46,
-      "decision": "trade",
-      "outcomeIdx": 1,
-      "edge": 0.4305405405405406,
-      "thresholdUsed": 0.12,
-      "size": 10,
-      "execution": null
-    },
-    {
-      "ts": "2026-08-09T16:12:52.841Z",
-      "marketId": "0x253822484643fa368e555eafb1ea25f694f8cc01",
-      "question": "Will Hamilton Tiger-Cats and BC Lions combine for 56+ points in their Aug 8, 2026 (UTC) CFL game?",
-      "category": "sports",
-      "outcomes": [
-        "Over",
-        "Under"
-      ],
-      "rawPrice": [
-        0.5,
-        0.5
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.54,
-            0.46
-          ],
-          "confidence": 0.58
-        },
-        "gemini": {
-          "probs": [
-            0.49,
-            0.51
-          ],
-          "confidence": 0.35,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.050000000000000044,
-      "blendedProbs": [
-        0.527037037037037,
-        0.472962962962963
-      ],
-      "confidence": 0.58,
-      "decision": "skip",
-      "outcomeIdx": 0,
-      "edge": 0.02703703703703697,
-      "thresholdUsed": 0.12,
-      "size": null,
-      "execution": null,
-      "skipReason": "bestEdge=0.027 < minEdge=0.12"
-    },
-    {
-      "ts": "2026-08-09T16:12:52.655Z",
-      "marketId": "0x6792b211ef9123819527ca397be3c533a6b8ead2",
-      "question": "Will an ISW daily map by 23:59 UTC Aug 30, 2026 show part of Moskovka, Kharkiv Oblast, as Russian advance/control?",
-      "category": "politics",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.5,
-        0.5
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.18,
-            0.82
-          ],
-          "confidence": 0.55
-        },
-        "gemini": {
-          "probs": [
-            0.05,
-            0.95
-          ],
-          "confidence": 0.8,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.13,
-      "blendedProbs": [
-        0.12222222222222222,
-        0.8777777777777778
-      ],
-      "confidence": 0.55,
-      "decision": "trade",
-      "outcomeIdx": 1,
-      "edge": 0.37777777777777777,
-      "thresholdUsed": 0.12,
-      "size": 10,
-      "execution": null
-    },
-    {
-      "ts": "2026-08-09T16:12:52.445Z",
-      "marketId": "0xb7179df1afd814960210c8c0b46d18575a768b98",
-      "question": "Will Elon Musk post 300-319 times on X (posts, quotes, reposts) from 12PM ET Aug 7 to 12PM ET Aug 14, 2026?",
-      "category": "tech",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.5,
-        0.5
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.18,
-            0.82
-          ],
-          "confidence": 0.55
-        },
-        "gemini": {
-          "probs": [
-            0.08,
-            0.92
-          ],
-          "confidence": 0.4,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.10000000000000009,
-      "blendedProbs": [
-        0.15142857142857144,
-        0.8485714285714285
-      ],
-      "confidence": 0.55,
-      "decision": "trade",
-      "outcomeIdx": 1,
-      "edge": 0.34857142857142853,
-      "thresholdUsed": 0.12,
-      "size": 10,
-      "execution": null
-    },
-    {
-      "ts": "2026-08-09T16:12:52.243Z",
-      "marketId": "0x1145e7365947a50d8cd741e0c8c21036a1fec4cb",
-      "question": "Will Ethereum (ETH/USDT on Binance) trade at or above $2,200 at any point between August 3 and August 9, 2026 (ET)?",
-      "category": "crypto",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.025806489035847473,
-        0.9741935109641526
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.62,
-            0.38
-          ],
-          "confidence": 0.46
-        },
-        "gemini": {
-          "probs": [
-            0.65,
-            0.35
-          ],
-          "confidence": 0.4,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.030000000000000027,
-      "blendedProbs": [
-        0.6285714285714287,
-        0.37142857142857144
-      ],
-      "confidence": 0.46,
-      "decision": "trade",
-      "outcomeIdx": 0,
-      "edge": 0.6027649395355812,
-      "thresholdUsed": 0.12,
-      "size": 10,
-      "execution": null
-    },
-    {
-      "ts": "2026-08-09T16:08:01.554Z",
-      "marketId": "0x6b1c259726e1968217150da895536e28570fae60",
-      "question": "Will Donald Trump post 180–199 times on Truth Social between Aug 4, 2026 at 12:00 pm ET and Aug 11, 2026 at 12:00 pm ET?",
-      "category": "politics",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.22525501578276363,
-        0.7747449842172364
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.24,
-            0.76
-          ],
-          "confidence": 0.58
-        },
-        "gemini": {
-          "probs": [
-            0.08,
-            0.92
-          ],
-          "confidence": 0.8,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.16000000000000003,
-      "blendedProbs": [
-        0.1688888888888889,
-        0.8311111111111111
-      ],
-      "confidence": 0.58,
-      "decision": "skip",
-      "outcomeIdx": 1,
-      "edge": 0.05636612689387477,
-      "thresholdUsed": 0.18,
-      "size": null,
-      "execution": null,
-      "skipReason": "bestEdge=0.056 < minEdge=0.18"
-    },
-    {
-      "ts": "2026-08-09T16:08:01.530Z",
-      "marketId": "0x14fbecee81b6578347790c12e518fd8ba88e982e",
-      "question": "Will Tencent hold Lab Rank #3 on arena.ai Text Arena Overall (no style control) at close Sep 1, 2026?",
-      "category": "tech",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.5332840382511312,
-        0.46671596174886876
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.5,
-            0.5
-          ],
-          "confidence": 0.25
-        },
-        "gemini": {
-          "probs": [
-            0.35,
-            0.65
-          ],
-          "confidence": 0.4,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.15000000000000002,
-      "blendedProbs": [
-        0.4571428571428572,
-        0.5428571428571429
-      ],
-      "confidence": 0.25,
-      "decision": "skip",
-      "outcomeIdx": 1,
-      "edge": 0.07614118110827417,
-      "thresholdUsed": 0.18,
-      "size": null,
-      "execution": null,
-      "skipReason": "bestEdge=0.076 < minEdge=0.18"
-    },
-    {
-      "ts": "2026-08-09T16:08:01.339Z",
       "marketId": "0x2103135668dab0bf66ac4f4729c4b16c32ba4160",
       "question": "Will \"Voicemails for Isabelle\" rank #2 on Netflix's global films Top 10 (Eng or Non-Eng) for week ending Aug 9, 2026?",
       "category": "culture",
