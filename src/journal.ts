@@ -37,6 +37,13 @@ export interface Receipt {
     txHash?: string;
     quotedTokensIn?: number;
     sharesOut?: string;
+    /** (quoted cost-per-share ÷ entryPriceUsed) − 1 — how much more
+     * expensive the actual fill was than the market's implied price at
+     * decision time. Positive = paid above that price (thin book eats
+     * into edge); null if it couldn't be computed. Only ever set on live
+     * trades — dry-run receipts never call buyShares(), so this stays
+     * undefined for them. */
+    priceImpactPct?: number | null;
     redeemedTxHash?: string;
     redeemedAmount?: string;
     resolved?: boolean; 

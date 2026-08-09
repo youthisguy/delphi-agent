@@ -21,6 +21,12 @@ export interface OpenPosition {
   currentPrice: number | null; // 0–1, same outcome's current implied probability; null if unavailable
   unrealizedPnl: number | null; // tokens; null when currentPrice is unavailable
   unrealizedPnlPct: number | null;
+  /** Quoted cost-per-share vs. entryPrice at trade time — how thin the
+   * market was for the size actually traded. Passed straight through
+   * from the receipt's execution.priceImpactPct; null/undefined for
+   * dry-run positions (no real fill happened) or older receipts logged
+   * before this field existed. */
+  priceImpactPct: number | null;
   marketStatus: string | null;
   isDryRun: boolean;
   ts: string;
@@ -109,6 +115,7 @@ export async function getOpenPositions(client: DelphiClient): Promise<OpenPositi
       currentPrice,
       unrealizedPnl,
       unrealizedPnlPct,
+      priceImpactPct: r.execution?.priceImpactPct ?? null,
       marketStatus,
       isDryRun: !r.execution,
       ts: r.ts,

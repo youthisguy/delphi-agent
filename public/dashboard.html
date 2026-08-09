@@ -345,11 +345,25 @@
     border-top: 1px solid var(--border-dim);
     padding: 8px 16px;
     display: flex;
+    align-items: center;
     justify-content: space-between;
     color: var(--text-muted);
     font-size: 9px;
     background: var(--bg-panel);
   }
+  footer .footer-action { display: flex; align-items: center; gap: 8px; }
+  button.mini {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 500;
+    text-transform: none;
+    background: transparent;
+    border: 1px solid var(--border-dim);
+    color: var(--text-muted);
+    padding: 2px 7px;
+  }
+  button.mini:hover { background: transparent; border-color: var(--border-bright); color: var(--text-main); }
+  button.mini:disabled { opacity: 0.4; cursor: not-allowed; }
 </style>
 </head>
 <body>
@@ -369,13 +383,6 @@
         <span class="pulse" id="pulse"></span>
         <span id="pulseLabel">SYS_INIT&hellip;</span>
       </div>
-    </div>
-
-    <!-- Checkpoint button wiring lives in dashboard.js, alongside the
-         node health-check button — not duplicated here. -->
-    <div class="telemetry" style="gap: 6px;">
-      <button type="button" class="primary" id="checkpointBtn" title="Commit &amp; push data/ to git so it survives the next deploy">Save checkpoint</button>
-      <span id="checkpointResult" class="panel-sub"></span>
     </div>
 
     <div class="mode-toggle">
@@ -490,6 +497,7 @@
             <th>ENTRY</th>
             <th>CURRENT</th>
             <th>UNREALIZED P&amp;L</th>
+            <th>IMPACT</th>
             <th>STATUS</th>
           </tr>
         </thead>
@@ -522,6 +530,7 @@
             <th>CONF</th>
             <th>SIZE</th>
             <th>PRICE</th>
+            <th>IMPACT</th>
           </tr>
         </thead>
         <tbody id="receiptsBody"></tbody>
@@ -543,6 +552,7 @@
             <th>CAT</th>
             <th>OUTCOMES</th>
             <th>IMPLIED PROBS</th>
+            <th>LIQUIDITY</th>
             <th>STATUS</th>
           </tr>
         </thead>
@@ -562,9 +572,10 @@
 </div>
 
 <footer>
-  <!-- <span>LAZY FALCON // SYSTEM STATUS: NOMINAL</span>
-  <span>PORT: 8080 | PROTOCOL: WEBSOCKET/REST</span>
-  <span>LATENCY: 12ms</span> -->
+  <span class="footer-action">
+    <span id="checkpointResult"></span>
+    <button type="button" class="mini" id="checkpointBtn" title="Commit &amp; push data/ to git so it survives the next deploy">save checkpoint</button>
+  </span>
 </footer>
 
 <script src="dashboard.js"></script>
@@ -745,7 +756,7 @@ async function loadPositions() {
       : '0 OPEN';
 
     if (!positions.length) {
-      $('#positionsBody').innerHTML = `<tr><td colspan="7"><div class="empty">no open positions</div></td></tr>`;
+      $('#positionsBody').innerHTML = `<tr><td colspan="8"><div class="empty">no open positions</div></td></tr>`;
       return;
     }
 
@@ -756,6 +767,12 @@ async function loadPositions() {
       const pnlText = hasPnl
         ? `${pnlSign}${fmtNum(p.unrealizedPnl, 2)} <span style="color:var(--text-muted)">(${pnlSign}${fmtNum((p.unrealizedPnlPct ?? 0) * 100, 1)}%)</span>`
         : 'N/A';
+      // Quoted cost-per-share vs. entryPrice at trade time — how thin the
+      // book was for the size actually traded. Only ever set on live
+      // fills (see index.ts's tradeOnMarket); dry-run positions show —.
+      const hasImpact = p.priceImpactPct !== null && p.priceImpactPct !== undefined;
+      const impactClass = !hasImpact ? '' : (p.priceImpactPct > 0.02 ? 'bad' : (p.priceImpactPct > 0.005 ? 'warn' : 'good'));
+      const impactText = hasImpact ? `${fmtNum(p.priceImpactPct * 100, 1)}%` : '—';
       return `
         <tr>
           <td class="q-cell" title="${esc(p.question)}">${esc(p.question)}</td>
@@ -764,6 +781,7 @@ async function loadPositions() {
           <td>${fmtNum(p.entryPrice, 3)}</td>
           <td>${p.currentPrice !== null ? fmtNum(p.currentPrice, 3) : 'N/A'}</td>
           <td class="${pnlClass}">${pnlText}</td>
+          <td class="${impactClass}">${impactText}</td>
           <td>
             ${p.isDryRun ? '<span class="pill synth">DRY</span>' : '<span class="pill trade">LIVE</span>'}
             ${p.marketStatus ? `<span style="color:var(--text-muted); font-size:9px;"> ${esc(p.marketStatus)}</span>` : ''}
@@ -772,7 +790,7 @@ async function loadPositions() {
       `;
     }).join('');
   } catch (e) {
-    $('#positionsBody').innerHTML = `<tr><td colspan="7"><div class="empty">positions unavailable &mdash; ${esc(e.message)}</div></td></tr>`;
+    $('#positionsBody').innerHTML = `<tr><td colspan="8"><div class="empty">positions unavailable &mdash; ${esc(e.message)}</div></td></tr>`;
   }
 }
 
@@ -867,7 +885,7 @@ async function loadReceipts() {
     const rows = r.receipts || [];
     $('#receiptCount').textContent = rows.length + ' SIGNALS LOGGED';
     if (!rows.length) {
-      $('#receiptsBody').innerHTML = `<tr><td colspan="9"><div class="empty">no strategy decisions recorded</div></td></tr>`;
+      $('#receiptsBody').innerHTML = `<tr><td colspan="10"><div class="empty">no strategy decisions recorded</div></td></tr>`;
       return;
     }
     $('#receiptsBody').innerHTML = rows.map(r => {
@@ -887,6 +905,13 @@ async function loadReceipts() {
       const reasonText = r.decision === 'skip'
         ? [r.skipReason, disagreementText].filter(Boolean).join(' · ')
         : disagreementText;
+      // Quoted cost-per-share vs. the market's implied price at decision
+      // time — only set on live-executed trades (see index.ts's
+      // tradeOnMarket / journal.ts's Receipt.execution.priceImpactPct).
+      const impact = r.execution?.priceImpactPct;
+      const hasImpact = impact !== null && impact !== undefined;
+      const impactClass = !hasImpact ? '' : (impact > 0.02 ? 'bad' : (impact > 0.005 ? 'warn' : 'good'));
+      const impactText = hasImpact ? `${fmtNum(impact * 100, 1)}%` : '—';
       return `
       <tr>
         <td>${timeAgo(r.ts)}</td>
@@ -902,6 +927,7 @@ async function loadReceipts() {
         <td>${fmtNum(r.confidence, 2)}</td>
         <td>${r.size ? fmtNum(r.size, 2) : '—'}</td>
         <td>${r.rawPrice ? r.rawPrice.map(p=>fmtNum(p,2)).join('/') : 'SYNTH'}</td>
+        <td class="${impactClass}">${impactText}</td>
       </tr>
     `;
     }).join('');
@@ -917,7 +943,7 @@ async function loadMarkets() {
     const markets = r.markets || [];
     $('#marketCount').textContent = markets.length + ' ACTIVE';
     if (!markets.length) {
-      $('#marketsBody').innerHTML = `<tr><td colspan="5"><div class="empty">no active market order books</div></td></tr>`;
+      $('#marketsBody').innerHTML = `<tr><td colspan="6"><div class="empty">no active market order books</div></td></tr>`;
       return;
     }
     $('#marketsBody').innerHTML = markets.map(m => {
@@ -925,12 +951,19 @@ async function loadMarkets() {
       const outcomes = m.metadata?.outcomes ?? m.outcomes ?? [];
       const cat = m.category ?? '—';
       const probs = (m.spotImpliedProbabilities || []).map(p => fmtNum(Number(p), 2)).join(' / ');
+      // Fetch order is already liquidity-ranked (server pins orderBy:
+      // "liquidity") — liquidityRank/isThinMarket are computed server-side
+      // as a relative, per-batch heuristic, not an absolute liquidity unit.
+      const liqCell = m.liquidityRank
+        ? `#${m.liquidityRank}${m.liquidityRankOf ? '/' + m.liquidityRankOf : ''} ${m.isThinMarket ? '<span class="pill synth" title="Bottom of this batch by liquidity rank">THIN</span>' : ''}`
+        : '—';
       return `
         <tr>
           <td class="q-cell" title="${esc(q)}">${esc(q)}</td>
           <td>${esc(cat)}</td>
           <td>${esc(outcomes.join('/'))}</td>
           <td class="v cyan">${probs || 'NO_BOOK'}</td>
+          <td>${liqCell}</td>
           <td><span class="pill trade">${esc(m.status)}</span></td>
         </tr>
       `;

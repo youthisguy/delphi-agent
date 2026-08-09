@@ -101,9 +101,9 @@ async function runCheckpoint() {
   }
   if (btn) {
     btn.disabled = true;
-    btn.textContent = "Saving…";
+    btn.textContent = "saving…";
   }
-  if (out) out.textContent = "Committing data/ and pushing…";
+  if (out) out.textContent = "committing…";
   try {
     const r = await j("/api/checkpoint", {
       method: "POST",
@@ -122,7 +122,7 @@ async function runCheckpoint() {
   } finally {
     if (btn) {
       btn.disabled = false;
-      btn.textContent = "Save checkpoint";
+      btn.textContent = "save checkpoint";
     }
   }
 }

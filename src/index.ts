@@ -42,6 +42,12 @@ interface TradeDecision {
   blendedProbs: number[];
   confidence: number;
   disagreement: number | null;
+  /** The market's own implied probability for outcomeIdx at decision time
+   * (or 0.5 if the book was synthetic) — same fallback backtest.ts's
+   * entryPriceUsed and positions.ts's entryPriceFor() use. This is what
+   * "shares per token spent" should be priced against, NOT the blended
+   * forecast probability. */
+  entryPriceUsed: number;
 }
 
 interface CycleBudget {
@@ -262,8 +268,19 @@ async function decide(
       `disagreement=${blend.disagreement?.toFixed(2) ?? "n/a"}`
   );
 
+  const entryPriceUsed = marketProbs[bestIdx] ?? 0.5;
+
   return {
-    decision: { outcomeIdx: bestIdx, tokensToSpend, bestEdge, minEdge, blendedProbs: blend.blendedProbs, confidence, disagreement: blend.disagreement },
+    decision: {
+      outcomeIdx: bestIdx,
+      tokensToSpend,
+      bestEdge,
+      minEdge,
+      blendedProbs: blend.blendedProbs,
+      confidence,
+      disagreement: blend.disagreement,
+      entryPriceUsed,
+    },
     receipt: { ...receiptBase, decision: "trade", outcomeIdx: bestIdx, edge: bestEdge, thresholdUsed: minEdge, size: tokensToSpend, execution: null },
   };
 }
@@ -300,11 +317,24 @@ async function tradeOnMarket(market: Market, decision: TradeDecision, dryRun: bo
   // test trade) that the market's collateral token matches
   // COMPETITION_TOKEN_ADDRESS — otherwise approval/spend could target a
   // different contract than the balance you just checked.
-  const trialShares = maxTokensIn;
+  //
+  // sharesOut is priced on a fixed 1e18 basis regardless of the
+  // collateral token's own decimals (e.g. a 6-decimal competition token
+  // still buys shares denominated in 1e18 units) — it must NOT be
+  // derived from maxTokensIn, which is scaled to the token's decimals
+  // (previously: `trialShares = maxTokensIn`, silently requesting a
+  // wildly wrong share count on any token with decimals !== 18).
+  // Instead derive the *desired* share count from tokensToSpend /
+  // entryPrice (shares ≈ tokens spent ÷ price-per-share) and scale that
+  // to 1e18.
+  const entryPrice = Math.max(decision.entryPriceUsed, 0.01);
+  const desiredShares = decision.tokensToSpend / entryPrice;
+  const sharesOut = BigInt(Math.floor(desiredShares * 1e18));
+
   const quote = await client.quoteBuy({
     marketAddress: market.id as `0x${string}`,
     outcomeIdx: decision.outcomeIdx,
-    sharesOut: trialShares,
+    sharesOut,
   });
 
   if (quote.tokensIn > maxTokensIn) {
@@ -312,17 +342,44 @@ async function tradeOnMarket(market: Market, decision: TradeDecision, dryRun: bo
     return null;
   }
 
-  await client.ensureTokenApproval({ marketAddress: market.id as `0x${string}`, minimumAmount: quote.tokensIn });
+  // 1.5% slippage buffer above the quoted cost. quoteBuy() and
+  // buyShares() are two separate calls — the pool's price can move
+  // between them (another trade lands, or plain AMM curve drift on a
+  // thin market). Passing quote.tokensIn as an exact maxTokensIn meant
+  // ANY movement at all reverted the tx. A small buffer lets execution
+  // still go through as long as the move stays within tolerance, while
+  // still capping worst-case slippage — never let it push spend past
+  // this trade's own max, though.
+  const SLIPPAGE_BPS = 150n; // 1.5%
+  let maxTokensInWithSlippage = quote.tokensIn + (quote.tokensIn * SLIPPAGE_BPS) / 10000n;
+  if (maxTokensInWithSlippage > maxTokensIn) maxTokensInWithSlippage = maxTokensIn;
+
+  await client.ensureTokenApproval({ marketAddress: market.id as `0x${string}`, minimumAmount: maxTokensInWithSlippage });
 
   const result = await client.buyShares({
     marketAddress: market.id as `0x${string}`,
     outcomeIdx: decision.outcomeIdx,
-    sharesOut: trialShares,
-    maxTokensIn: quote.tokensIn,
+    sharesOut,
+    maxTokensIn: maxTokensInWithSlippage,
   });
 
-  console.log(`  Trade executed: ${result.transactionHash}`);
-  return { txHash: result.transactionHash, quotedTokensIn: Number(quote.tokensIn), sharesOut: trialShares.toString() };
+  console.log(
+    `  Trade executed: ${result.transactionHash} (shares=${sharesOut}, quotedTokensIn=${quote.tokensIn}, cap=${maxTokensInWithSlippage})`
+  );
+
+  // Price impact: quoted cost-per-share vs. the market's implied price at
+  // decision time — how much more expensive the actual fill was than the
+  // price the edge/sizing decision was made against, i.e. how thin this
+  // market was for the size just traded.
+  const costPerShare = Number(quote.tokensIn) / 10 ** decimals / desiredShares;
+  const priceImpactPct = entryPrice > 0 ? Number(((costPerShare - entryPrice) / entryPrice).toFixed(4)) : null;
+
+  return {
+    txHash: result.transactionHash,
+    quotedTokensIn: Number(quote.tokensIn),
+    sharesOut: sharesOut.toString(),
+    priceImpactPct,
+  };
 }
 
 // Last completed cycle's counters, kept in memory so a "running: true"

@@ -132,6 +132,16 @@ export const CONFIG = {
     ? Number(process.env.COMPETITION_TOKEN_DECIMALS)
     : null,
 
+  // --- Liquidity monitor ---
+  // listMarkets() already defaults to orderBy: "liquidity" (best-liquidity
+  // first), so the fetched order is itself a liquidity ranking. This just
+  // controls how much of the bottom of that ranking gets flagged "thin" in
+  // the dashboard — a relative, per-batch heuristic rather than an
+  // absolute liquidity unit, since Market doesn't expose a guaranteed
+  // stable liquidity field to threshold against directly. 0.3 = bottom 30%
+  // of whatever batch was fetched gets flagged.
+  thinLiquidityBottomFraction: Number(process.env.THIN_LIQUIDITY_BOTTOM_FRACTION ?? 0.3),
+
   dataDir: DATA_DIR,
   journalPath: path.join(DATA_DIR, "journal.jsonl"),
   summaryPath: path.join(DATA_DIR, "summary.json"),

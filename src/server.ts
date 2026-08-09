@@ -193,9 +193,28 @@ app.get("/api/markets/open", async (req, res) => {
     const { markets } = await client.listMarkets({
       status: "open" as any,
       limit,
+      // Explicit even though it's also the SDK's current default — pinned
+      // here so the rank/thin-flag logic below stays correct even if that
+      // default ever changes upstream.
+      orderBy: "liquidity" as any,
       pricesAndImpliedProbabilities: true,
     });
-    res.json({ markets: markets ?? [] });
+    const list = markets ?? [];
+
+    // Fetch order is already liquidity-ranked (best first). Surface that
+    // rank plus a relative "thin" flag for the bottom slice of THIS batch
+    // — a coarse heuristic, not an absolute liquidity threshold, since
+    // Market doesn't expose a guaranteed stable liquidity field to
+    // threshold against directly.
+    const thinCutoff = Math.ceil(list.length * (1 - CONFIG.thinLiquidityBottomFraction));
+    const withLiquidity = list.map((m: any, i: number) => ({
+      ...m,
+      liquidityRank: i + 1,
+      liquidityRankOf: list.length,
+      isThinMarket: list.length > 0 && i >= thinCutoff,
+    }));
+
+    res.json({ markets: withLiquidity });
   } catch (err) {
     res.status(500).json({ error: err instanceof Error ? err.message : String(err) });
   }
