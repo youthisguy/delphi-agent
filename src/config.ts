@@ -142,6 +142,16 @@ export const CONFIG = {
   // of whatever batch was fetched gets flagged.
   thinLiquidityBottomFraction: Number(process.env.THIN_LIQUIDITY_BOTTOM_FRACTION ?? 0.3),
 
+  // Fire scripts/checkpoint.sh (commit + push data/) once at the end of
+  // any cycle that entered at least one trade (live or dry-run) — so a
+  // receipt is never more than one loop tick away from being safe on
+  // the remote, not sitting on Render's ephemeral disk waiting on a
+  // manual trigger. Best-effort: a failed checkpoint is logged and added
+  // to that cycle's errors, but never aborts the cycle — the trade
+  // already happened and its receipt is already on local disk either
+  // way. On by default; set AUTO_CHECKPOINT_ON_TRADE=false to disable.
+  autoCheckpointOnTrade: process.env.AUTO_CHECKPOINT_ON_TRADE !== "false",
+
   dataDir: DATA_DIR,
   journalPath: path.join(DATA_DIR, "journal.jsonl"),
   summaryPath: path.join(DATA_DIR, "summary.json"),

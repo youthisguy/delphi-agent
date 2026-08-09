@@ -16,6 +16,7 @@ import { checkAndRedeemSettledPositions } from "./redeem.js";
 import { getOpenPositions } from "./positions.js";
 import { getErc20Balance, getErc20Decimals, hasContractCode, resolveWalletAddress } from "./chainRead.js";
 import { getCachedForecast, setCachedForecast, pruneForecastCache } from "./forecastCache.js";
+import { runCheckpointScript } from "./checkpoint.js";
 import { CONFIG, getDryRun, getCompetitionTokenAddress } from "./config.js";
 
 const client = new DelphiClient();
@@ -171,8 +172,8 @@ async function decide(
     llmProbs = llmResult.probs;
     confidence = llmResult.confidence;
 
-    // Gemini — blended for every market (was previously gated to only
-    // isTimeSensitive() questions). Grounding (Google Search) stays
+    // Gemini — blended for every market 
+    // Grounding (Google Search)
     // limited to time-sensitive questions since that's specifically
     // where a stale training cutoff hurts — no reason to pay the extra
     // grounding latency/cost on a static question like "who wins this
@@ -536,6 +537,29 @@ async function runCycle() {
       const msg = `recomputeSummary failed: ${err instanceof Error ? err.message : err}`;
       console.error(" ", msg);
       errors.push(msg);
+    }
+
+    // Checkpoint once at the end of the cycle (not per-trade) — one push
+    // covers every receipt this cycle wrote, whether it was one trade or
+    // several. Only bothers if something actually traded this cycle;
+    // scripts/checkpoint.sh already no-ops cleanly on an empty diff, but
+    // skipping the subprocess entirely on skip-only cycles avoids paying
+    // git overhead every loop tick for nothing. Best-effort, same as
+    // above — a checkpoint failure is logged and recorded in this
+    // cycle's errors, never fatal, since every receipt is already
+    // durably on local disk regardless of whether the push succeeds.
+    if (CONFIG.autoCheckpointOnTrade && traded > 0) {
+      try {
+        const cp = await runCheckpointScript();
+        if (cp.ok) {
+          console.log(`  [checkpoint] ${cp.output || "pushed"}`);
+        } else {
+          console.warn("  [checkpoint] failed:", cp.output);
+          errors.push(`checkpoint failed: ${cp.output}`);
+        }
+      } catch (err) {
+        console.warn("  [checkpoint] threw:", err instanceof Error ? err.message : err);
+      }
     }
 
     pruneForecastCache();

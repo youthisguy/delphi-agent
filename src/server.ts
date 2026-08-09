@@ -2,8 +2,6 @@ import "dotenv/config";
 import express from "express";
 import fs from "node:fs";
 import path from "node:path";
-import { execFile } from "node:child_process";
-import { promisify } from "node:util";
 import { DelphiClient } from "@gensyn-ai/gensyn-delphi-sdk";
 import { CONFIG, getDryRun, setDryRun, getCompetitionTokenAddress, setCompetitionTokenAddress } from "./config.js";
 import { readReceipts, readPinnedSummary } from "./journal.js";
@@ -11,6 +9,7 @@ import { runBacktest, listBacktestRuns, readBacktestRun } from "./backtest.js";
 import { getAllNodesView, getPoolSummary, runHealthCheck } from "./keyPool.js";
 import { getNativeBalance, getErc20Balance, getErc20Decimals, hasContractCode, getChainId, resolveWalletAddress } from "./chainRead.js";
 import { getOpenPositions } from "./positions.js";
+import { runCheckpointScript } from "./checkpoint.js";
 
 const app = express();
 app.use(express.json());
@@ -260,8 +259,6 @@ app.get("/api/backtest/history/:file", (req, res) => {
 
 // --- checkpoint (persist data/ across redeploys) ---------------------------
 
-const execFileAsync = promisify(execFile);
-
 // This dashboard has no auth on any of its routes, and this one triggers
 // a real `git commit` + `git push` on the server — so it's gated behind
 // an optional shared secret rather than left wide open. Set
@@ -273,17 +270,15 @@ app.post("/api/checkpoint", async (req: any, res: any) => {
   if (expected && req.header("x-checkpoint-secret") !== expected) {
     return res.status(401).json({ error: "unauthorized" });
   }
-  try {
-    const scriptPath = path.resolve(process.cwd(), "scripts/checkpoint.sh");
-    const { stdout, stderr } = await execFileAsync("bash", [scriptPath], { timeout: 60_000 });
-    res.json({ ok: true, output: (stdout + stderr).trim() });
-  } catch (err: any) {
-    res.status(500).json({
-      ok: false,
-      error: err instanceof Error ? err.message : String(err),
-      output: String((err?.stdout ?? "") + (err?.stderr ?? "")).trim(),
-    });
+  const result = await runCheckpointScript();
+  if (!result.ok) {
+    // Also log server-side (visible in Render's Logs tab) so a failure
+    // is debuggable even before the dashboard.js fix that surfaces this
+    // same output in the browser.
+    console.error("[checkpoint] failed:", result.output);
+    return res.status(500).json({ ok: false, error: "checkpoint script failed", output: result.output });
   }
+  res.json({ ok: true, output: result.output });
 });
 
 app.listen(CONFIG.port, () => {

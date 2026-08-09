@@ -351,19 +351,6 @@
     font-size: 9px;
     background: var(--bg-panel);
   }
-  footer .footer-action { display: flex; align-items: center; gap: 8px; }
-  button.mini {
-    font-family: var(--font-mono);
-    font-size: 9px;
-    font-weight: 500;
-    text-transform: none;
-    background: transparent;
-    border: 1px solid var(--border-dim);
-    color: var(--text-muted);
-    padding: 2px 7px;
-  }
-  button.mini:hover { background: transparent; border-color: var(--border-bright); color: var(--text-main); }
-  button.mini:disabled { opacity: 0.4; cursor: not-allowed; }
 </style>
 </head>
 <body>
@@ -572,10 +559,6 @@
 </div>
 
 <footer>
-  <span class="footer-action">
-    <span id="checkpointResult"></span>
-    <button type="button" class="mini" id="checkpointBtn" title="Commit &amp; push data/ to git so it survives the next deploy">save checkpoint</button>
-  </span>
 </footer>
 
 <script src="dashboard.js"></script>
@@ -595,7 +578,21 @@ const esc = (s) => (s ?? '').toString().replace(/[&<>"']/g, c => ({'&':'&amp;','
 
 async function j(url, opts) {
   const res = await fetch(url, opts);
-  if (!res.ok) throw new Error(url + ' -> ' + res.status);
+  if (!res.ok) {
+    // Surface the server's actual error/output instead of just the status
+    // code — /api/checkpoint (and others) return { error, output } bodies
+    // specifically so failures are debuggable from the dashboard, but a
+    // bare `-> 500` here was throwing that away before it ever reached
+    // the screen.
+    let detail = '';
+    try {
+      const body = await res.json();
+      detail = body?.error || body?.output || JSON.stringify(body);
+    } catch {
+      try { detail = await res.text(); } catch { /* give up, use status only */ }
+    }
+    throw new Error(`${url} -> ${res.status}${detail ? ': ' + detail : ''}`);
+  }
   return res.json();
 }
 

@@ -46,6 +46,17 @@ TIMESTAMP=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 git commit -m "checkpoint: journal snapshot ${TIMESTAMP}" --quiet
 
 CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+# Render (and most PaaS deploy flows) check out a specific commit rather
+# than a branch, leaving the deployed working copy in detached HEAD state
+# — `git rev-parse --abbrev-ref HEAD` then returns the literal string
+# "HEAD", and `git push URL HEAD:HEAD` fails. Fall back to an explicit
+# target branch in that case. Defaults to "main"; set CHECKPOINT_BRANCH
+# in the environment if your default branch is something else (e.g.
+# "master").
+if [ "$CURRENT_BRANCH" = "HEAD" ]; then
+  CURRENT_BRANCH="${CHECKPOINT_BRANCH:-main}"
+  echo "Detached HEAD detected (normal on Render's deploy checkout) — pushing to '${CURRENT_BRANCH}' instead. Set CHECKPOINT_BRANCH to override." >&2
+fi
 git push "${GIT_PUSH_URL}" "HEAD:${CURRENT_BRANCH}"
 
 echo "Checkpoint pushed at ${TIMESTAMP} (branch: ${CURRENT_BRANCH})."
