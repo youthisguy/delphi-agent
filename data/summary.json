@@ -1,7 +1,7 @@
 {
-  "updatedAt": "2026-08-09T20:12:32.048Z",
-  "totalReceipts": 110,
-  "totalTrades": 67,
+  "updatedAt": "2026-08-09T20:17:32.347Z",
+  "totalReceipts": 111,
+  "totalTrades": 68,
   "totalSkips": 43,
   "rollingAccuracy": {
     "n": 0,
@@ -25,7 +25,7 @@
     "politics": {
       "n": 0,
       "hitRate": null,
-      "trades": 18
+      "trades": 19
     },
     "tech": {
       "n": 0,
@@ -48,7 +48,7 @@
       "trades": 9
     }
   },
-  "openExposureTokens": 645.7712214034268,
+  "openExposureTokens": 655.7712214034268,
   "tradePerformance": {
     "settled": 0,
     "wins": 0,
@@ -56,7 +56,7 @@
     "winRate": null,
     "voidTrades": 0,
     "totalPnl": 0,
-    "openTrades": 67
+    "openTrades": 68
   },
   "skipCalibration": {
     "settled": 0,
@@ -65,6 +65,51 @@
     "voidSkips": 0
   },
   "lastNDecisions": [
+    {
+      "ts": "2026-08-09T20:17:32.345Z",
+      "marketId": "0xbc54636b1804f09f8dcc373c14e470a5a7e12a66",
+      "question": "Will Donald Trump post 180–199 times on Truth Social between Aug 4, 2026 at 12:00 pm ET and Aug 11, 2026 at 12:00 pm ET?",
+      "category": "politics",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.5,
+        0.5
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.18,
+            0.82
+          ],
+          "confidence": 0.56
+        },
+        "gemini": {
+          "probs": [
+            0.18,
+            0.82
+          ],
+          "confidence": 0.4,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0,
+      "blendedProbs": [
+        0.18000000000000002,
+        0.82
+      ],
+      "confidence": 0.56,
+      "decision": "trade",
+      "outcomeIdx": 1,
+      "edge": 0.31999999999999995,
+      "thresholdUsed": 0.12,
+      "size": 10,
+      "execution": null
+    },
     {
       "ts": "2026-08-09T20:12:32.045Z",
       "marketId": "0xbc54636b1804f09f8dcc373c14e470a5a7e12a66",
@@ -1156,57 +1201,6 @@
       "size": null,
       "execution": null,
       "skipReason": "models disagree sharply (spread=0.69 >= hard threshold 0.3)"
-    },
-    {
-      "ts": "2026-08-09T16:22:57.639Z",
-      "marketId": "0x8a2ab5676360b033cea839e13d6c8b1ab6237bea",
-      "question": "Who will win the Metro Bank One Day Cup match between Northamptonshire and Somerset on August 9, 2026?",
-      "category": "sports",
-      "outcomes": [
-        "Northamptonshire",
-        "Somerset",
-        "No result"
-      ],
-      "rawPrice": [
-        0.3333333333333333,
-        0.3333333333333333,
-        0.3333333333333333
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.36,
-            0.42,
-            0.22
-          ],
-          "confidence": 0.46
-        },
-        "gemini": {
-          "probs": [
-            0.42,
-            0.53,
-            0.05
-          ],
-          "confidence": 0.4,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.16999999999999998,
-      "blendedProbs": [
-        0.37714285714285717,
-        0.45142857142857146,
-        0.17142857142857143
-      ],
-      "confidence": 0.46,
-      "decision": "skip",
-      "outcomeIdx": 1,
-      "edge": 0.11809523809523814,
-      "thresholdUsed": 0.18,
-      "size": null,
-      "execution": null,
-      "skipReason": "bestEdge=0.118 < minEdge=0.18"
     }
   ]
 }
