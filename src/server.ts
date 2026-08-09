@@ -12,6 +12,7 @@ import { getOpenPositions } from "./positions.js";
 import { checkSettledOutcomes } from "./settlement.js";
 import { runCheckpointScript } from "./checkpoint.js";
 import { extractLiquidity, extractVolume } from "./marketFields.js";
+import { withDelphiRetry } from "./delphiRetry.js";
 
 const app = express();
 app.use(express.json());
@@ -52,7 +53,10 @@ app.get("/api/balances", async (_req: any, res: any) => {
   // SDK's own token (the test/competition token it's currently wired to).
   // Kept as-is so nothing breaks before the real CA is known.
   try {
-    const { balance, decimals } = await client.getErc20BalanceWithDecimals();
+    const { balance, decimals } = await withDelphiRetry(() => client.getErc20BalanceWithDecimals(), {
+      label: "getErc20BalanceWithDecimals",
+      maxRetries: 2, // dashboard read on a 15s poll — fail fast rather than blocking the page for minutes
+    });
     result.sdkToken = { balance: balance.toString(), decimals, human: Number(balance) / 10 ** decimals };
   } catch (err) {
     result.sdkToken = { error: err instanceof Error ? err.message : String(err) };
@@ -66,7 +70,10 @@ app.get("/api/balances", async (_req: any, res: any) => {
   // DELPHI_RPC_URL needed. Only fall back to the raw JSON-RPC path in
   // chainRead.ts if that SDK method isn't available for some reason.
   try {
-    const wei: bigint = await (client as any).getEthBalance();
+    const wei: bigint = await withDelphiRetry(() => (client as any).getEthBalance(), {
+      label: "getEthBalance",
+      maxRetries: 2, // dashboard read on a 15s poll — same reasoning as getErc20BalanceWithDecimals above
+    });
     result.gas = { wei: wei.toString(), human: Number(wei) / 1e18 };
   } catch (sdkErr) {
     if (walletAddress && process.env.DELPHI_RPC_URL) {
@@ -191,15 +198,19 @@ app.get("/api/positions", async (_req: any, res: any) => {
 app.get("/api/markets/open", async (req, res) => {
   try {
     const limit = Number(req.query.limit ?? 50);
-    const { markets } = await client.listMarkets({
-      status: "open" as any,
-      limit,
-      // Explicit even though it's also the SDK's current default — pinned
-      // here so the rank/thin-flag logic below stays correct even if that
-      // default ever changes upstream.
-      orderBy: "liquidity" as any,
-      pricesAndImpliedProbabilities: true,
-    });
+    const { markets } = await withDelphiRetry(
+      () =>
+        client.listMarkets({
+          status: "open" as any,
+          limit,
+          // Explicit even though it's also the SDK's current default —
+          // pinned here so the rank/thin-flag logic below stays correct
+          // even if that default ever changes upstream.
+          orderBy: "liquidity" as any,
+          pricesAndImpliedProbabilities: true,
+        }),
+      { label: "listMarkets(open)", maxRetries: 2 } // dashboard read on a 15s poll
+    );
     const list = markets ?? [];
 
     // Fetch order is already liquidity-ranked (best first). Surface that

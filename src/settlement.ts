@@ -1,6 +1,7 @@
 import type { DelphiClient, Market } from "@gensyn-ai/gensyn-delphi-sdk";
 import { readReceipts, patchReceiptSettlement, type Receipt, type ReceiptSettlement } from "./journal.js";
 import { extractWinningIdx } from "./backtest.js";
+import { withDelphiRetry } from "./delphiRetry.js";
 
 /**
  * Ground-truth settlement pass — walks every receipt (trade AND skip,
@@ -24,7 +25,9 @@ export async function checkSettledOutcomes(
     let market = marketCache.get(r.marketId);
     if (market === undefined) {
       try {
-        market = (await client.getMarket({ id: r.marketId } as any)) ?? null;
+        market = (await withDelphiRetry(() => client.getMarket({ id: r.marketId } as any), {
+          label: `getMarket(${r.marketId})`,
+        })) ?? null;
       } catch (err) {
         console.warn(
           `  [settlement] couldn't fetch market ${r.marketId}:`,

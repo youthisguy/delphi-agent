@@ -8,6 +8,7 @@ import getLlmForecast from "./llmForecast.js";
 import { getGeminiForecast } from "./geminiForecast.js";
 import { blendSignals, isTimeSensitive, type Signal } from "./blend.js";
 import { recomputeSummary } from "./journal.js";
+import { withDelphiRetry } from "./delphiRetry.js";
 import { CONFIG } from "./config.js";
 
 const MAX_TOKENS_PER_TRADE = CONFIG.maxTokensPerTrade;
@@ -213,11 +214,15 @@ export async function runBacktest(
 
   let markets: Market[] = [];
   try {
-    const res = await client.listMarkets({
-      status: "settled" as any,
-      limit: maxMarkets,
-      pricesAndImpliedProbabilities: true,
-    });
+    const res = await withDelphiRetry(
+      () =>
+        client.listMarkets({
+          status: "settled" as any,
+          limit: maxMarkets,
+          pricesAndImpliedProbabilities: true,
+        }),
+      { label: "listMarkets(settled)" }
+    );
     markets = res.markets ?? [];
   } catch (err) {
     console.error(

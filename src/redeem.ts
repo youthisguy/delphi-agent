@@ -1,5 +1,6 @@
 import type { DelphiClient, Market } from "@gensyn-ai/gensyn-delphi-sdk";
 import { readReceipts, patchReceiptExecution, type Receipt } from "./journal.js";
+import { withDelphiRetry } from "./delphiRetry.js";
 
 /**
  * On settlement:
@@ -52,7 +53,9 @@ export async function checkAndRedeemSettledPositions(
     try {
       // getMarket() takes an options object (not a bare address string) —
       // same shape as listMarkets(). Confirmed against SDK docs.
-      market = await client.getMarket({ id: receipt.marketId } as any);
+      market = await withDelphiRetry(() => client.getMarket({ id: receipt.marketId } as any), {
+        label: `getMarket(${receipt.marketId})`,
+      });
     } catch (err) {
       console.warn(`  [redeem] couldn't fetch market ${receipt.marketId}:`, err);
       continue;
@@ -79,10 +82,14 @@ export async function checkAndRedeemSettledPositions(
       }
 
       try {
-        const result = await client.liquidate({
-          marketAddress: receipt.marketId as `0x${string}`,
-          outcomeIndices,
-        });
+        const result = await withDelphiRetry(
+          () =>
+            client.liquidate({
+              marketAddress: receipt.marketId as `0x${string}`,
+              outcomeIndices,
+            }),
+          { label: `liquidate(${receipt.marketId})` }
+        );
 
         // Not a win or a loss — the market never resolved to an outcome,
         // so this shouldn't count toward forecast accuracy either way.
@@ -137,9 +144,13 @@ export async function checkAndRedeemSettledPositions(
       // redeemMarket() takes just the market address — it redeems whatever
       // winning shares the signer wallet holds in that market, no
       // outcomeIdx param needed (confirmed against SDK docs).
-      const result = await client.redeemMarket({
-        marketAddress: receipt.marketId as `0x${string}`,
-      });
+      const result = await withDelphiRetry(
+        () =>
+          client.redeemMarket({
+            marketAddress: receipt.marketId as `0x${string}`,
+          }),
+        { label: `redeemMarket(${receipt.marketId})` }
+      );
 
       patchReceiptExecution(receipt.marketId, {
         resolved: true,

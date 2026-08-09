@@ -8,6 +8,7 @@ import "dotenv/config";
 import { DelphiClient, type Market } from "@gensyn-ai/gensyn-delphi-sdk";
 import { findSimilarPolymarketOdds } from "./externalOdds.js";
 import getLlmForecast from "./llmForecast.js";
+import { withDelphiRetry } from "./delphiRetry.js";
 
 const client = new DelphiClient();
 const MAX_MARKETS = 50; 
@@ -134,11 +135,15 @@ async function evaluate(market: Market) {
 async function main() {
   console.log("Lazy Falcon — live dry-run demo\n");
 
-  const { markets } = await client.listMarkets({
-    status: "open",
-    limit: MAX_MARKETS,
-    pricesAndImpliedProbabilities: true,
-  });
+  const { markets } = await withDelphiRetry(
+    () =>
+      client.listMarkets({
+        status: "open",
+        limit: MAX_MARKETS,
+        pricesAndImpliedProbabilities: true,
+      }),
+    { label: "listMarkets(open)" }
+  );
 
   if (!markets?.length) {
     console.log("No open markets returned.");

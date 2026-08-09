@@ -1,6 +1,7 @@
 import type { DelphiClient, Market } from "@gensyn-ai/gensyn-delphi-sdk";
 import { readReceipts, type Receipt } from "./journal.js";
 import { extractLiquidity, extractVolume } from "./marketFields.js";
+import { withDelphiRetry } from "./delphiRetry.js";
 
 /**
  * Mark-to-market for still-open trades — deliberately NOT part of the
@@ -86,10 +87,14 @@ export async function getOpenPositions(client: DelphiClient): Promise<OpenPositi
       // getMarket() takes an options object (not a bare address string),
       // and — same as listMarkets() — only returns spotImpliedProbabilities
       // when pricesAndImpliedProbabilities is explicitly requested.
-      const market: Market | undefined = await client.getMarket({
-        id: r.marketId,
-        pricesAndImpliedProbabilities: true,
-      } as any);
+      const market: Market | undefined = await withDelphiRetry(
+        () =>
+          client.getMarket({
+            id: r.marketId,
+            pricesAndImpliedProbabilities: true,
+          } as any),
+        { label: `getMarket(${r.marketId})` }
+      );
       if (market) {
         marketStatus = (market as any).status ?? null;
         liquidityTokens = extractLiquidity(market);

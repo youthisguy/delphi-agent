@@ -17,6 +17,7 @@ import { getOpenPositions } from "./positions.js";
 import { getErc20Balance, getErc20Decimals, hasContractCode, resolveWalletAddress } from "./chainRead.js";
 import { getCachedForecast, setCachedForecast, pruneForecastCache } from "./forecastCache.js";
 import { runCheckpointScript } from "./checkpoint.js";
+import { withDelphiRetry } from "./delphiRetry.js";
 import { CONFIG, getDryRun, getCompetitionTokenAddress } from "./config.js";
 
 const client = new DelphiClient();
@@ -321,11 +322,15 @@ async function tradeOnMarket(market: Market, decision: TradeDecision, dryRun: bo
   const desiredShares = decision.tokensToSpend / entryPrice;
   const sharesOut = BigInt(Math.floor(desiredShares * 1e18));
 
-  const quote = await client.quoteBuy({
-    marketAddress: market.id as `0x${string}`,
-    outcomeIdx: decision.outcomeIdx,
-    sharesOut,
-  });
+  const quote = await withDelphiRetry(
+    () =>
+      client.quoteBuy({
+        marketAddress: market.id as `0x${string}`,
+        outcomeIdx: decision.outcomeIdx,
+        sharesOut,
+      }),
+    { label: `quoteBuy(${market.id})` }
+  );
 
   if (quote.tokensIn > maxTokensIn) {
     console.log("  Skipping: quoted cost exceeds max spend.");
@@ -344,14 +349,25 @@ async function tradeOnMarket(market: Market, decision: TradeDecision, dryRun: bo
   let maxTokensInWithSlippage = quote.tokensIn + (quote.tokensIn * SLIPPAGE_BPS) / 10000n;
   if (maxTokensInWithSlippage > maxTokensIn) maxTokensInWithSlippage = maxTokensIn;
 
-  await client.ensureTokenApproval({ marketAddress: market.id as `0x${string}`, minimumAmount: maxTokensInWithSlippage });
+  // Retrying these on a 429 specifically (not any other failure) is safe
+  // from a double-send angle: a Cloudflare rate-limit block happens at
+  // the API gateway, before the request ever reaches the chain — nothing
+  // was submitted yet, so there's nothing to duplicate by trying again.
+  await withDelphiRetry(
+    () => client.ensureTokenApproval({ marketAddress: market.id as `0x${string}`, minimumAmount: maxTokensInWithSlippage }),
+    { label: `ensureTokenApproval(${market.id})` }
+  );
 
-  const result = await client.buyShares({
-    marketAddress: market.id as `0x${string}`,
-    outcomeIdx: decision.outcomeIdx,
-    sharesOut,
-    maxTokensIn: maxTokensInWithSlippage,
-  });
+  const result = await withDelphiRetry(
+    () =>
+      client.buyShares({
+        marketAddress: market.id as `0x${string}`,
+        outcomeIdx: decision.outcomeIdx,
+        sharesOut,
+        maxTokensIn: maxTokensInWithSlippage,
+      }),
+    { label: `buyShares(${market.id})` }
+  );
 
   console.log(
     `  Trade executed: ${result.transactionHash} (shares=${sharesOut}, quotedTokensIn=${quote.tokensIn}, cap=${maxTokensInWithSlippage})`
@@ -486,7 +502,10 @@ async function runCycle() {
 
     const openStatus = "open" as any;
     try {
-      const res = await client.listMarkets({ status: openStatus, limit: CONFIG.maxMarketsPerLoop, pricesAndImpliedProbabilities: true });
+      const res = await withDelphiRetry(
+        () => client.listMarkets({ status: openStatus, limit: CONFIG.maxMarketsPerLoop, pricesAndImpliedProbabilities: true }),
+        { label: "listMarkets(open)" }
+      );
       markets = res.markets ?? [];
     } catch (err) {
       const msg = `listMarkets failed: ${err instanceof Error ? err.message : err}`;

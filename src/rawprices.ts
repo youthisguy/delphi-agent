@@ -1,11 +1,16 @@
 import "dotenv/config";
 import { DelphiClient } from "@gensyn-ai/gensyn-delphi-sdk";
+import { withDelphiRetry } from "./delphiRetry.js";
 
 const client = new DelphiClient();
-const { markets } = await client.listMarkets({
-  limit: 3,
-  pricesAndImpliedProbabilities: true,
-});
+const { markets } = await withDelphiRetry(
+  () =>
+    client.listMarkets({
+      limit: 3,
+      pricesAndImpliedProbabilities: true,
+    }),
+  { label: "listMarkets(rawprices)" }
+);
 
 for (const m of markets ?? []) {
   console.log({
