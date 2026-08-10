@@ -12,11 +12,17 @@ import { withDelphiRetry } from "./delphiRetry.js";
  * GET /api/positions.
  *
  * All per-position getMarket() calls run in parallel (Promise.all) and
- * are capped at maxRetries: 2 — same reasoning as every other dashboard
- * route on a 15s poll (see server.ts): fail fast on a rate-limited or
- * 404'd market rather than blocking the whole page for minutes while
- * withDelphiRetry's default 5-retry/30s-doubling backoff runs its course
- * sequentially across dozens of open positions.
+ * are capped at maxRetries: 2 — fail fast on a rate-limited market
+ * rather than blocking the whole page for minutes. The tradeoff of
+ * failing fast is that a live rate-limit storm can make EVERY position's
+ * getMarket() call fail within its 2 retries simultaneously — without
+ * a fallback, that would blank out PnL/current-price for the whole table
+ * at once, flickering in and out with every rate-limit window. The
+ * lastKnownSnapshot cache below fixes that: a transient failure falls
+ * back to the last successfully-fetched price (marked `stale: true`)
+ * instead of going blank, while a genuine 404 (market no longer exists)
+ * still clears the cache and shows nothing, since there's no real value
+ * to fall back to for a market that's actually gone.
  */
 
 export interface OpenPosition {
@@ -38,9 +44,9 @@ export interface OpenPosition {
   priceImpactPct: number | null;
   marketStatus: string | null;
   /** Current liquidity/volume for this market, in tokens — always null
-   * on this API build (see marketFields.ts's header comment: the field
-   * is confirmed absent from the Market object entirely, not just
-   * unrecognized). Kept for forward compatibility. */
+   * on this API build (confirmed absent from the Market object entirely
+   * via rawprices.ts, not just unrecognized — see marketFields.ts).
+   * Kept for forward compatibility. */
   liquidityTokens: number | null;
   volumeTokens: number | null;
   /** True if the underlying getMarket() call for this position 404'd
@@ -49,6 +55,12 @@ export interface OpenPosition {
    * the dashboard distinguish "stale/gone" from "temporarily
    * unreachable" instead of showing the same blank dashes for both. */
   marketNotFound: boolean;
+  /** True if this poll's getMarket() call failed transiently (rate
+   * limit, timeout, etc.) and the values shown are carried over from
+   * the last successful fetch rather than freshly read this poll. False
+   * on a fresh successful read OR when marketNotFound is true (no
+   * fallback value exists for a genuinely-gone market). */
+  stale: boolean;
   isDryRun: boolean;
   ts: string;
 }
@@ -78,6 +90,24 @@ function isNotFoundError(err: unknown): boolean {
 }
 
 /**
+ * Last successfully-fetched snapshot per market, keyed by marketId.
+ * Module-level (persists across polls within this process, same
+ * lifetime as everything else in this file) so a transient failure on
+ * one poll can fall back to real numbers from a recent successful poll
+ * instead of going blank. Unbounded growth isn't a practical concern —
+ * this only ever holds one entry per currently-open position, and open
+ * positions are naturally bounded by bankroll/maxTokensPerTrade.
+ */
+interface CachedMarketSnapshot {
+  currentPrice: number | null;
+  marketStatus: string | null;
+  liquidityTokens: number | null;
+  volumeTokens: number | null;
+  fetchedAt: number;
+}
+const lastKnownSnapshot = new Map<string, CachedMarketSnapshot>();
+
+/**
  * Every trade receipt that hasn't been marked resolved yet counts as
  * "open" — this covers both live trades still awaiting settlement AND
  * dry-run trades (execution is always null there, so nothing ever marks
@@ -102,6 +132,8 @@ export async function getOpenPositions(client: DelphiClient): Promise<OpenPositi
       let liquidityTokens: number | null = null;
       let volumeTokens: number | null = null;
       let marketNotFound = false;
+      let stale = false;
+
       try {
         const market: Market | undefined = await withDelphiRetry(
           () =>
@@ -119,6 +151,15 @@ export async function getOpenPositions(client: DelphiClient): Promise<OpenPositi
           if (rawProbs && rawProbs[outcomeIdx] !== undefined) {
             currentPrice = normalizeProb(rawProbs[outcomeIdx]);
           }
+          // Fresh success — refresh the cache so a LATER transient
+          // failure has something real to fall back to.
+          lastKnownSnapshot.set(r.marketId, {
+            currentPrice,
+            marketStatus,
+            liquidityTokens,
+            volumeTokens,
+            fetchedAt: Date.now(),
+          });
         }
       } catch (err) {
         marketNotFound = isNotFoundError(err);
@@ -126,6 +167,24 @@ export async function getOpenPositions(client: DelphiClient): Promise<OpenPositi
           `  [positions] couldn't fetch market ${r.marketId}${marketNotFound ? " (404 — market no longer exists server-side)" : ""}:`,
           err instanceof Error ? err.message : err
         );
+
+        if (marketNotFound) {
+          // Genuinely gone — don't resurrect stale numbers for a market
+          // that no longer exists on the API at all.
+          lastKnownSnapshot.delete(r.marketId);
+        } else {
+          // Transient (rate limit, timeout, etc.) — fall back to the
+          // last successful read rather than showing a blank PnL that
+          // flickers in and out with every rate-limit window.
+          const cached = lastKnownSnapshot.get(r.marketId);
+          if (cached) {
+            currentPrice = cached.currentPrice;
+            marketStatus = cached.marketStatus;
+            liquidityTokens = cached.liquidityTokens;
+            volumeTokens = cached.volumeTokens;
+            stale = true;
+          }
+        }
       }
 
       const size = r.size ?? 0;
@@ -155,6 +214,7 @@ export async function getOpenPositions(client: DelphiClient): Promise<OpenPositi
         liquidityTokens,
         volumeTokens,
         marketNotFound,
+        stale,
         isDryRun: !r.execution,
         ts: r.ts,
       } satisfies OpenPosition;
