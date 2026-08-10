@@ -1,8 +1,9 @@
 function statusDot(status) {
   if (status === "ok") return "ok";
-  if (status === "untested") return "off";  
+  if (status === "cooldown") return "warn";
   return "off";
 }
+
 
 function statusLabel(status) {
   const map = {
