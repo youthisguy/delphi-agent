@@ -10,7 +10,7 @@ import { findSimilarPolymarketOdds } from "./externalOdds.js";
 import getLlmForecast from "./llmForecast.js";
 import { getGeminiForecast } from "./geminiForecast.js";
 import { blendSignals, isTimeSensitive, type Signal } from "./blend.js";
-import { appendReceipt, patchReceiptExecution, recomputeSummary, type Receipt } from "./journal.js";
+import { appendReceipt, patchReceiptExecution, readReceipts, recomputeSummary, type Receipt } from "./journal.js";
 import { checkAndRedeemSettledPositions } from "./redeem.js";
 import { checkSettledOutcomes } from "./settlement.js";
 import { getOpenPositions } from "./positions.js";
@@ -72,21 +72,10 @@ interface CycleBudget {
  * failure propagates — sizing against an unknown balance isn't safe.
  */
 async function getCycleBudget(dryRun: boolean): Promise<CycleBudget> {
-  // Dry-run is for paper-testing signal/sizing logic independent of
-  // whatever the wallet's real balance happens to be right now (e.g.
-  // pre-funding, it's legitimately 0 — that shouldn't block every
-  // market from ever generating a sized signal). Live balance only
-  // matters once trades actually execute, i.e. dryRun === false.
   if (dryRun) {
     return { total: CONFIG.dryRunVirtualBankroll, source: "virtual (dry-run fallback)" };
   }
 
-  // Live sizing must be checked against the actual competition token —
-  // client.getErc20BalanceWithDecimals() reads whatever token the SDK
-  // is internally wired to by default, which is NOT guaranteed to be the
-  // same contract as COMPETITION_TOKEN_ADDRESS. Read the configured
-  // token explicitly via raw eth_call instead, same path the dashboard's
-  // /api/balances competitionToken field already uses.
   const tokenAddress = getCompetitionTokenAddress();
   if (!tokenAddress) {
     throw new Error(
@@ -124,6 +113,29 @@ async function getCycleBudget(dryRun: boolean): Promise<CycleBudget> {
   return { total: available, source: "on-chain" };
 }
 
+function skipReceipt(market: Market, reason: string): Receipt {
+  return {
+    ts: new Date().toISOString(),
+    marketId: market.id,
+    question: (market as any).question || (market as any).metadata?.question || "",
+    category: (market as any).category,
+    outcomes: (market as any).outcomes || (market as any).metadata?.outcomes || ["Yes", "No"],
+    rawPrice: null,
+    syntheticPrice: false,
+    signals: { llm: null, gemini: null, polymarket: null },
+    disagreement: null,
+    blendedProbs: [],
+    confidence: 0,
+    decision: "skip",
+    outcomeIdx: null,
+    edge: 0,
+    thresholdUsed: 0,
+    size: null,
+    execution: null,
+    skipReason: reason,
+  };
+}
+
 async function decide(
   market: Market,
   remainingBudget: number
@@ -152,10 +164,6 @@ async function decide(
   // CONFIG.forecastCacheTtlMs (default 20 min) so a small open-market
   // pool getting re-evaluated every loop tick doesn't burn a fresh
   // OpenAI + Gemini call on an unchanged question every single cycle.
-  // Cache is invalidated early if the market's price has moved
-  // meaningfully (see forecastCache.ts) since that's new information the
-  // cached forecast never saw. Polymarket lookup above stays uncached —
-  // it's a live external feed, not a model opinion.
   const currentMarketProbsForCache = hasValidPrice ? rawProbs : null;
   const cached = getCachedForecast(market.id, currentMarketProbsForCache);
 
@@ -173,12 +181,6 @@ async function decide(
     llmProbs = llmResult.probs;
     confidence = llmResult.confidence;
 
-    // Gemini — blended for every market (was previously gated to only
-    // isTimeSensitive() questions). Grounding (Google Search) stays
-    // limited to time-sensitive questions since that's specifically
-    // where a stale training cutoff hurts — no reason to pay the extra
-    // grounding latency/cost on a static question like "who wins this
-    // golf tournament in 3 months."
     if (CONFIG.geminiEnabled) {
       const grounded = isTimeSensitive(question);
       geminiSignal = await getGeminiForecast(question, outcomes, { grounded });
@@ -252,10 +254,6 @@ async function decide(
     };
   }
 
-  // Conviction: how far past the edge bar this signal cleared, scaled by
-  // confidence — 1x at exactly the threshold, capped at
-  // maxConvictionMultiplier for signals that clear it by a wide margin.
-  // Synthetic-price markets keep the existing 0.7x haircut on top.
   const sizeMultiplier = hasValidPrice ? 1.0 : 0.7;
   const convictionScore = Math.min(
     CONFIG.maxConvictionMultiplier,
@@ -287,14 +285,25 @@ async function decide(
   };
 }
 
-async function tradeOnMarket(market: Market, decision: TradeDecision, dryRun: boolean): Promise<Receipt["execution"]> {
+/**
+ * Result of an execution attempt, distinct from the raw execution block
+ * itself — lets the caller tell "genuinely filled" apart from "declined
+ * without an on-chain call" (insufficient balance / slippage cap) apart
+ * from "threw". Only the first case should ever be journaled as
+ * decision: "trade" outside of dry-run.
+ */
+interface TradeAttemptResult {
+  filled: boolean;
+  execution: Receipt["execution"];
+  declineReason?: string;
+}
+
+async function tradeOnMarket(market: Market, decision: TradeDecision, dryRun: boolean): Promise<TradeAttemptResult> {
   if (dryRun) {
-    console.log(`  DRY RUN: would buy outcome ${decision.outcomeIdx} on ${market.id}, ~${decision.tokensToSpend.toFixed(2)} tokens`);
-    return null;
+    console.log(`[TRADE-EXEC] market=${market.id} dryRun=true result=SIMULATED outcome=${decision.outcomeIdx} tokens=${decision.tokensToSpend.toFixed(2)}`);
+    return { filled: true, execution: null };
   }
 
-  // Same fix as getCycleBudget(): check against the configured
-  // competition token, not whatever the SDK defaults to.
   const tokenAddress = getCompetitionTokenAddress();
   if (!tokenAddress) throw new Error("COMPETITION_TOKEN_ADDRESS not set — refusing to trade live.");
   const walletAddress = await resolveWalletAddress(client);
@@ -305,19 +314,11 @@ async function tradeOnMarket(market: Market, decision: TradeDecision, dryRun: bo
   const maxTokensIn = BigInt(Math.floor(Math.min(decision.tokensToSpend, CONFIG.maxTokensPerTrade) * 10 ** decimals));
 
   if (maxTokensIn > rawBalance) {
-    console.log(`  Skipping ${market.id}: insufficient competition-token balance for desired spend.`);
-    return null;
+    const reason = "insufficient_balance";
+    console.log(`[TRADE-EXEC] market=${market.id} dryRun=false result=DECLINED reason=${reason}`);
+    return { filled: false, execution: null, declineReason: "insufficient competition-token balance for desired spend" };
   }
 
-  // sharesOut is priced on a fixed 1e18 basis regardless of the
-  // collateral token's own decimals (e.g. a 6-decimal competition token
-  // still buys shares denominated in 1e18 units) — it must NOT be
-  // derived from maxTokensIn, which is scaled to the token's decimals
-  // (previously: `trialShares = maxTokensIn`, silently requesting a
-  // wildly wrong share count on any token with decimals !== 18).
-  // Instead derive the *desired* share count from tokensToSpend /
-  // entryPrice (shares ≈ tokens spent ÷ price-per-share) and scale that
-  // to 1e18.
   const entryPrice = Math.max(decision.entryPriceUsed, 0.01);
   const desiredShares = decision.tokensToSpend / entryPrice;
   const sharesOut = BigInt(Math.floor(desiredShares * 1e18));
@@ -333,26 +334,16 @@ async function tradeOnMarket(market: Market, decision: TradeDecision, dryRun: bo
   );
 
   if (quote.tokensIn > maxTokensIn) {
-    console.log("  Skipping: quoted cost exceeds max spend.");
-    return null;
+    const reason = "quote_exceeds_max_spend";
+    console.log(`[TRADE-EXEC] market=${market.id} dryRun=false result=DECLINED reason=${reason}`);
+    return { filled: false, execution: null, declineReason: "quoted cost exceeds max spend" };
   }
 
-  // 1.5% slippage buffer above the quoted cost. quoteBuy() and
-  // buyShares() are two separate calls — the pool's price can move
-  // between them (another trade lands, or plain AMM curve drift on a
-  // thin market). Passing quote.tokensIn as an exact maxTokensIn meant
-  // ANY movement at all reverted the tx. A small buffer lets execution
-  // still go through as long as the move stays within tolerance, while
-  // still capping worst-case slippage — never let it push spend past
-  // this trade's own max, though.
+  // 1.5% slippage buffer above the quoted cost.
   const SLIPPAGE_BPS = 150n; // 1.5%
   let maxTokensInWithSlippage = quote.tokensIn + (quote.tokensIn * SLIPPAGE_BPS) / 10000n;
   if (maxTokensInWithSlippage > maxTokensIn) maxTokensInWithSlippage = maxTokensIn;
 
-  // Retrying these on a 429 specifically (not any other failure) is safe
-  // from a double-send angle: a Cloudflare rate-limit block happens at
-  // the API gateway, before the request ever reaches the chain — nothing
-  // was submitted yet, so there's nothing to duplicate by trying again.
   await withDelphiRetry(
     () => client.ensureTokenApproval({ marketAddress: market.id as `0x${string}`, minimumAmount: maxTokensInWithSlippage }),
     { label: `ensureTokenApproval(${market.id})` }
@@ -370,33 +361,26 @@ async function tradeOnMarket(market: Market, decision: TradeDecision, dryRun: bo
   );
 
   console.log(
-    `  Trade executed: ${result.transactionHash} (shares=${sharesOut}, quotedTokensIn=${quote.tokensIn}, cap=${maxTokensInWithSlippage})`
+    `[TRADE-EXEC] market=${market.id} dryRun=false result=FILLED tx=${result.transactionHash} shares=${sharesOut} quotedTokensIn=${quote.tokensIn} cap=${maxTokensInWithSlippage}`
   );
 
-  // Price impact: quoted cost-per-share vs. the market's implied price at
-  // decision time — how much more expensive the actual fill was than the
-  // price the edge/sizing decision was made against, i.e. how thin this
-  // market was for the size just traded.
   const costPerShare = Number(quote.tokensIn) / 10 ** decimals / desiredShares;
   const priceImpactPct = entryPrice > 0 ? Number(((costPerShare - entryPrice) / entryPrice).toFixed(4)) : null;
 
   return {
-    txHash: result.transactionHash,
-    quotedTokensIn: Number(quote.tokensIn),
-    sharesOut: sharesOut.toString(),
-    priceImpactPct,
+    filled: true,
+    execution: {
+      txHash: result.transactionHash,
+      quotedTokensIn: Number(quote.tokensIn),
+      sharesOut: sharesOut.toString(),
+      priceImpactPct,
+    },
   };
 }
 
 // Last completed cycle's counters, kept in memory so a "running: true"
 // status write mid-cycle doesn't have to blank out the previous numbers
 // the dashboard is already showing.
-//
-// Seeded from the existing loop-status.json on disk (if any) rather than
-// hardcoded zeros — otherwise every process restart (redeploy, crash
-// recovery, manual bounce) makes the dashboard show "0/0/0/0" for cycle
-// metrics even though the journal already has real trading history,
-// until an entirely new cycle completes (up to loopIntervalMs later).
 function loadLastCycleStats(): { openMarkets: number; evaluated: number; traded: number; skipped: number; errors: string[] } {
   try {
     if (fs.existsSync(CONFIG.loopStatusPath)) {
@@ -427,10 +411,6 @@ function writeLoopStatus(status: Record<string, unknown>) {
 
 async function runOnce() {
   if (cycleInFlight) {
-    // Every network call in the pipeline is now timeout-bounded, so this
-    // should be rare — but if a cycle somehow does run long, letting a
-    // second one start on top of it would interleave writeLoopStatus()
-    // calls and corrupt running/nextRunAt. Skip the tick instead.
     console.warn("[loop] previous cycle still in flight — skipping this tick");
     return;
   }
@@ -444,10 +424,6 @@ async function runOnce() {
 
 async function runCycle() {
   const dryRun = getDryRun();
-  // Fixed at the top of the cycle so "next run" reflects the loop's actual
-  // cadence (setInterval fires on a fixed period from when this cycle
-  // *started*, not from when it finishes), rather than drifting by however
-  // long this particular cycle takes to run.
   const cycleStartedAt = Date.now();
   const nextRunAt = cycleStartedAt + CONFIG.loopIntervalMs;
   console.log(`\n[${new Date().toISOString()}] Loop start (dryRun=${dryRun})`);
@@ -462,8 +438,7 @@ async function runCycle() {
   let remainingBudget = 0;
 
   try {
-    // 0. Redeem any settled winning positions from prior loops first, so
-    // collateral is freed up before we size new trades this loop.
+    // 0. Redeem any settled winning positions from prior loops first.
     try {
       const redemptions = await checkAndRedeemSettledPositions(client, dryRun);
       if (redemptions.length) console.log(`  Redemption check: ${JSON.stringify(redemptions)}`);
@@ -473,11 +448,7 @@ async function runCycle() {
       errors.push(msg);
     }
 
-    // 0.4 Record win/loss/void + P&L for every receipt whose market has
-    // settled since it was last checked — trade AND skip, live AND
-    // dry-run (redemption above only ever touches live trades). Runs
-    // right after redemption so a live trade just redeemed above already
-    // has its execution.redeemedAmount available for this pass to read.
+    // 0.4 Record win/loss/void + P&L for every receipt whose market has settled.
     try {
       const settled = await checkSettledOutcomes(client);
       if (settled.settled) console.log(`  Settlement check: ${settled.settled}/${settled.checked} newly settled`);
@@ -487,8 +458,7 @@ async function runCycle() {
       errors.push(msg);
     }
 
-    // 0.5 Resolve this cycle's deployable capital ONCE — every market
-    // evaluated below sizes against what's left of it, not a fresh read.
+    // 0.5 Resolve this cycle's deployable capital ONCE.
     try {
       cycleBudget = await getCycleBudget(dryRun);
       remainingBudget = cycleBudget.total;
@@ -497,7 +467,7 @@ async function runCycle() {
       const msg = `budget resolution failed: ${err instanceof Error ? err.message : err}`;
       console.error(" ", msg);
       errors.push(msg);
-      return; // can't size safely without a known live balance
+      return;
     }
 
     const openStatus = "open" as any;
@@ -511,12 +481,33 @@ async function runCycle() {
       const msg = `listMarkets failed: ${err instanceof Error ? err.message : err}`;
       console.error(" ", msg);
       errors.push(msg);
-      return; // status still gets written correctly by the finally block below
+      return;
     }
 
     console.log(`Evaluating ${markets.length} market(s)`);
 
+    // Markets we already hold an open (unresolved) trade on — computed
+    // once per cycle from the journal, no extra SDK calls. Prevents the
+    // same market from being traded repeatedly across cycles (previously
+    // nothing checked this, so a market that kept clearing the edge bar
+    // every cycle could accumulate many redundant same-side positions).
+    // Skipping BEFORE calling decide() also saves the OpenAI/Gemini call
+    // on markets we can't act on anyway.
+    const allReceiptsForHoldCheck = await readReceipts();
+    const heldMarketIds = new Set(
+      allReceiptsForHoldCheck
+        .filter((r) => r.decision === "trade" && !r.execution?.resolved)
+        .map((r) => r.marketId)
+    );
+
     for (const market of markets) {
+      if (heldMarketIds.has(market.id)) {
+        console.log(`  SKIP ${market.id}: already holding an open position on this market`);
+        skipped++;
+        appendReceipt(skipReceipt(market, "already holding an open position on this market"));
+        continue;
+      }
+
       try {
         const { decision, receipt } = await decide(market, remainingBudget);
         if (!decision) {
@@ -526,22 +517,44 @@ async function runCycle() {
         }
 
         // Reserve the capital the moment it's decided, not after execution
-        // fires — so the next market in this same loop, evaluated
-        // microseconds later, sees the reduced remainder. This holds even
-        // in dryRun: paper sizing should still reflect realistic
-        // within-cycle capital constraints.
+        // fires — so the next market in this same loop sees the reduced
+        // remainder. Holds even in dryRun: paper sizing should still
+        // reflect realistic within-cycle capital constraints.
         remainingBudget -= decision.tokensToSpend;
 
-        let execution: Receipt["execution"] = null;
+        let attempt: TradeAttemptResult = { filled: false, execution: null };
         try {
-          execution = await tradeOnMarket(market, decision, dryRun);
-          traded++;
+          attempt = await tradeOnMarket(market, decision, dryRun);
         } catch (err) {
           const msg = `trade failed for ${market.id}: ${err instanceof Error ? err.message : err}`;
           console.error(" ", msg);
           errors.push(msg);
         }
-        appendReceipt({ ...receipt, execution });
+
+        if (attempt.filled) {
+          // Genuinely executed (or intentionally simulated in dry-run) —
+          // this is a real trade.
+          traded++;
+          heldMarketIds.add(market.id); // hold for the rest of THIS cycle too
+          appendReceipt({ ...receipt, execution: attempt.execution });
+        } else {
+          // Live, but tradeOnMarket declined without an on-chain call
+          // (insufficient balance / quote moved past cap) or threw.
+          // Nothing actually happened — don't let it masquerade as a
+          // trade in the counters or in positions.ts's DRY/LIVE badge
+          // logic (which keys off `execution` being non-null).
+          skipped++;
+          const declineNote = attempt.declineReason ?? "trade attempt failed, see errors";
+          console.warn(`  [loop] LIVE_NOOP ${market.id}: sizing decided a trade but execution never landed (${declineNote}) — recording as skip, not trade`);
+          appendReceipt({
+            ...receipt,
+            decision: "skip",
+            outcomeIdx: null,
+            size: null,
+            execution: null,
+            skipReason: `live execution declined: ${declineNote}`,
+          });
+        }
       } catch (err) {
         const msg = `decide() failed for ${market.id}: ${err instanceof Error ? err.message : err}`;
         console.error(" ", msg);
@@ -549,10 +562,6 @@ async function runCycle() {
       }
     }
 
-    // Best-effort: recomputeSummary() touches the same journal file the
-    // loop above just wrote to, and any hiccup here (malformed line,
-    // transient fs error, concurrent write from a backtest run) must not
-    // swallow the real evaluation counts we already have in hand.
     try {
       await recomputeSummary();
     } catch (err) {
@@ -561,15 +570,6 @@ async function runCycle() {
       errors.push(msg);
     }
 
-    // Checkpoint once at the end of the cycle (not per-trade) — one push
-    // covers every receipt this cycle wrote, whether it was one trade or
-    // several. Only bothers if something actually traded this cycle;
-    // scripts/checkpoint.sh already no-ops cleanly on an empty diff, but
-    // skipping the subprocess entirely on skip-only cycles avoids paying
-    // git overhead every loop tick for nothing. Best-effort, same as
-    // above — a checkpoint failure is logged and recorded in this
-    // cycle's errors, never fatal, since every receipt is already
-    // durably on local disk regardless of whether the push succeeds.
     if (CONFIG.autoCheckpointOnTrade && traded > 0) {
       try {
         const cp = await runCheckpointScript();
@@ -608,7 +608,7 @@ async function main() {
     dryRun: getDryRun(),
     running: false,
     intervalMs: CONFIG.loopIntervalMs,
-    nextRunAt: Date.now(), // first cycle kicks off immediately below
+    nextRunAt: Date.now(),
   });
 
   await runOnce().catch((err) => console.error("Loop error:", err));

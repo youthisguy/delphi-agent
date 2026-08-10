@@ -479,12 +479,11 @@
         <thead>
           <tr>
             <th>MARKET QUESTION</th>
-            <th>SIDE</th>
-            <th>SIZE</th>
-            <th>ENTRY</th>
-            <th>CURRENT</th>
-            <th>UNREALIZED P&amp;L</th>
-            <th>IMPACT</th>
+            <th>CAT</th>
+            <th>OUTCOMES</th>
+            <th>IMPLIED PROBS</th>
+            <th>FEE</th>
+            <th>RESOLVES</th>
             <th>LIQUIDITY</th>
             <th>VOLUME</th>
             <th>STATUS</th>
@@ -571,6 +570,17 @@
 const $ = (sel) => document.querySelector(sel);
 const fmtPct = (x) => (x === null || x === undefined) ? '&mdash;' : (x * 100).toFixed(1) + '%';
 const fmtNum = (x, d=2) => (x === null || x === undefined || Number.isNaN(x)) ? '&mdash;' : Number(x).toFixed(d);
+const fmtTimeUntil = (ms) => {
+  if (ms === null || ms === undefined) return '&mdash;';
+  const past = ms < 0;
+  const abs = Math.abs(ms);
+  const mins = Math.floor(abs / 60000);
+  let text;
+  if (mins < 60) text = mins + 'm';
+  else if (mins < 1440) text = Math.floor(mins / 60) + 'h';
+  else text = Math.floor(mins / 1440) + 'd';
+  return past ? `<span class="v bad">-${text} overdue</span>` : text;
+};
 const timeAgo = (iso) => {
   if (!iso) return '&mdash;';
   const s = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
@@ -768,32 +778,36 @@ async function loadPositions() {
       const pnlSign = hasPnl && p.unrealizedPnl > 0 ? '+' : '';
       const pnlText = hasPnl
         ? `${pnlSign}${fmtNum(p.unrealizedPnl, 2)} <span style="color:var(--text-muted)">(${pnlSign}${fmtNum((p.unrealizedPnlPct ?? 0) * 100, 1)}%)</span>`
-        : 'N/A';
-      // Quoted cost-per-share vs. entryPrice at trade time — how thin the
-      // book was for the size actually traded. Only ever set on live
-      // fills (see index.ts's tradeOnMarket); dry-run positions show —.
+        : (p.marketNotFound ? 'N/A' : 'N/A');
       const hasImpact = p.priceImpactPct !== null && p.priceImpactPct !== undefined;
       const impactClass = !hasImpact ? '' : (p.priceImpactPct > 0.02 ? 'bad' : (p.priceImpactPct > 0.005 ? 'warn' : 'good'));
       const impactText = hasImpact ? `${fmtNum(p.priceImpactPct * 100, 1)}%` : '—';
-      // Liquidity/volume, in tokens — null means the API didn't expose a
-      // field this build recognizes (see marketFields.ts), not that the
-      // market actually has zero.
       const liqText = (p.liquidityTokens !== null && p.liquidityTokens !== undefined) ? fmtNum(p.liquidityTokens, 2) : '—';
       const volText = (p.volumeTokens !== null && p.volumeTokens !== undefined) ? fmtNum(p.volumeTokens, 2) : '—';
+
+      // marketNotFound (404 from the API — market no longer exists
+      // server-side, e.g. an old/expired testnet market) is a distinct
+      // state from "temporarily unreachable" or "still open" — surface
+      // it plainly instead of leaving CURRENT/P&L looking like a normal
+      // stale-poll blank.
+      const statusCell = p.marketNotFound
+        ? `<span class="pill" style="background:rgba(255,51,102,0.1); color:var(--red); border:1px solid var(--red);" title="Market no longer exists on the API — likely expired/removed">GONE</span>`
+        : (p.marketStatus ? `<span style="color:var(--text-muted); font-size:9px;">${esc(p.marketStatus)}</span>` : '');
+
       return `
-        <tr>
+        <tr${p.marketNotFound ? ' style="opacity:0.55;"' : ''}>
           <td class="q-cell" title="${esc(p.question)}">${esc(p.question)}</td>
           <td>${esc(p.outcomeLabel)}</td>
           <td>${fmtNum(p.size, 2)}</td>
           <td>${fmtNum(p.entryPrice, 3)}</td>
-          <td>${p.currentPrice !== null ? fmtNum(p.currentPrice, 3) : 'N/A'}</td>
+          <td>${p.currentPrice !== null ? fmtNum(p.currentPrice, 3) : (p.marketNotFound ? '—' : 'N/A')}</td>
           <td class="${pnlClass}">${pnlText}</td>
           <td class="${impactClass}">${impactText}</td>
           <td>${liqText}</td>
           <td>${volText}</td>
           <td>
             ${p.isDryRun ? '<span class="pill synth">DRY</span>' : '<span class="pill trade">LIVE</span>'}
-            ${p.marketStatus ? `<span style="color:var(--text-muted); font-size:9px;"> ${esc(p.marketStatus)}</span>` : ''}
+            ${statusCell}
           </td>
         </tr>
       `;
@@ -970,7 +984,7 @@ async function loadMarkets() {
     const markets = r.markets || [];
     $('#marketCount').textContent = markets.length + ' ACTIVE';
     if (!markets.length) {
-      $('#marketsBody').innerHTML = `<tr><td colspan="7"><div class="empty">no active market order books</div></td></tr>`;
+      $('#marketsBody').innerHTML = `<tr><td colspan="9"><div class="empty">no active market order books</div></td></tr>`;
       return;
     }
     $('#marketsBody').innerHTML = markets.map(m => {
@@ -978,11 +992,6 @@ async function loadMarkets() {
       const outcomes = m.metadata?.outcomes ?? m.outcomes ?? [];
       const cat = m.category ?? '—';
       const probs = (m.spotImpliedProbabilities || []).map(p => fmtNum(Number(p), 2)).join(' / ');
-      // Fetch order is already liquidity-ranked (server pins orderBy:
-      // "liquidity"). liquidityTokens/volumeTokens are the actual token
-      // figures when the API exposes a recognizable field (see
-      // marketFields.ts — unverified field names/scaling, hence the
-      // fallback to the rank badge when null rather than showing "0").
       const hasLiq = m.liquidityTokens !== null && m.liquidityTokens !== undefined;
       const liqCell = hasLiq
         ? `${fmtNum(m.liquidityTokens, 2)} ${m.isThinMarket ? '<span class="pill synth" title="Bottom of this batch by liquidity rank">THIN</span>' : ''}`
@@ -990,12 +999,23 @@ async function loadMarkets() {
           ? `#${m.liquidityRank}${m.liquidityRankOf ? '/' + m.liquidityRankOf : ''} ${m.isThinMarket ? '<span class="pill synth" title="Bottom of this batch by liquidity rank">THIN</span>' : ''}`
           : '—');
       const volCell = (m.volumeTokens !== null && m.volumeTokens !== undefined) ? fmtNum(m.volumeTokens, 2) : '—';
+
+      const feeCell = (m.tradingFeePct !== null && m.tradingFeePct !== undefined)
+        ? `${(m.tradingFeePct * 100).toFixed(1)}%`
+        : '—';
+      const resolvesCell = fmtTimeUntil(m.msUntilResolve);
+      const qCell = m.marketUrl
+        ? `<a href="${esc(m.marketUrl)}" target="_blank" rel="noopener" style="color:inherit; text-decoration:none;" title="${esc(q)}">${esc(q)}</a>`
+        : esc(q);
+
       return `
         <tr>
-          <td class="q-cell" title="${esc(q)}">${esc(q)}</td>
+          <td class="q-cell" title="${esc(q)}">${qCell}</td>
           <td>${esc(cat)}</td>
           <td>${esc(outcomes.join('/'))}</td>
           <td class="v cyan">${probs || 'NO_BOOK'}</td>
+          <td>${feeCell}</td>
+          <td>${resolvesCell}</td>
           <td>${liqCell}</td>
           <td>${volCell}</td>
           <td><span class="pill trade">${esc(m.status)}</span></td>
@@ -1003,7 +1023,7 @@ async function loadMarkets() {
       `;
     }).join('');
   } catch (e) {
-    $('#marketsBody').innerHTML = `<tr><td colspan="5"><div class="empty">market stream offline</div></td></tr>`;
+    $('#marketsBody').innerHTML = `<tr><td colspan="9"><div class="empty">market stream offline</div></td></tr>`;
   }
 }
 

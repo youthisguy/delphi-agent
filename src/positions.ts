@@ -7,9 +7,16 @@ import { withDelphiRetry } from "./delphiRetry.js";
  * Mark-to-market for still-open trades — deliberately NOT part of the
  * trading loop (index.ts). It's read-only, has no bearing on any
  * decision, and every extra SDK call inside the loop's hot path is one
- * more thing that can throw and (before the recent try/finally fix)
- * jam the whole cycle. Instead this is computed on demand, whenever the
- * dashboard asks for it via GET /api/positions.
+ * more thing that can throw and jam the whole cycle. Instead this is
+ * computed on demand, whenever the dashboard asks for it via
+ * GET /api/positions.
+ *
+ * All per-position getMarket() calls run in parallel (Promise.all) and
+ * are capped at maxRetries: 2 — same reasoning as every other dashboard
+ * route on a 15s poll (see server.ts): fail fast on a rate-limited or
+ * 404'd market rather than blocking the whole page for minutes while
+ * withDelphiRetry's default 5-retry/30s-doubling backoff runs its course
+ * sequentially across dozens of open positions.
  */
 
 export interface OpenPosition {
@@ -30,11 +37,18 @@ export interface OpenPosition {
    * before this field existed. */
   priceImpactPct: number | null;
   marketStatus: string | null;
-  /** Current liquidity/volume for this market, in tokens (or null if the
-   * API doesn't expose a field this build recognizes — see
-   * marketFields.ts's header comment; unverified field names/scaling). */
+  /** Current liquidity/volume for this market, in tokens — always null
+   * on this API build (see marketFields.ts's header comment: the field
+   * is confirmed absent from the Market object entirely, not just
+   * unrecognized). Kept for forward compatibility. */
   liquidityTokens: number | null;
   volumeTokens: number | null;
+  /** True if the underlying getMarket() call for this position 404'd
+   * (market no longer exists server-side — e.g. an old testnet market
+   * that's been removed) rather than merely failing transiently. Lets
+   * the dashboard distinguish "stale/gone" from "temporarily
+   * unreachable" instead of showing the same blank dashes for both. */
+  marketNotFound: boolean;
   isDryRun: boolean;
   ts: string;
 }
@@ -56,6 +70,11 @@ function normalizeProb(raw: unknown): number | null {
   const n = Number(raw);
   if (!Number.isFinite(n)) return null;
   return n > 1.5 ? n / 1e18 : n;
+}
+
+function isNotFoundError(err: unknown): boolean {
+  const msg = err instanceof Error ? err.message : String(err);
+  return /\b404\b/.test(msg) || /not found/i.test(msg) || /no rows in result set/i.test(msg);
 }
 
 /**
@@ -82,6 +101,7 @@ export async function getOpenPositions(client: DelphiClient): Promise<OpenPositi
       let marketStatus: string | null = null;
       let liquidityTokens: number | null = null;
       let volumeTokens: number | null = null;
+      let marketNotFound = false;
       try {
         const market: Market | undefined = await withDelphiRetry(
           () =>
@@ -101,13 +121,20 @@ export async function getOpenPositions(client: DelphiClient): Promise<OpenPositi
           }
         }
       } catch (err) {
-        console.warn(`  [positions] couldn't fetch market ${r.marketId}:`, err instanceof Error ? err.message : err);
+        marketNotFound = isNotFoundError(err);
+        console.warn(
+          `  [positions] couldn't fetch market ${r.marketId}${marketNotFound ? " (404 — market no longer exists server-side)" : ""}:`,
+          err instanceof Error ? err.message : err
+        );
       }
 
       const size = r.size ?? 0;
       let unrealizedPnl: number | null = null;
       let unrealizedPnlPct: number | null = null;
       if (currentPrice !== null && entryPrice > 0) {
+        // 1 share pays out 1 token if this outcome wins, 0 otherwise, so a
+        // share's fair value tracks its implied probability directly —
+        // P&L% is just how much that probability has moved since entry.
         unrealizedPnlPct = (currentPrice - entryPrice) / entryPrice;
         unrealizedPnl = size * unrealizedPnlPct;
       }
@@ -127,6 +154,7 @@ export async function getOpenPositions(client: DelphiClient): Promise<OpenPositi
         marketStatus,
         liquidityTokens,
         volumeTokens,
+        marketNotFound,
         isDryRun: !r.execution,
         ts: r.ts,
       } satisfies OpenPosition;

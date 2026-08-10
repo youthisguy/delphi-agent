@@ -11,7 +11,17 @@ import { getNativeBalance, getErc20Balance, getErc20Decimals, hasContractCode, g
 import { getOpenPositions } from "./positions.js";
 import { checkSettledOutcomes } from "./settlement.js";
 import { runCheckpointScript } from "./checkpoint.js";
-import { extractLiquidity, extractVolume } from "./marketFields.js";
+import {
+  extractLiquidity,
+  extractVolume,
+  extractResolvesAt,
+  extractSettlesAt,
+  extractTradingFeePct,
+  extractDataSources,
+  extractMarketUrl,
+  extractAppMarketId,
+  msUntilResolve,
+} from "./marketFields.js";
 import { withDelphiRetry } from "./delphiRetry.js";
 
 const app = express();
@@ -34,7 +44,7 @@ app.get("/api/status", (_req:any, res:any) => {
   const configHealth = {
     openaiKey: Boolean(process.env.OPENAI_API_KEY),
     geminiKey: CONFIG.geminiEnabled,
-    delphiConfigured: Boolean(process.env.DELPHI_RPC_URL || process.env.DELPHI_PRIVATE_KEY), // adjust to whatever env vars the SDK actually needs
+    delphiConfigured: Boolean(process.env.DELPHI_RPC_URL || process.env.DELPHI_PRIVATE_KEY),
   };
   res.json({ dryRun: getDryRun(), loopStatus, configHealth });
 });
@@ -50,12 +60,10 @@ app.post("/api/dryrun", (req, res) => {
 app.get("/api/balances", async (_req: any, res: any) => {
   const result: Record<string, unknown> = {};
 
-  // SDK's own token (the test/competition token it's currently wired to).
-  // Kept as-is so nothing breaks before the real CA is known.
   try {
     const { balance, decimals } = await withDelphiRetry(() => client.getErc20BalanceWithDecimals(), {
       label: "getErc20BalanceWithDecimals",
-      maxRetries: 2, // dashboard read on a 15s poll — fail fast rather than blocking the page for minutes
+      maxRetries: 2,
     });
     result.sdkToken = { balance: balance.toString(), decimals, human: Number(balance) / 10 ** decimals };
   } catch (err) {
@@ -65,14 +73,10 @@ app.get("/api/balances", async (_req: any, res: any) => {
   const walletAddress = await resolveWalletAddress(client);
   result.walletAddress = walletAddress;
 
-  // Gas (native ETH) — per check-setup.ts, client.getEthBalance() works
-  // straight out of the SDK's own RPC connection, no separate
-  // DELPHI_RPC_URL needed. Only fall back to the raw JSON-RPC path in
-  // chainRead.ts if that SDK method isn't available for some reason.
   try {
     const wei: bigint = await withDelphiRetry(() => (client as any).getEthBalance(), {
       label: "getEthBalance",
-      maxRetries: 2, // dashboard read on a 15s poll — same reasoning as getErc20BalanceWithDecimals above
+      maxRetries: 2,
     });
     result.gas = { wei: wei.toString(), human: Number(wei) / 1e18 };
   } catch (sdkErr) {
@@ -90,10 +94,6 @@ app.get("/api/balances", async (_req: any, res: any) => {
     }
   }
 
-  // Competition token, once its CA is known. The SDK's
-  // getErc20BalanceWithDecimals() only reads whatever token it's
-  // internally wired to (no address param) — reading an arbitrary CA
-  // still requires a raw eth_call, which needs DELPHI_RPC_URL.
   const tokenAddress = getCompetitionTokenAddress();
   result.competitionTokenAddress = tokenAddress;
   if (tokenAddress) {
@@ -137,15 +137,10 @@ app.get("/api/balances", async (_req: any, res: any) => {
   res.json(result);
 });
 
-// Competition token contract address isn't known yet — this lets you set
-// it from the dashboard the moment it's announced, no redeploy needed.
-// GET returns the currently configured address (or null if unset).
 app.get("/api/token-address", (_req: any, res: any) => {
   res.json({ address: getCompetitionTokenAddress() });
 });
 
-// POST { address: "0x..." } to set it, or { address: null } to clear back
-// to "unknown" (e.g. if the CA changes mid-competition).
 app.post("/api/token-address", (req: any, res: any) => {
   const { address } = req.body ?? {};
   const isValidAddress = typeof address === "string" && /^0x[a-fA-F0-9]{40}$/.test(address);
@@ -159,16 +154,10 @@ app.post("/api/token-address", (req: any, res: any) => {
 
 // --- key pool / nodes -------------------------------------------------------
 
-// Current status of every configured OpenAI/Gemini key ("node"), as last
-// updated by live forecast calls or the manual health check below.
 app.get("/api/nodes", (_req: any, res: any) => {
   res.json({ nodes: getAllNodesView(), summary: getPoolSummary() });
 });
 
-// Manual / periodic verification: actively pings every node so the
-// dashboard reflects reality even for nodes that haven't been used by a
-// live forecast recently. Does not affect runtime rotation directly —
-// that happens automatically on every forecast call via keyPool.ts.
 app.post("/api/nodes/health-check", async (_req: any, res: any) => {
   try {
     const result = await runHealthCheck();
@@ -180,9 +169,6 @@ app.post("/api/nodes/health-check", async (_req: any, res: any) => {
 
 // --- positions (mark-to-market) --------------------------------------------
 
-// Computed on demand from the journal + a fresh market fetch per open
-// trade — not cached, not part of the trading loop. See positions.ts for
-// why this stays separate from index.ts's cycle.
 app.get("/api/positions", async (_req: any, res: any) => {
   try {
     const positions = await getOpenPositions(client);
@@ -203,33 +189,31 @@ app.get("/api/markets/open", async (req, res) => {
         client.listMarkets({
           status: "open" as any,
           limit,
-          // Explicit even though it's also the SDK's current default —
-          // pinned here so the rank/thin-flag logic below stays correct
-          // even if that default ever changes upstream.
           orderBy: "liquidity" as any,
           pricesAndImpliedProbabilities: true,
         }),
-      { label: "listMarkets(open)", maxRetries: 2 } // dashboard read on a 15s poll
+      { label: "listMarkets(open)", maxRetries: 2 }
     );
     const list = markets ?? [];
 
-    // Fetch order is already liquidity-ranked (best first). Surface that
-    // rank plus a relative "thin" flag for the bottom slice of THIS batch
-    // — a coarse heuristic, not an absolute liquidity threshold, since
-    // Market doesn't expose a guaranteed stable liquidity field to
-    // threshold against directly.
     const thinCutoff = Math.ceil(list.length * (1 - CONFIG.thinLiquidityBottomFraction));
     const withLiquidity = list.map((m: any, i: number) => ({
       ...m,
       liquidityRank: i + 1,
       liquidityRankOf: list.length,
       isThinMarket: list.length > 0 && i >= thinCutoff,
-      // Actual token amounts, when the API exposes them — see
-      // marketFields.ts's header comment for the "unverified field
-      // name/scaling" caveat. null means this build couldn't find a
-      // recognizable field, not that the market has zero liquidity.
+      // Confirmed absent from this API version (see marketFields.ts) —
+      // kept for forward compatibility, always null on this build.
       liquidityTokens: extractLiquidity(m),
       volumeTokens: extractVolume(m),
+      // New fields
+      resolvesAt: extractResolvesAt(m),
+      settlesAt: extractSettlesAt(m),
+      msUntilResolve: msUntilResolve(m),
+      tradingFeePct: extractTradingFeePct(m),
+      dataSources: extractDataSources(m),
+      marketUrl: extractMarketUrl(m),
+      appMarketId: extractAppMarketId(m),
     }));
 
     res.json({ markets: withLiquidity });
@@ -242,8 +226,8 @@ app.get("/api/markets/open", async (req, res) => {
 
 app.get("/api/receipts", async (req, res) => {
   const limit = Number(req.query.limit ?? 50);
-  const type = req.query.type as string | undefined; // "trade" | "skip"
-  let receipts = await readReceipts(limit * 3); // over-fetch a bit before filtering
+  const type = req.query.type as string | undefined;
+  let receipts = await readReceipts(limit * 3);
   if (type === "trade" || type === "skip") {
     receipts = receipts.filter((r) => r.decision === type);
   }
@@ -254,12 +238,6 @@ app.get("/api/summary", (_req, res) => {
   res.json(readPinnedSummary() ?? { note: "no summary yet — run the loop or a backtest first" });
 });
 
-// Manual trigger for the same settlement pass runCycle() runs
-// automatically at the top of every cycle (see index.ts) — mainly for
-// testing without waiting on the next loop tick. Patches win/loss/void +
-// pnl onto any receipt (trade or skip, live or dry-run) whose market has
-// resolved, then recomputes the pinned summary so /api/summary reflects
-// it immediately.
 app.post("/api/settlement/check", async (_req: any, res: any) => {
   try {
     const result = await checkSettledOutcomes(client);
@@ -294,12 +272,6 @@ app.get("/api/backtest/history/:file", (req, res) => {
 
 // --- checkpoint (persist data/ across redeploys) ---------------------------
 
-// This dashboard has no auth on any of its routes, and this one triggers
-// a real `git commit` + `git push` on the server — so it's gated behind
-// an optional shared secret rather than left wide open. Set
-// CHECKPOINT_SECRET in the environment to require it; if unset, the
-// check is skipped (fine for local dev, not recommended once this is
-// reachable from the open internet).
 app.post("/api/checkpoint", async (req: any, res: any) => {
   const expected = process.env.CHECKPOINT_SECRET;
   if (expected && req.header("x-checkpoint-secret") !== expected) {
@@ -307,9 +279,6 @@ app.post("/api/checkpoint", async (req: any, res: any) => {
   }
   const result = await runCheckpointScript();
   if (!result.ok) {
-    // Also log server-side (visible in Render's Logs tab) so a failure
-    // is debuggable even before the dashboard.js fix that surfaces this
-    // same output in the browser.
     console.error("[checkpoint] failed:", result.output);
     return res.status(500).json({ ok: false, error: "checkpoint script failed", output: result.output });
   }
