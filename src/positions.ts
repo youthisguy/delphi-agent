@@ -2,6 +2,10 @@ import type { DelphiClient, Market } from "@gensyn-ai/gensyn-delphi-sdk";
 import { readReceipts, type Receipt } from "./journal.js";
 import { extractLiquidity, extractVolume } from "./marketFields.js";
 import { withDelphiRetry } from "./delphiRetry.js";
+import {
+  extractTradingFeePct,
+  extractResolvesAt,
+} from "./marketFields.js";
 
 /**
  * Mark-to-market for still-open trades — deliberately NOT part of the
@@ -15,8 +19,8 @@ import { withDelphiRetry } from "./delphiRetry.js";
  * are capped at maxRetries: 2 — fail fast on a rate-limited market
  * rather than blocking the whole page for minutes. The tradeoff of
  * failing fast is that a live rate-limit storm can make EVERY position's
- * getMarket() call fail within its 2 retries simultaneously — without
- * a fallback, that would blank out PnL/current-price for the whole table
+ * getMarket() call fail within its 2 retries simultaneously — without a
+ * fallback, that would blank out PnL/current-price for the whole table
  * at once, flickering in and out with every rate-limit window. The
  * lastKnownSnapshot cache below fixes that: a transient failure falls
  * back to the last successfully-fetched price (marked `stale: true`)
@@ -43,12 +47,12 @@ export interface OpenPosition {
    * before this field existed. */
   priceImpactPct: number | null;
   marketStatus: string | null;
-  /** Current liquidity/volume for this market, in tokens — always null
-   * on this API build (confirmed absent from the Market object entirely
-   * via rawprices.ts, not just unrecognized — see marketFields.ts).
-   * Kept for forward compatibility. */
+  /** Current liquidity/volume for this market, in tokens. */
   liquidityTokens: number | null;
   volumeTokens: number | null;
+  tradingFeePct: number | null;
+  resolvesAt: string | null;
+  msUntilResolve: number | null;
   /** True if the underlying getMarket() call for this position 404'd
    * (market no longer exists server-side — e.g. an old testnet market
    * that's been removed) rather than merely failing transiently. Lets
@@ -70,7 +74,11 @@ export interface OpenPosition {
  * trade priced against an empty book was priced against 0.5, so mark it
  * against 0.5 here too rather than inventing a different assumption. */
 function entryPriceFor(r: Receipt): number {
-  if (r.rawPrice && r.outcomeIdx !== null && r.rawPrice[r.outcomeIdx] !== undefined) {
+  if (
+    r.rawPrice &&
+    r.outcomeIdx !== null &&
+    r.rawPrice[r.outcomeIdx] !== undefined
+  ) {
     return r.rawPrice[r.outcomeIdx];
   }
   return 0.5;
@@ -86,7 +94,11 @@ function normalizeProb(raw: unknown): number | null {
 
 function isNotFoundError(err: unknown): boolean {
   const msg = err instanceof Error ? err.message : String(err);
-  return /\b404\b/.test(msg) || /not found/i.test(msg) || /no rows in result set/i.test(msg);
+  return (
+    /\b404\b/.test(msg) ||
+    /not found/i.test(msg) ||
+    /no rows in result set/i.test(msg)
+  );
 }
 
 /**
@@ -103,8 +115,11 @@ interface CachedMarketSnapshot {
   marketStatus: string | null;
   liquidityTokens: number | null;
   volumeTokens: number | null;
+  tradingFeePct: number | null;
+  resolvesAt: string | null;
   fetchedAt: number;
 }
+
 const lastKnownSnapshot = new Map<string, CachedMarketSnapshot>();
 
 /**
@@ -114,8 +129,11 @@ const lastKnownSnapshot = new Map<string, CachedMarketSnapshot>();
  * them resolved; they're priced purely off the market's current implied
  * probability, never an actual fill).
  */
-export async function getOpenPositions(client: DelphiClient): Promise<OpenPosition[]> {
+export async function getOpenPositions(
+  client: DelphiClient
+): Promise<OpenPosition[]> {
   const receipts = await readReceipts();
+
   const openTrades = receipts.filter(
     (r) =>
       r.decision === "trade" &&
@@ -128,6 +146,7 @@ export async function getOpenPositions(client: DelphiClient): Promise<OpenPositi
       !r.settlement &&
       !r.execution?.resolved
   );
+
   if (openTrades.length === 0) return [];
 
   // Firing every open position's getMarket() at once (old Promise.all
@@ -138,107 +157,164 @@ export async function getOpenPositions(client: DelphiClient): Promise<OpenPositi
   // without hammering the API in one burst every 15s poll.
   const POSITION_FETCH_CONCURRENCY = 3;
   const positions: OpenPosition[] = [];
-  for (let i = 0; i < openTrades.length; i += POSITION_FETCH_CONCURRENCY) {
-    const batch = openTrades.slice(i, i + POSITION_FETCH_CONCURRENCY);
+
+  for (
+    let i = 0;
+    i < openTrades.length;
+    i += POSITION_FETCH_CONCURRENCY
+  ) {
+    const batch = openTrades.slice(
+      i,
+      i + POSITION_FETCH_CONCURRENCY
+    );
+
     const batchResults = await Promise.all(
       batch.map(async (r) => {
-      const outcomeIdx = r.outcomeIdx as number;
-      const entryPrice = entryPriceFor(r);
-      const outcomeLabel = r.outcomes?.[outcomeIdx] ?? `outcome #${outcomeIdx}`;
+        const outcomeIdx = r.outcomeIdx as number;
+        const entryPrice = entryPriceFor(r);
+        const outcomeLabel =
+          r.outcomes?.[outcomeIdx] ?? `outcome #${outcomeIdx}`;
 
-      let currentPrice: number | null = null;
-      let marketStatus: string | null = null;
-      let liquidityTokens: number | null = null;
-      let volumeTokens: number | null = null;
-      let marketNotFound = false;
-      let stale = false;
+        let currentPrice: number | null = null;
+        let marketStatus: string | null = null;
+        let liquidityTokens: number | null = null;
+        let volumeTokens: number | null = null;
+        let tradingFeePct: number | null = null;
+        let resolvesAt: string | null = null;
+        let marketNotFound = false;
+        let stale = false;
 
-      try {
-        const market: Market | undefined = await withDelphiRetry(
-          () =>
-            client.getMarket({
-              id: r.marketId,
-              pricesAndImpliedProbabilities: true,
-            } as any),
-          { label: `getMarket(${r.marketId})`, maxRetries: 2 } // dashboard read on a 15s poll — fail fast
-        );
-        if (market) {
-          marketStatus = (market as any).status ?? null;
-          liquidityTokens = extractLiquidity(market);
-          volumeTokens = extractVolume(market);
-          const rawProbs = (market as any).spotImpliedProbabilities as unknown[] | undefined;
-          if (rawProbs && rawProbs[outcomeIdx] !== undefined) {
-            currentPrice = normalizeProb(rawProbs[outcomeIdx]);
+        try {
+          const market: Market | undefined = await withDelphiRetry(
+            () =>
+              client.getMarket({
+                id: r.marketId,
+                pricesAndImpliedProbabilities: true,
+              } as any),
+            {
+              label: `getMarket(${r.marketId})`,
+              maxRetries: 2,
+            } // dashboard read on a 15s poll — fail fast
+          );
+
+          if (market) {
+            marketStatus = (market as any).status ?? null;
+            liquidityTokens = extractLiquidity(market);
+            volumeTokens = extractVolume(market);
+            tradingFeePct = extractTradingFeePct(market);
+            resolvesAt = extractResolvesAt(market);
+
+            const rawProbs =
+              (market as any).spotImpliedProbabilities as
+                | unknown[]
+                | undefined;
+
+            if (
+              rawProbs &&
+              rawProbs[outcomeIdx] !== undefined
+            ) {
+              currentPrice = normalizeProb(
+                rawProbs[outcomeIdx]
+              );
+            }
+
+            // Fresh success — refresh the cache so a LATER transient
+            // failure has something real to fall back to.
+            lastKnownSnapshot.set(r.marketId, {
+              currentPrice,
+              marketStatus,
+              liquidityTokens,
+              volumeTokens,
+              tradingFeePct,
+              resolvesAt,
+              fetchedAt: Date.now(),
+            });
           }
-          // Fresh success — refresh the cache so a LATER transient
-          // failure has something real to fall back to.
-          lastKnownSnapshot.set(r.marketId, {
-            currentPrice,
-            marketStatus,
-            liquidityTokens,
-            volumeTokens,
-            fetchedAt: Date.now(),
-          });
-        }
-      } catch (err) {
-        marketNotFound = isNotFoundError(err);
-        console.warn(
-          `  [positions] couldn't fetch market ${r.marketId}${marketNotFound ? " (404 — market no longer exists server-side)" : ""}:`,
-          err instanceof Error ? err.message : err
-        );
+        } catch (err) {
+          marketNotFound = isNotFoundError(err);
 
-        if (marketNotFound) {
-          // Genuinely gone — don't resurrect stale numbers for a market
-          // that no longer exists on the API at all.
-          lastKnownSnapshot.delete(r.marketId);
-        } else {
-          // Transient (rate limit, timeout, etc.) — fall back to the
-          // last successful read rather than showing a blank PnL that
-          // flickers in and out with every rate-limit window.
-          const cached = lastKnownSnapshot.get(r.marketId);
-          if (cached) {
-            currentPrice = cached.currentPrice;
-            marketStatus = cached.marketStatus;
-            liquidityTokens = cached.liquidityTokens;
-            volumeTokens = cached.volumeTokens;
-            stale = true;
+          console.warn(
+            `  [positions] couldn't fetch market ${r.marketId}${
+              marketNotFound
+                ? " (404 — market no longer exists server-side)"
+                : ""
+            }:`,
+            err instanceof Error ? err.message : err
+          );
+
+          if (marketNotFound) {
+            // Genuinely gone — don't resurrect stale numbers for a market
+            // that no longer exists on the API at all.
+            lastKnownSnapshot.delete(r.marketId);
+          } else {
+            // Transient (rate limit, timeout, etc.) — fall back to the
+            // last successful read rather than showing a blank PnL that
+            // flickers in and out with every rate-limit window.
+            const cached = lastKnownSnapshot.get(r.marketId);
+
+            if (cached) {
+              currentPrice = cached.currentPrice;
+              marketStatus = cached.marketStatus;
+              liquidityTokens = cached.liquidityTokens;
+              volumeTokens = cached.volumeTokens;
+              tradingFeePct = cached.tradingFeePct;
+              resolvesAt = cached.resolvesAt;
+              stale = true;
+            }
           }
         }
-      }
 
-      const size = r.size ?? 0;
-      let unrealizedPnl: number | null = null;
-      let unrealizedPnlPct: number | null = null;
-      if (currentPrice !== null && entryPrice > 0) {
-        // 1 share pays out 1 token if this outcome wins, 0 otherwise, so a
-        // share's fair value tracks its implied probability directly —
-        // P&L% is just how much that probability has moved since entry.
-        unrealizedPnlPct = (currentPrice - entryPrice) / entryPrice;
-        unrealizedPnl = size * unrealizedPnlPct;
-      }
+        // Recomputed fresh from resolvesAt every poll (even when
+        // resolvesAt itself came from the stale-fallback cache above) —
+        // it's a function of "now", so caching the ms delta itself would
+        // just grow staler than the resolvesAt timestamp it's derived
+        // from for no benefit.
+        const msUntilResolveVal = resolvesAt
+          ? new Date(resolvesAt).getTime() - Date.now()
+          : null;
 
-      return {
-        marketId: r.marketId,
-        question: r.question,
-        category: r.category,
-        outcomeIdx,
-        outcomeLabel,
-        size,
-        entryPrice,
-        currentPrice,
-        unrealizedPnl,
-        unrealizedPnlPct,
-        priceImpactPct: r.execution?.priceImpactPct ?? null,
-        marketStatus,
-        liquidityTokens,
-        volumeTokens,
-        marketNotFound,
-        stale,
-        isDryRun: !r.execution,
-        ts: r.ts,
-      } satisfies OpenPosition;
+        const size = r.size ?? 0;
+
+        let unrealizedPnl: number | null = null;
+        let unrealizedPnlPct: number | null = null;
+
+        if (currentPrice !== null && entryPrice > 0) {
+          // 1 share pays out 1 token if this outcome wins, 0 otherwise,
+          // so a share's fair value tracks its implied probability
+          // directly — P&L% is just how much that probability has moved
+          // since entry.
+          unrealizedPnlPct =
+            (currentPrice - entryPrice) / entryPrice;
+          unrealizedPnl = size * unrealizedPnlPct;
+        }
+
+        return {
+          marketId: r.marketId,
+          question: r.question,
+          category: r.category,
+          outcomeIdx,
+          outcomeLabel,
+          size,
+          entryPrice,
+          currentPrice,
+          unrealizedPnl,
+          unrealizedPnlPct,
+          priceImpactPct:
+            r.execution?.priceImpactPct ?? null,
+          marketStatus,
+          liquidityTokens,
+          volumeTokens,
+          tradingFeePct,
+          resolvesAt,
+          msUntilResolve: msUntilResolveVal,
+          marketNotFound,
+          stale,
+          isDryRun: !r.execution,
+          ts: r.ts,
+        } satisfies OpenPosition;
       })
     );
+
     positions.push(...batchResults);
   }
 

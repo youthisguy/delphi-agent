@@ -524,8 +524,8 @@
             <th>IMPLIED PROBS</th>
             <th>FEE</th>
             <th>RESOLVES</th>
-            <th>LIQUIDITY</th>
-            <th>VOLUME</th>
+            <th>FEE</th>
+            <th>RESOLVES</th>
             <th>STATUS</th>
           </tr>
         </thead>
@@ -749,9 +749,8 @@ async function loadPositions() {
       const impactClass = !hasImpact ? '' : (p.priceImpactPct > 0.02 ? 'bad' : (p.priceImpactPct > 0.005 ? 'warn' : 'good'));
       const impactText = hasImpact ? `${fmtNum(p.priceImpactPct * 100, 1)}%` : '—';
 
-      const liqText = (p.liquidityTokens !== null && p.liquidityTokens !== undefined) ? fmtNum(p.liquidityTokens, 2) : '—';
-      const volText = (p.volumeTokens !== null && p.volumeTokens !== undefined) ? fmtNum(p.volumeTokens, 2) : '—';
-
+      const feeCell = (p.tradingFeePct !== null && p.tradingFeePct !== undefined) ? (p.tradingFeePct * 100).toFixed(1) + '%' : '—';
+      const resolvesCell = fmtTimeUntil(p.msUntilResolve);
       // marketNotFound (confirmed 404 — market no longer exists
       // server-side) is a distinct state from "temporarily unreachable"
       // (stale) or "still open" — surface it plainly rather than

@@ -18,6 +18,7 @@ import { getErc20Balance, getErc20Decimals, hasContractCode, resolveWalletAddres
 import { getCachedForecast, setCachedForecast, pruneForecastCache } from "./forecastCache.js";
 import { runCheckpointScript } from "./checkpoint.js";
 import { withDelphiRetry } from "./delphiRetry.js";
+import { extractTradingFeePct } from "./marketFields.js";
 import { CONFIG, getDryRun, getCompetitionTokenAddress } from "./config.js";
 
 const client = new DelphiClient();
@@ -111,6 +112,63 @@ async function getCycleBudget(dryRun: boolean): Promise<CycleBudget> {
   const openExposure = openPositions.reduce((sum, p) => sum + p.size, 0);
   const available = Math.max(0, humanBalance - openExposure - CONFIG.bankrollReserveTokens);
   return { total: available, source: "on-chain" };
+}
+
+/** Same decimals resolution tradeOnMarket()/getCycleBudget() use — env
+ * override first, then on-chain decimals(), falling back to 18. Kept
+ * best-effort here: this is only used to interpret a *reference* quote
+ * for sizing, not to move real funds, so a decimals miss here is far
+ * less dangerous than the buyShares() path — still logged though. */
+async function getReferenceTokenDecimals(): Promise<number> {
+  if (CONFIG.competitionTokenDecimals !== null) return CONFIG.competitionTokenDecimals;
+  const tokenAddress = getCompetitionTokenAddress();
+  if (!tokenAddress) return 18;
+  try {
+    return await getErc20Decimals(tokenAddress);
+  } catch {
+    return 18;
+  }
+}
+
+/**
+ * For markets with no valid order book (hasValidPrice === false in
+ * decide()), 0.5 was previously just a guess — sizing against it can
+ * diverge wildly from the real on-chain price, and that mismatch is
+ * exactly what was tripping tradeOnMarket()'s "quoted cost exceeds max
+ * spend" guard downstream: sizing thought the book was 50/50, the real
+ * AMM price wasn't, and the two disagreed by the time the real
+ * quoteBuy() ran at execution time.
+ *
+ * This asks the AMM directly for a tiny reference quote (1 share) on
+ * the candidate outcome and derives its implied price from that, so
+ * decide()'s sizing and tradeOnMarket()'s real quote are working off
+ * the same number. Returns null (caller falls back to 0.5, the old
+ * behavior) if the call fails for any reason — e.g. a market that's
+ * been announced but isn't actually live on-chain yet.
+ */
+async function getReferenceEntryPrice(market: Market, outcomeIdx: number): Promise<number | null> {
+  try {
+    const REFERENCE_SHARES = BigInt(1e18); // 1 share — enough to read a live price without materially moving it
+    const decimals = await getReferenceTokenDecimals();
+    const quote = await withDelphiRetry(
+      () =>
+        client.quoteBuy({
+          marketAddress: market.id as `0x${string}`,
+          outcomeIdx,
+          sharesOut: REFERENCE_SHARES,
+        }),
+      { label: `quoteBuy(ref:${market.id})`, maxRetries: 2 }
+    );
+    const price = Number(quote.tokensIn) / 10 ** decimals; // tokensIn for 1 share ≈ that outcome's implied price
+    if (!Number.isFinite(price) || price <= 0) return null;
+    return Math.min(price, 0.99);
+  } catch (err) {
+    console.warn(
+      `  [decide] reference quoteBuy failed for ${market.id}#${outcomeIdx}, falling back to synthetic 0.5:`,
+      err instanceof Error ? err.message : err
+    );
+    return null;
+  }
 }
 
 function skipReceipt(market: Market, reason: string): Receipt {
@@ -221,7 +279,33 @@ async function decide(
     : confidence > 0.65
       ? 0.15
       : 0.2;
-  const minEdge = baseMinEdge * blend.edgeMultiplier;
+  // Trading fee eats directly into edge — an 8%-edge signal against a
+  // 5% fee is a much thinner bet than the same edge against a 0.5% fee
+  // (see marketFields.ts's extractTradingFeePct doc comment). Added as
+  // a flat addend rather than folded into edgeMultiplier so it stays
+  // legible on its own and doesn't get compounded by the disagreement
+  // multiplier, which is measuring something unrelated (signal spread,
+  // not cost of entry).
+  const tradingFeePct = extractTradingFeePct(market) ?? 0;
+  const minEdge = baseMinEdge * blend.edgeMultiplier + tradingFeePct;
+
+  // Markets with no real order book were being sized against a blind
+  // 0.5 guess. If that guess was wrong, decide()'s sizing and
+  // tradeOnMarket()'s real quoteBuy() later disagreed about the price —
+  // which is what was tripping the "quoted cost exceeds max spend"
+  // guard on live execution. Get a real reference price for the
+  // candidate outcome up front so both stages agree, and re-check the
+  // edge against that real number instead of the synthetic one.
+  if (!hasValidPrice && bestIdx !== -1) {
+    const refPrice = await getReferenceEntryPrice(market, bestIdx);
+    if (refPrice !== null) {
+      console.log(
+        `  [decide] ${market.id}: no order book — reference quote outcome=${bestIdx} price=${refPrice.toFixed(3)} (was assuming 0.500)`
+      );
+      marketProbs[bestIdx] = refPrice;
+      bestEdge = blend.blendedProbs[bestIdx] - refPrice;
+    }
+  }
 
   const receiptBase: Omit<Receipt, "decision" | "outcomeIdx" | "edge" | "thresholdUsed" | "size" | "execution" | "skipReason"> = {
     ts: new Date().toISOString(),
@@ -229,7 +313,12 @@ async function decide(
     question,
     category,
     outcomes,
-    rawPrice: hasValidPrice ? rawProbs : null,
+    // Once a reference quote replaces the 0.5 placeholder above,
+    // marketProbs holds a real number at bestIdx — record it here too,
+    // so positions.ts/settlement.ts's entryPriceFor() (which reads
+    // rawPrice, not marketProbs) uses the same real price this trade
+    // was actually sized and priced against, not a hardcoded 0.5.
+    rawPrice: hasValidPrice ? rawProbs : bestIdx !== -1 && marketProbs[bestIdx] !== 0.5 ? marketProbs : null,
     syntheticPrice: !hasValidPrice,
     signals: {
       llm: { probs: llmProbs, confidence },
