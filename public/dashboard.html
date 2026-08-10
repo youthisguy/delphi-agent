@@ -524,6 +524,7 @@
             <th>IMPLIED PROBS</th>
             <th>FEE</th>
             <th>RESOLVES</th>
+            <th>LIQUIDITY</th>
             <th>STATUS</th>
           </tr>
         </thead>
@@ -727,7 +728,7 @@ async function loadPositions() {
     const totalClass = total > 0 ? 'good' : (total < 0 ? 'bad' : '');
     const totalSign = total > 0 ? '+' : '';
     $('#positionsPnlSummary').innerHTML = positions.length
-      ? `${positions.length} OPEN &middot; <span class="${totalClass}">${totalSign}${fmtNum(total, 2)} TOK</span>`
+      ? `${positions.length} OPEN &middot; <span class="${totalClass}">${totalSign}${fmtNum(total, 2)} TST</span>`
       : '0 OPEN';
 
     if (!positions.length) {
@@ -808,7 +809,7 @@ async function loadSummary() {
       <div class="stat-grid" style="margin-bottom:10px;">
         <div class="stat-card"><span class="k">Win Rate</span><span class="v ${tp.winRate === null ? '' : (tp.winRate >= 0.5 ? 'good' : 'bad')}">${fmtPct(tp.winRate)}</span></div>
         <div class="stat-card"><span class="k">Record</span><span class="v"><span class="good">${tp.wins}W</span> / <span class="bad">${tp.losses}L</span>${tp.voidTrades ? ` <span style="color:var(--text-muted)">(${tp.voidTrades} void)</span>` : ''}</span></div>
-        <div class="stat-card"><span class="k">Total P&amp;L</span><span class="v ${pnlClass}">${pnlSign}${fmtNum(tp.totalPnl, 2)} TOK</span></div>
+        <div class="stat-card"><span class="k">Total P&amp;L</span><span class="v ${pnlClass}">${pnlSign}${fmtNum(tp.totalPnl, 2)} TST</span></div>
         <div class="stat-card"><span class="k">Open (unsettled)</span><span class="v">${tp.openTrades}</span></div>
       </div>`;
     }
