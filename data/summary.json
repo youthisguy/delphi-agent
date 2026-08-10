@@ -1,7 +1,7 @@
 {
-  "updatedAt": "2026-08-10T01:06:59.725Z",
-  "totalReceipts": 165,
-  "totalTrades": 117,
+  "updatedAt": "2026-08-10T01:12:00.107Z",
+  "totalReceipts": 166,
+  "totalTrades": 118,
   "totalSkips": 48,
   "rollingAccuracy": {
     "n": 0,
@@ -25,7 +25,7 @@
     "politics": {
       "n": 0,
       "hitRate": null,
-      "trades": 68
+      "trades": 69
     },
     "tech": {
       "n": 0,
@@ -48,7 +48,7 @@
       "trades": 9
     }
   },
-  "openExposureTokens": 1375.7712214034268,
+  "openExposureTokens": 1390.7712214034268,
   "tradePerformance": {
     "settled": 0,
     "wins": 0,
@@ -56,7 +56,7 @@
     "winRate": null,
     "voidTrades": 0,
     "totalPnl": 0,
-    "openTrades": 117
+    "openTrades": 118
   },
   "skipCalibration": {
     "settled": 0,
@@ -65,6 +65,51 @@
     "voidSkips": 0
   },
   "lastNDecisions": [
+    {
+      "ts": "2026-08-10T01:12:00.106Z",
+      "marketId": "0xbc54636b1804f09f8dcc373c14e470a5a7e12a66",
+      "question": "Will Donald Trump post 180–199 times on Truth Social between Aug 4, 2026 at 12:00 pm ET and Aug 11, 2026 at 12:00 pm ET?",
+      "category": "politics",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.5,
+        0.5
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.18,
+            0.82
+          ],
+          "confidence": 0.55
+        },
+        "gemini": {
+          "probs": [
+            0.18,
+            0.82
+          ],
+          "confidence": 0.4,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0,
+      "blendedProbs": [
+        0.18000000000000002,
+        0.82
+      ],
+      "confidence": 0.55,
+      "decision": "trade",
+      "outcomeIdx": 1,
+      "edge": 0.31999999999999995,
+      "thresholdUsed": 0.12,
+      "size": 15,
+      "execution": null
+    },
     {
       "ts": "2026-08-10T01:06:59.723Z",
       "marketId": "0xbc54636b1804f09f8dcc373c14e470a5a7e12a66",
@@ -1102,51 +1147,6 @@
     },
     {
       "ts": "2026-08-09T23:11:57.407Z",
-      "marketId": "0xbc54636b1804f09f8dcc373c14e470a5a7e12a66",
-      "question": "Will Donald Trump post 180–199 times on Truth Social between Aug 4, 2026 at 12:00 pm ET and Aug 11, 2026 at 12:00 pm ET?",
-      "category": "politics",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.5,
-        0.5
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.18,
-            0.82
-          ],
-          "confidence": 0.62
-        },
-        "gemini": {
-          "probs": [
-            0.08,
-            0.92
-          ],
-          "confidence": 0.4,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.10000000000000009,
-      "blendedProbs": [
-        0.15142857142857144,
-        0.8485714285714285
-      ],
-      "confidence": 0.62,
-      "decision": "trade",
-      "outcomeIdx": 1,
-      "edge": 0.34857142857142853,
-      "thresholdUsed": 0.12,
-      "size": 15,
-      "execution": null
-    },
-    {
-      "ts": "2026-08-09T23:06:56.615Z",
       "marketId": "0xbc54636b1804f09f8dcc373c14e470a5a7e12a66",
       "question": "Will Donald Trump post 180–199 times on Truth Social between Aug 4, 2026 at 12:00 pm ET and Aug 11, 2026 at 12:00 pm ET?",
       "category": "politics",
