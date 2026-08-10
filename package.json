@@ -9,7 +9,7 @@
     "start": "concurrently -k \"tsx src/server.ts\" \"tsx src/index.ts\"",
    "server": "tsx src/server.ts",
     "demo": "tsx src/demo.ts",
-    "backtest": "tsx src/backtest.ts",
+    "rawprices": "tsx src/rawprices.ts",    "backtest": "tsx src/backtest.ts",
     "build": "echo 'no build step'",
     "typecheck": "tsc --noEmit",
     "loop": "tsx src/index.ts"

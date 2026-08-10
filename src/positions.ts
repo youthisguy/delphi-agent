@@ -117,12 +117,31 @@ const lastKnownSnapshot = new Map<string, CachedMarketSnapshot>();
 export async function getOpenPositions(client: DelphiClient): Promise<OpenPosition[]> {
   const receipts = await readReceipts();
   const openTrades = receipts.filter(
-    (r) => r.decision === "trade" && r.outcomeIdx !== null && !r.execution?.resolved
+    (r) =>
+      r.decision === "trade" &&
+      r.outcomeIdx !== null &&
+      // `execution.resolved` only ever gets set for LIVE trades (see
+      // redeem.ts) — dry-run trades' execution stays null forever, so
+      // checking that alone left settled dry-run trades stuck "open"
+      // permanently. `r.settlement` (from settlement.ts) is the actual
+      // ground truth for both live and dry-run, so check that too.
+      !r.settlement &&
+      !r.execution?.resolved
   );
   if (openTrades.length === 0) return [];
 
-  const positions = await Promise.all(
-    openTrades.map(async (r) => {
+  // Firing every open position's getMarket() at once (old Promise.all
+  // over the full list) is what caused the rate-limit thundering herd:
+  // N simultaneous calls hit the same 429 window, all wait it out
+  // together, then all retry on the same tick, re-triggering it
+  // indefinitely. Batching a few at a time keeps this endpoint fast
+  // without hammering the API in one burst every 15s poll.
+  const POSITION_FETCH_CONCURRENCY = 3;
+  const positions: OpenPosition[] = [];
+  for (let i = 0; i < openTrades.length; i += POSITION_FETCH_CONCURRENCY) {
+    const batch = openTrades.slice(i, i + POSITION_FETCH_CONCURRENCY);
+    const batchResults = await Promise.all(
+      batch.map(async (r) => {
       const outcomeIdx = r.outcomeIdx as number;
       const entryPrice = entryPriceFor(r);
       const outcomeLabel = r.outcomes?.[outcomeIdx] ?? `outcome #${outcomeIdx}`;
@@ -218,8 +237,10 @@ export async function getOpenPositions(client: DelphiClient): Promise<OpenPositi
         isDryRun: !r.execution,
         ts: r.ts,
       } satisfies OpenPosition;
-    })
-  );
+      })
+    );
+    positions.push(...batchResults);
+  }
 
   return positions;
 }

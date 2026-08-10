@@ -49,13 +49,26 @@ function sleep(ms: number): Promise<void> {
 // active rate-limit window.
 let rateLimitedUntil = 0;
 
+// Only log once per distinct window instead of once per waiting caller.
+// With N positions polled in parallel (positions.ts), all N used to log
+// their own "waiting Xs" line on every single tick — that's what was
+// filling the logs with hundreds of near-identical lines per second.
+let lastLoggedWindowEnd = 0;
+
 async function waitOutKnownWindow(label: string): Promise<void> {
-  const waitMs = rateLimitedUntil - Date.now();
+  const windowEnd = rateLimitedUntil;
+  const waitMs = windowEnd - Date.now();
   if (waitMs > 0) {
-    console.warn(
-      `  [delphi-retry] ${label} waiting ${(waitMs / 1000).toFixed(0)}s — inside a rate-limit window another call already hit`
-    );
-    await sleep(waitMs);
+    if (windowEnd !== lastLoggedWindowEnd) {
+      lastLoggedWindowEnd = windowEnd;
+      console.warn(
+        `  [delphi-retry] ${label} (+others) waiting ${(waitMs / 1000).toFixed(0)}s — inside a rate-limit window another call already hit`
+      );
+    }
+    // Jitter avoids every parallel caller waking up on the exact same
+    // millisecond and re-triggering the SAME rate limit together
+    // (thundering herd) — spreads re-attempts over ~1.5s instead.
+    await sleep(waitMs + Math.random() * 1500);
   }
 }
 
