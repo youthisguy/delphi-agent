@@ -1,0 +1,569 @@
+{
+  "updatedAt": "2026-08-10T19:19:55.139Z",
+  "totalReceipts": 11,
+  "totalTrades": 6,
+  "totalSkips": 5,
+  "rollingAccuracy": {
+    "n": 0,
+    "hitRate": null
+  },
+  "calibrationByConfidenceBucket": {
+    "high(0.6-0.8)": {
+      "n": 0,
+      "hitRate": null
+    },
+    "mid(0.4-0.6)": {
+      "n": 0,
+      "hitRate": null
+    }
+  },
+  "perCategory": {
+    "sports": {
+      "n": 0,
+      "hitRate": null,
+      "trades": 1
+    },
+    "culture": {
+      "n": 0,
+      "hitRate": null,
+      "trades": 1
+    },
+    "tech": {
+      "n": 0,
+      "hitRate": null,
+      "trades": 3
+    },
+    "economics": {
+      "n": 0,
+      "hitRate": null,
+      "trades": 1
+    }
+  },
+  "openExposureTokens": 137.2768392394062,
+  "tradePerformance": {
+    "settled": 0,
+    "wins": 0,
+    "losses": 0,
+    "winRate": null,
+    "voidTrades": 0,
+    "totalPnl": 0,
+    "openTrades": 6
+  },
+  "skipCalibration": {
+    "settled": 0,
+    "wouldHaveWon": 0,
+    "wouldHaveWonRate": null,
+    "voidSkips": 0
+  },
+  "lastNDecisions": [
+    {
+      "ts": "2026-08-10T19:19:55.135Z",
+      "marketId": "0xf00cfaf8fc8f84f0a1d6151a5cf466c996901e9f",
+      "question": "Will NSIDC Arctic sea ice extent for 2026-08-12 (UTC) be below 5.88 million km²?",
+      "category": "miscellaneous",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.5860268851969592,
+        0.4139731148030408
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.72,
+            0.28
+          ],
+          "confidence": 0.74
+        },
+        "gemini": {
+          "probs": [
+            0.35,
+            0.65
+          ],
+          "confidence": 0.55,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.37,
+      "blendedProbs": [
+        0.5887096774193548,
+        0.4112903225806452
+      ],
+      "confidence": 0.74,
+      "decision": "skip",
+      "outcomeIdx": 0,
+      "edge": 0.002682792222395536,
+      "thresholdUsed": 0.085,
+      "size": null,
+      "execution": null,
+      "skipReason": "models disagree sharply (spread=0.37 >= hard threshold 0.3)"
+    },
+    {
+      "ts": "2026-08-10T19:19:46.741Z",
+      "marketId": "0x7090dec53161de700627de95344adeb1f2182943",
+      "question": "Will NSÍ Runavík advance past FC Lugano in their 2026–27 UEFA Conference League qualifying tie (2nd leg 13 Aug 2026)?",
+      "category": "sports",
+      "outcomes": [
+        "NSÍ Runavík",
+        "FC Lugano"
+      ],
+      "rawPrice": [
+        0.3080108012999021,
+        0.6919891987000979
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.08,
+            0.92
+          ],
+          "confidence": 0.72
+        },
+        "gemini": {
+          "probs": [
+            0.08,
+            0.92
+          ],
+          "confidence": 0.85,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0,
+      "blendedProbs": [
+        0.08000000000000002,
+        0.92
+      ],
+      "confidence": 0.72,
+      "decision": "trade",
+      "outcomeIdx": 1,
+      "edge": 0.22801080129990214,
+      "thresholdUsed": 0.085,
+      "size": 23.70294526845227,
+      "execution": {
+        "txHash": "0x25a32e03ad500bb35c0e3842622fed7ff83f8605d87f85d44cee78b01ab2b168",
+        "quotedTokensIn": 23221510,
+        "sharesOut": "31952894040779890688",
+        "priceImpactPct": 0.0502
+      }
+    },
+    {
+      "ts": "2026-08-10T19:19:43.336Z",
+      "marketId": "0x2907372d7be71fe8ea1573daafed1870fc9fcf68",
+      "question": "Will the SILSO estimated sunspot number for 2026-08-12 UTC be 40 or higher?",
+      "category": "miscellaneous",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.5167337337195753,
+        0.4832662662804247
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.62,
+            0.38
+          ],
+          "confidence": 0.58
+        },
+        "gemini": {
+          "probs": [
+            0.65,
+            0.35
+          ],
+          "confidence": 0.45,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.030000000000000027,
+      "blendedProbs": [
+        0.6293103448275863,
+        0.3706896551724138
+      ],
+      "confidence": 0.58,
+      "decision": "skip",
+      "outcomeIdx": 0,
+      "edge": 0.11257661110801098,
+      "thresholdUsed": 0.125,
+      "size": null,
+      "execution": null,
+      "skipReason": "bestEdge=0.113 < minEdge=0.13"
+    },
+    {
+      "ts": "2026-08-10T19:19:38.331Z",
+      "marketId": "0x1db6058367342c4f604d1a0e01566ff2f6481b9d",
+      "question": "Will BLS show US average price for eggs (grade A, large, per dozen, series APU0000708111) rise from June to July 2026?",
+      "category": "economics",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.49129448131069786,
+        0.5087055186893021
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.58,
+            0.42
+          ],
+          "confidence": 0.56
+        },
+        "gemini": {
+          "probs": [
+            0.55,
+            0.45
+          ],
+          "confidence": 0.4,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.030000000000000027,
+      "blendedProbs": [
+        0.5714285714285715,
+        0.4285714285714286
+      ],
+      "confidence": 0.56,
+      "decision": "skip",
+      "outcomeIdx": 0,
+      "edge": 0.08013409011787365,
+      "thresholdUsed": 0.125,
+      "size": null,
+      "execution": null,
+      "skipReason": "bestEdge=0.080 < minEdge=0.13"
+    },
+    {
+      "ts": "2026-08-10T18:50:46.531Z",
+      "marketId": "0xbe5b366b4a66f7d811aa144248ca84f4db66451d",
+      "question": "Will Juventus's men's first team win their match kicking off 10:00 UTC on Aug 11, 2026?",
+      "category": "sports",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.5740347299237482,
+        0.42596527007625185
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.62,
+            0.38
+          ],
+          "confidence": 0.42
+        },
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [
+        0.62,
+        0.38
+      ],
+      "confidence": 0.42,
+      "decision": "skip",
+      "outcomeIdx": 0,
+      "edge": 0.04596527007625184,
+      "thresholdUsed": 0.125,
+      "size": null,
+      "execution": null,
+      "skipReason": "bestEdge=0.046 < minEdge=0.13"
+    },
+    {
+      "ts": "2026-08-10T18:21:50.834Z",
+      "marketId": "0x41026490b1882d909200bacab10ea15bb9a07314",
+      "question": "Will \"A Quiet Place: Day One\" be the #1 US movie in the Netflix Top 10 list published Aug 11, 2026?",
+      "category": "culture",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.3830290636742116,
+        0.6169709363257884
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.18,
+            0.82
+          ],
+          "confidence": 0.56
+        },
+        "gemini": {
+          "probs": [
+            0.03,
+            0.97
+          ],
+          "confidence": 0.85,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.15000000000000002,
+      "blendedProbs": [
+        0.11108108108108108,
+        0.8889189189189189
+      ],
+      "confidence": 0.56,
+      "decision": "trade",
+      "outcomeIdx": 1,
+      "edge": 0.2719479825931306,
+      "thresholdUsed": 0.185,
+      "size": 10.536325542764994,
+      "execution": {
+        "txHash": "0x75050972369002dabc89650b37495b3c9a4d16b63cc9362409f6b70a0bd99cb5",
+        "quotedTokensIn": 10325152,
+        "sharesOut": "16625105820944138240",
+        "priceImpactPct": 0.0066
+      }
+    },
+    {
+      "ts": "2026-08-10T18:21:47.467Z",
+      "marketId": "0x719f25b62ccb7906f82243edae7cab19dfee9ec0",
+      "question": "Will Bitcoin's CoinGecko daily close on 2026-08-10 UTC be between $64,000 and $66,000?",
+      "category": "crypto",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.4498991037220207,
+        0.5501008962779793
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.5,
+            0.5
+          ],
+          "confidence": 0.25
+        },
+        "gemini": {
+          "probs": [
+            0.03,
+            0.97
+          ],
+          "confidence": 0.8,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.47,
+      "blendedProbs": [
+        0.2911111111111111,
+        0.7088888888888889
+      ],
+      "confidence": 0.25,
+      "decision": "skip",
+      "outcomeIdx": 1,
+      "edge": 0.1587879926109096,
+      "thresholdUsed": 0.125,
+      "size": null,
+      "execution": null,
+      "skipReason": "models disagree sharply (spread=0.47 >= hard threshold 0.3)"
+    },
+    {
+      "ts": "2026-08-10T18:21:39.615Z",
+      "marketId": "0xa66a47aac290f8dec9c809166fc6cd703966d64b",
+      "question": "Will SpaceX launch the Dragon CRS-35 cargo mission before 00:00 UTC on Aug 14, 2026?",
+      "category": "tech",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.3637424094686008,
+        0.6362575905313992
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.72,
+            0.28
+          ],
+          "confidence": 0.58
+        },
+        "gemini": {
+          "probs": [
+            0.95,
+            0.05
+          ],
+          "confidence": 0.85,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.23000000000000004,
+      "blendedProbs": [
+        0.8256756756756757,
+        0.17432432432432435
+      ],
+      "confidence": 0.58,
+      "decision": "trade",
+      "outcomeIdx": 0,
+      "edge": 0.46193326620707487,
+      "thresholdUsed": 0.185,
+      "size": 19.983291811900276,
+      "execution": {
+        "txHash": "0xe2a00e3b481dc47b0b44d6690a70c271e2a2885cf70fd8cdcbd1cf182f2dd43d",
+        "quotedTokensIn": 19579302,
+        "sharesOut": "53197433892183859200",
+        "priceImpactPct": 0.0118
+      }
+    },
+    {
+      "ts": "2026-08-10T18:21:30.834Z",
+      "marketId": "0x9e51ae58500a3ad19017af2eb4d846359b1c7ae7",
+      "question": "Will US core CPI (YoY) exceed headline CPI (YoY) for July 2026, per the BLS CPI release?",
+      "category": "economics",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.36933485705774294,
+        0.6306651429422572
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.06,
+            0.94
+          ],
+          "confidence": 0.78
+        },
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [
+        0.06,
+        0.94
+      ],
+      "confidence": 0.78,
+      "decision": "trade",
+      "outcomeIdx": 1,
+      "edge": 0.3093348570577428,
+      "thresholdUsed": 0.085,
+      "size": 45.647122058494034,
+      "execution": {
+        "txHash": "0xea6f95d47d4837f3485acba766727196c359b67d737e9c09bf4805b40b1b1862",
+        "quotedTokensIn": 44729330,
+        "sharesOut": "70309071604942028800",
+        "priceImpactPct": 0.0087
+      }
+    },
+    {
+      "ts": "2026-08-10T18:21:23.107Z",
+      "marketId": "0x260838dea933ec339270a8565cf8601b58a85db2",
+      "question": "Will Take-Two or Rockstar disclose a numeric GTA VI preorder figure by 03:59 UTC on Aug 14, 2026?",
+      "category": "tech",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.3964038657943368,
+        0.6035961342056633
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.18,
+            0.82
+          ],
+          "confidence": 0.58
+        },
+        "gemini": {
+          "probs": [
+            0.08,
+            0.92
+          ],
+          "confidence": 0.8,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.10000000000000009,
+      "blendedProbs": [
+        0.13555555555555554,
+        0.8644444444444445
+      ],
+      "confidence": 0.58,
+      "decision": "trade",
+      "outcomeIdx": 1,
+      "edge": 0.2608483102387812,
+      "thresholdUsed": 0.125,
+      "size": 20.716951883648047,
+      "execution": {
+        "txHash": "0x4a6c6f78790714e8c3be8b93f8d540ef7571e791c6d9cfc159c714d098a4ce52",
+        "quotedTokensIn": 20301558,
+        "sharesOut": "33403024346178080768",
+        "priceImpactPct": 0.0069
+      }
+    },
+    {
+      "ts": "2026-08-10T18:21:14.498Z",
+      "marketId": "0x9b7e3199c73ca293626ab886d8e1601c33d58ccb",
+      "question": "Will OpenAI publicly release a model named Astra before 03:59 UTC on Aug 14, 2026?",
+      "category": "tech",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.35671250340702865,
+        0.6432874965929712
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.08,
+            0.92
+          ],
+          "confidence": 0.42
+        },
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [
+        0.08,
+        0.92
+      ],
+      "confidence": 0.42,
+      "decision": "trade",
+      "outcomeIdx": 1,
+      "edge": 0.2767125034070288,
+      "thresholdUsed": 0.125,
+      "size": 16.690202674146587,
+      "execution": {
+        "txHash": "0x5c0fa3790b238368dd071dbfc1a16cc11508f5a74c53949c476783523793119d",
+        "quotedTokensIn": 16355963,
+        "sharesOut": "25273156450407723008",
+        "priceImpactPct": 0.006
+      }
+    }
+  ]
+}
