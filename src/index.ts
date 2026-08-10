@@ -289,18 +289,18 @@ async function decide(
   const tradingFeePct = extractTradingFeePct(market) ?? 0;
   const minEdge = baseMinEdge * blend.edgeMultiplier + tradingFeePct;
 
-  // Markets with no real order book were being sized against a blind
-  // 0.5 guess. If that guess was wrong, decide()'s sizing and
-  // tradeOnMarket()'s real quoteBuy() later disagreed about the price —
-  // which is what was tripping the "quoted cost exceeds max spend"
-  // guard on live execution. Get a real reference price for the
-  // candidate outcome up front so both stages agree, and re-check the
-  // edge against that real number instead of the synthetic one.
-  if (!hasValidPrice && bestIdx !== -1) {
+// A market can pass hasValidPrice and still be untraded — a freshly
+  // opened AMM pool starts at an exact 1/n price before any real trading,
+  // and that spot price is only accurate for infinitesimal size. Treat
+  // "looks untouched" the same as "no book at all".
+  const looksUntouched =
+    hasValidPrice && marketProbs.every((p) => Math.abs(p - 1 / marketProbs.length) < 0.005);
+
+  if ((!hasValidPrice || looksUntouched) && bestIdx !== -1) {
     const refPrice = await getReferenceEntryPrice(market, bestIdx);
     if (refPrice !== null) {
       console.log(
-        `  [decide] ${market.id}: no order book — reference quote outcome=${bestIdx} price=${refPrice.toFixed(3)} (was assuming 0.500)`
+        `  [decide] ${market.id}: ${hasValidPrice ? "untouched initial price" : "no order book"} — reference quote outcome=${bestIdx} price=${refPrice.toFixed(3)}`
       );
       marketProbs[bestIdx] = refPrice;
       bestEdge = blend.blendedProbs[bestIdx] - refPrice;
@@ -422,49 +422,78 @@ async function tradeOnMarket(market: Market, decision: TradeDecision, dryRun: bo
     { label: `quoteBuy(${market.id})` }
   );
 
+  let finalSharesOut = sharesOut;
+  let finalQuote = quote;
+
   if (quote.tokensIn > maxTokensIn) {
-    const reason = "quote_exceeds_max_spend";
-    console.log(`[TRADE-EXEC] market=${market.id} dryRun=false result=DECLINED reason=${reason}`);
-    return { filled: false, execution: null, declineReason: "quoted cost exceeds max spend" };
+    // Real AMM price impact on a meaningful-size buy — scale shares down
+    // to fit the budget instead of declining outright, then requote once
+    // to confirm the smaller size actually fits.
+    const scale = Number(maxTokensIn) / Number(quote.tokensIn);
+    const scaledShares = BigInt(Math.floor(Number(sharesOut) * scale * 0.98)); // small extra margin
+
+    if (scaledShares <= 0n) {
+      const reason = "quote_exceeds_max_spend";
+      console.log(`[TRADE-EXEC] market=${market.id} dryRun=false result=DECLINED reason=${reason}`);
+      return { filled: false, execution: null, declineReason: "quoted cost exceeds max spend even at minimal size" };
+    }
+
+    finalQuote = await withDelphiRetry(
+      () =>
+        client.quoteBuy({
+          marketAddress: market.id as `0x${string}`,
+          outcomeIdx: decision.outcomeIdx,
+          sharesOut: scaledShares,
+        }),
+      { label: `quoteBuy(retry:${market.id})` }
+    );
+
+    if (finalQuote.tokensIn > maxTokensIn) {
+      const reason = "quote_exceeds_max_spend";
+      console.log(`[TRADE-EXEC] market=${market.id} dryRun=false result=DECLINED reason=${reason}`);
+      return { filled: false, execution: null, declineReason: "quoted cost exceeds max spend after resize" };
+    }
+
+    finalSharesOut = scaledShares;
   }
 
-  // 1.5% slippage buffer above the quoted cost.
-  const SLIPPAGE_BPS = 150n; // 1.5%
-  let maxTokensInWithSlippage = quote.tokensIn + (quote.tokensIn * SLIPPAGE_BPS) / 10000n;
-  if (maxTokensInWithSlippage > maxTokensIn) maxTokensInWithSlippage = maxTokensIn;
+// 1.5% slippage buffer above the quoted cost.
+const SLIPPAGE_BPS = 150n;
+let maxTokensInWithSlippage = finalQuote.tokensIn + (finalQuote.tokensIn * SLIPPAGE_BPS) / 10000n;
+if (maxTokensInWithSlippage > maxTokensIn) maxTokensInWithSlippage = maxTokensIn;
 
-  await withDelphiRetry(
-    () => client.ensureTokenApproval({ marketAddress: market.id as `0x${string}`, minimumAmount: maxTokensInWithSlippage }),
-    { label: `ensureTokenApproval(${market.id})` }
-  );
+await withDelphiRetry(
+  () => client.ensureTokenApproval({ marketAddress: market.id as `0x${string}`, minimumAmount: maxTokensInWithSlippage }),
+  { label: `ensureTokenApproval(${market.id})` }
+);
 
-  const result = await withDelphiRetry(
-    () =>
-      client.buyShares({
-        marketAddress: market.id as `0x${string}`,
-        outcomeIdx: decision.outcomeIdx,
-        sharesOut,
-        maxTokensIn: maxTokensInWithSlippage,
-      }),
-    { label: `buyShares(${market.id})` }
-  );
+const result = await withDelphiRetry(
+  () =>
+    client.buyShares({
+      marketAddress: market.id as `0x${string}`,
+      outcomeIdx: decision.outcomeIdx,
+      sharesOut: finalSharesOut,
+      maxTokensIn: maxTokensInWithSlippage,
+    }),
+  { label: `buyShares(${market.id})` }
+);
 
-  console.log(
-    `[TRADE-EXEC] market=${market.id} dryRun=false result=FILLED tx=${result.transactionHash} shares=${sharesOut} quotedTokensIn=${quote.tokensIn} cap=${maxTokensInWithSlippage}`
-  );
+console.log(
+  `[TRADE-EXEC] market=${market.id} dryRun=false result=FILLED tx=${result.transactionHash} shares=${finalSharesOut} quotedTokensIn=${finalQuote.tokensIn} cap=${maxTokensInWithSlippage}`
+);
 
-  const costPerShare = Number(quote.tokensIn) / 10 ** decimals / desiredShares;
-  const priceImpactPct = entryPrice > 0 ? Number(((costPerShare - entryPrice) / entryPrice).toFixed(4)) : null;
+const costPerShare = Number(finalQuote.tokensIn) / 10 ** decimals / (Number(finalSharesOut) / 1e18);
+const priceImpactPct = entryPrice > 0 ? Number(((costPerShare - entryPrice) / entryPrice).toFixed(4)) : null;
 
-  return {
-    filled: true,
-    execution: {
-      txHash: result.transactionHash,
-      quotedTokensIn: Number(quote.tokensIn),
-      sharesOut: sharesOut.toString(),
-      priceImpactPct,
-    },
-  };
+return {
+  filled: true,
+  execution: {
+    txHash: result.transactionHash,
+    quotedTokensIn: Number(finalQuote.tokensIn),
+    sharesOut: finalSharesOut.toString(),
+    priceImpactPct,
+  },
+};
 }
 
 // Last completed cycle's counters, kept in memory so a "running: true"
