@@ -1,13 +1,17 @@
 {
-  "updatedAt": "2026-08-10T23:05:21.398Z",
-  "totalReceipts": 305,
-  "totalTrades": 10,
-  "totalSkips": 295,
+  "updatedAt": "2026-08-11T03:45:22.161Z",
+  "totalReceipts": 865,
+  "totalTrades": 11,
+  "totalSkips": 854,
   "rollingAccuracy": {
     "n": 0,
     "hitRate": null
   },
   "calibrationByConfidenceBucket": {
+    "mid(0.4-0.6)": {
+      "n": 0,
+      "hitRate": null
+    },
     "low(<0.4)": {
       "n": 0,
       "hitRate": null
@@ -15,13 +19,14 @@
     "high(0.6-0.8)": {
       "n": 0,
       "hitRate": null
-    },
-    "mid(0.4-0.6)": {
-      "n": 0,
-      "hitRate": null
     }
   },
   "perCategory": {
+    "economics": {
+      "n": 0,
+      "hitRate": null,
+      "trades": 2
+    },
     "sports": {
       "n": 0,
       "hitRate": null,
@@ -46,14 +51,9 @@
       "n": 0,
       "hitRate": null,
       "trades": 3
-    },
-    "economics": {
-      "n": 0,
-      "hitRate": null,
-      "trades": 1
     }
   },
-  "openExposureTokens": 148.54876997985312,
+  "openExposureTokens": 151.12537351301845,
   "tradePerformance": {
     "settled": 0,
     "wins": 0,
@@ -61,7 +61,7 @@
     "winRate": null,
     "voidTrades": 0,
     "totalPnl": 0,
-    "openTrades": 10
+    "openTrades": 11
   },
   "skipCalibration": {
     "settled": 0,
@@ -71,61 +71,7 @@
   },
   "lastNDecisions": [
     {
-      "ts": "2026-08-10T23:05:21.312Z",
-      "marketId": "0xf00cfaf8fc8f84f0a1d6151a5cf466c996901e9f",
-      "question": "Will NSIDC Arctic sea ice extent for 2026-08-12 (UTC) be below 5.88 million km²?",
-      "category": "miscellaneous",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": null,
-      "syntheticPrice": false,
-      "signals": {
-        "llm": null,
-        "gemini": null,
-        "polymarket": null
-      },
-      "disagreement": null,
-      "blendedProbs": [],
-      "confidence": 0,
-      "decision": "skip",
-      "outcomeIdx": null,
-      "edge": 0,
-      "thresholdUsed": 0,
-      "size": null,
-      "execution": null,
-      "skipReason": "already holding an open position on this market"
-    },
-    {
-      "ts": "2026-08-10T23:05:21.312Z",
-      "marketId": "0x7090dec53161de700627de95344adeb1f2182943",
-      "question": "Will NSÍ Runavík advance past FC Lugano in their 2026–27 UEFA Conference League qualifying tie (2nd leg 13 Aug 2026)?",
-      "category": "sports",
-      "outcomes": [
-        "NSÍ Runavík",
-        "FC Lugano"
-      ],
-      "rawPrice": null,
-      "syntheticPrice": false,
-      "signals": {
-        "llm": null,
-        "gemini": null,
-        "polymarket": null
-      },
-      "disagreement": null,
-      "blendedProbs": [],
-      "confidence": 0,
-      "decision": "skip",
-      "outcomeIdx": null,
-      "edge": 0,
-      "thresholdUsed": 0,
-      "size": null,
-      "execution": null,
-      "skipReason": "already holding an open position on this market"
-    },
-    {
-      "ts": "2026-08-10T23:05:21.312Z",
+      "ts": "2026-08-11T03:45:17.296Z",
       "marketId": "0x1db6058367342c4f604d1a0e01566ff2f6481b9d",
       "question": "Will BLS show US average price for eggs (grade A, large, per dozen, series APU0000708111) rise from June to July 2026?",
       "category": "economics",
@@ -134,8 +80,8 @@
         "No"
       ],
       "rawPrice": [
-        0.5104290208078316,
-        0.48957097919216847
+        0.41404384051123644,
+        0.5859561594887637
       ],
       "syntheticPrice": false,
       "signals": {
@@ -148,636 +94,61 @@
         },
         "gemini": {
           "probs": [
-            0.55,
-            0.45
-          ],
-          "confidence": 0.35,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.030000000000000027,
-      "blendedProbs": [
-        0.5722222222222222,
-        0.42777777777777776
-      ],
-      "confidence": 0.56,
-      "decision": "skip",
-      "outcomeIdx": 0,
-      "edge": 0.0617932014143906,
-      "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "bestEdge=0.062 < minEdge=0.13"
-    },
-    {
-      "ts": "2026-08-10T23:05:21.246Z",
-      "marketId": "0x2907372d7be71fe8ea1573daafed1870fc9fcf68",
-      "question": "Will the SILSO estimated sunspot number for 2026-08-12 UTC be 40 or higher?",
-      "category": "miscellaneous",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": null,
-      "syntheticPrice": false,
-      "signals": {
-        "llm": null,
-        "gemini": null,
-        "polymarket": null
-      },
-      "disagreement": null,
-      "blendedProbs": [],
-      "confidence": 0,
-      "decision": "skip",
-      "outcomeIdx": null,
-      "edge": 0,
-      "thresholdUsed": 0,
-      "size": null,
-      "execution": null,
-      "skipReason": "already holding an open position on this market"
-    },
-    {
-      "ts": "2026-08-10T23:05:12.133Z",
-      "marketId": "0xbe5b366b4a66f7d811aa144248ca84f4db66451d",
-      "question": "Will Juventus's men's first team win their match kicking off 10:00 UTC on Aug 11, 2026?",
-      "category": "sports",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.6293961032388894,
-        0.37060389676111066
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.5,
-            0.5
-          ],
-          "confidence": 0.25
-        },
-        "gemini": null,
-        "polymarket": null
-      },
-      "disagreement": null,
-      "blendedProbs": [
-        0.5,
-        0.5
-      ],
-      "confidence": 0.25,
-      "decision": "trade",
-      "outcomeIdx": 1,
-      "edge": 0.12939610323888934,
-      "thresholdUsed": 0.125,
-      "size": 0.861145095083435,
-      "execution": {
-        "txHash": "0x39c7920797ef420d56e8bc78877d017a76718585a2ec31e8fa83b682a1852827",
-        "quotedTokensIn": 843916,
-        "sharesOut": "2265104537852300544",
-        "priceImpactPct": 0.0053
-      }
-    },
-    {
-      "ts": "2026-08-10T23:05:07.753Z",
-      "marketId": "0x41026490b1882d909200bacab10ea15bb9a07314",
-      "question": "Will \"A Quiet Place: Day One\" be the #1 US movie in the Netflix Top 10 list published Aug 11, 2026?",
-      "category": "culture",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": null,
-      "syntheticPrice": false,
-      "signals": {
-        "llm": null,
-        "gemini": null,
-        "polymarket": null
-      },
-      "disagreement": null,
-      "blendedProbs": [],
-      "confidence": 0,
-      "decision": "skip",
-      "outcomeIdx": null,
-      "edge": 0,
-      "thresholdUsed": 0,
-      "size": null,
-      "execution": null,
-      "skipReason": "already holding an open position on this market"
-    },
-    {
-      "ts": "2026-08-10T23:05:07.753Z",
-      "marketId": "0xa66a47aac290f8dec9c809166fc6cd703966d64b",
-      "question": "Will SpaceX launch the Dragon CRS-35 cargo mission before 00:00 UTC on Aug 14, 2026?",
-      "category": "tech",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": null,
-      "syntheticPrice": false,
-      "signals": {
-        "llm": null,
-        "gemini": null,
-        "polymarket": null
-      },
-      "disagreement": null,
-      "blendedProbs": [],
-      "confidence": 0,
-      "decision": "skip",
-      "outcomeIdx": null,
-      "edge": 0,
-      "thresholdUsed": 0,
-      "size": null,
-      "execution": null,
-      "skipReason": "already holding an open position on this market"
-    },
-    {
-      "ts": "2026-08-10T23:05:07.752Z",
-      "marketId": "0x9e51ae58500a3ad19017af2eb4d846359b1c7ae7",
-      "question": "Will US core CPI (YoY) exceed headline CPI (YoY) for July 2026, per the BLS CPI release?",
-      "category": "economics",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": null,
-      "syntheticPrice": false,
-      "signals": {
-        "llm": null,
-        "gemini": null,
-        "polymarket": null
-      },
-      "disagreement": null,
-      "blendedProbs": [],
-      "confidence": 0,
-      "decision": "skip",
-      "outcomeIdx": null,
-      "edge": 0,
-      "thresholdUsed": 0,
-      "size": null,
-      "execution": null,
-      "skipReason": "already holding an open position on this market"
-    },
-    {
-      "ts": "2026-08-10T23:05:07.752Z",
-      "marketId": "0x260838dea933ec339270a8565cf8601b58a85db2",
-      "question": "Will Take-Two or Rockstar disclose a numeric GTA VI preorder figure by 03:59 UTC on Aug 14, 2026?",
-      "category": "tech",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": null,
-      "syntheticPrice": false,
-      "signals": {
-        "llm": null,
-        "gemini": null,
-        "polymarket": null
-      },
-      "disagreement": null,
-      "blendedProbs": [],
-      "confidence": 0,
-      "decision": "skip",
-      "outcomeIdx": null,
-      "edge": 0,
-      "thresholdUsed": 0,
-      "size": null,
-      "execution": null,
-      "skipReason": "already holding an open position on this market"
-    },
-    {
-      "ts": "2026-08-10T23:05:07.752Z",
-      "marketId": "0x9b7e3199c73ca293626ab886d8e1601c33d58ccb",
-      "question": "Will OpenAI publicly release a model named Astra before 03:59 UTC on Aug 14, 2026?",
-      "category": "tech",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": null,
-      "syntheticPrice": false,
-      "signals": {
-        "llm": null,
-        "gemini": null,
-        "polymarket": null
-      },
-      "disagreement": null,
-      "blendedProbs": [],
-      "confidence": 0,
-      "decision": "skip",
-      "outcomeIdx": null,
-      "edge": 0,
-      "thresholdUsed": 0,
-      "size": null,
-      "execution": null,
-      "skipReason": "already holding an open position on this market"
-    },
-    {
-      "ts": "2026-08-10T23:00:12.068Z",
-      "marketId": "0xf00cfaf8fc8f84f0a1d6151a5cf466c996901e9f",
-      "question": "Will NSIDC Arctic sea ice extent for 2026-08-12 (UTC) be below 5.88 million km²?",
-      "category": "miscellaneous",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": null,
-      "syntheticPrice": false,
-      "signals": {
-        "llm": null,
-        "gemini": null,
-        "polymarket": null
-      },
-      "disagreement": null,
-      "blendedProbs": [],
-      "confidence": 0,
-      "decision": "skip",
-      "outcomeIdx": null,
-      "edge": 0,
-      "thresholdUsed": 0,
-      "size": null,
-      "execution": null,
-      "skipReason": "already holding an open position on this market"
-    },
-    {
-      "ts": "2026-08-10T23:00:12.068Z",
-      "marketId": "0x7090dec53161de700627de95344adeb1f2182943",
-      "question": "Will NSÍ Runavík advance past FC Lugano in their 2026–27 UEFA Conference League qualifying tie (2nd leg 13 Aug 2026)?",
-      "category": "sports",
-      "outcomes": [
-        "NSÍ Runavík",
-        "FC Lugano"
-      ],
-      "rawPrice": null,
-      "syntheticPrice": false,
-      "signals": {
-        "llm": null,
-        "gemini": null,
-        "polymarket": null
-      },
-      "disagreement": null,
-      "blendedProbs": [],
-      "confidence": 0,
-      "decision": "skip",
-      "outcomeIdx": null,
-      "edge": 0,
-      "thresholdUsed": 0,
-      "size": null,
-      "execution": null,
-      "skipReason": "already holding an open position on this market"
-    },
-    {
-      "ts": "2026-08-10T23:00:12.068Z",
-      "marketId": "0x1db6058367342c4f604d1a0e01566ff2f6481b9d",
-      "question": "Will BLS show US average price for eggs (grade A, large, per dozen, series APU0000708111) rise from June to July 2026?",
-      "category": "economics",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.5121362791871963,
-        0.4878637208128037
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.58,
-            0.42
-          ],
-          "confidence": 0.56
-        },
-        "gemini": {
-          "probs": [
-            0.55,
-            0.45
-          ],
-          "confidence": 0.35,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.030000000000000027,
-      "blendedProbs": [
-        0.5722222222222222,
-        0.42777777777777776
-      ],
-      "confidence": 0.56,
-      "decision": "skip",
-      "outcomeIdx": 0,
-      "edge": 0.0600859430350259,
-      "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "bestEdge=0.060 < minEdge=0.13"
-    },
-    {
-      "ts": "2026-08-10T23:00:07.802Z",
-      "marketId": "0x2907372d7be71fe8ea1573daafed1870fc9fcf68",
-      "question": "Will the SILSO estimated sunspot number for 2026-08-12 UTC be 40 or higher?",
-      "category": "miscellaneous",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": null,
-      "syntheticPrice": false,
-      "signals": {
-        "llm": null,
-        "gemini": null,
-        "polymarket": null
-      },
-      "disagreement": null,
-      "blendedProbs": [],
-      "confidence": 0,
-      "decision": "skip",
-      "outcomeIdx": null,
-      "edge": 0,
-      "thresholdUsed": 0,
-      "size": null,
-      "execution": null,
-      "skipReason": "already holding an open position on this market"
-    },
-    {
-      "ts": "2026-08-10T23:00:07.802Z",
-      "marketId": "0xbe5b366b4a66f7d811aa144248ca84f4db66451d",
-      "question": "Will Juventus's men's first team win their match kicking off 10:00 UTC on Aug 11, 2026?",
-      "category": "sports",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.6293961032388894,
-        0.37060389676111066
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.58,
-            0.42
-          ],
-          "confidence": 0.42
-        },
-        "gemini": null,
-        "polymarket": null
-      },
-      "disagreement": null,
-      "blendedProbs": [
-        0.58,
-        0.42
-      ],
-      "confidence": 0.42,
-      "decision": "skip",
-      "outcomeIdx": 1,
-      "edge": 0.04939610323888932,
-      "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "bestEdge=0.049 < minEdge=0.13"
-    },
-    {
-      "ts": "2026-08-10T23:00:07.724Z",
-      "marketId": "0x41026490b1882d909200bacab10ea15bb9a07314",
-      "question": "Will \"A Quiet Place: Day One\" be the #1 US movie in the Netflix Top 10 list published Aug 11, 2026?",
-      "category": "culture",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": null,
-      "syntheticPrice": false,
-      "signals": {
-        "llm": null,
-        "gemini": null,
-        "polymarket": null
-      },
-      "disagreement": null,
-      "blendedProbs": [],
-      "confidence": 0,
-      "decision": "skip",
-      "outcomeIdx": null,
-      "edge": 0,
-      "thresholdUsed": 0,
-      "size": null,
-      "execution": null,
-      "skipReason": "already holding an open position on this market"
-    },
-    {
-      "ts": "2026-08-10T23:00:07.724Z",
-      "marketId": "0xa66a47aac290f8dec9c809166fc6cd703966d64b",
-      "question": "Will SpaceX launch the Dragon CRS-35 cargo mission before 00:00 UTC on Aug 14, 2026?",
-      "category": "tech",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": null,
-      "syntheticPrice": false,
-      "signals": {
-        "llm": null,
-        "gemini": null,
-        "polymarket": null
-      },
-      "disagreement": null,
-      "blendedProbs": [],
-      "confidence": 0,
-      "decision": "skip",
-      "outcomeIdx": null,
-      "edge": 0,
-      "thresholdUsed": 0,
-      "size": null,
-      "execution": null,
-      "skipReason": "already holding an open position on this market"
-    },
-    {
-      "ts": "2026-08-10T23:00:07.724Z",
-      "marketId": "0x260838dea933ec339270a8565cf8601b58a85db2",
-      "question": "Will Take-Two or Rockstar disclose a numeric GTA VI preorder figure by 03:59 UTC on Aug 14, 2026?",
-      "category": "tech",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": null,
-      "syntheticPrice": false,
-      "signals": {
-        "llm": null,
-        "gemini": null,
-        "polymarket": null
-      },
-      "disagreement": null,
-      "blendedProbs": [],
-      "confidence": 0,
-      "decision": "skip",
-      "outcomeIdx": null,
-      "edge": 0,
-      "thresholdUsed": 0,
-      "size": null,
-      "execution": null,
-      "skipReason": "already holding an open position on this market"
-    },
-    {
-      "ts": "2026-08-10T23:00:07.724Z",
-      "marketId": "0x9e51ae58500a3ad19017af2eb4d846359b1c7ae7",
-      "question": "Will US core CPI (YoY) exceed headline CPI (YoY) for July 2026, per the BLS CPI release?",
-      "category": "economics",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": null,
-      "syntheticPrice": false,
-      "signals": {
-        "llm": null,
-        "gemini": null,
-        "polymarket": null
-      },
-      "disagreement": null,
-      "blendedProbs": [],
-      "confidence": 0,
-      "decision": "skip",
-      "outcomeIdx": null,
-      "edge": 0,
-      "thresholdUsed": 0,
-      "size": null,
-      "execution": null,
-      "skipReason": "already holding an open position on this market"
-    },
-    {
-      "ts": "2026-08-10T23:00:07.724Z",
-      "marketId": "0x9b7e3199c73ca293626ab886d8e1601c33d58ccb",
-      "question": "Will OpenAI publicly release a model named Astra before 03:59 UTC on Aug 14, 2026?",
-      "category": "tech",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": null,
-      "syntheticPrice": false,
-      "signals": {
-        "llm": null,
-        "gemini": null,
-        "polymarket": null
-      },
-      "disagreement": null,
-      "blendedProbs": [],
-      "confidence": 0,
-      "decision": "skip",
-      "outcomeIdx": null,
-      "edge": 0,
-      "thresholdUsed": 0,
-      "size": null,
-      "execution": null,
-      "skipReason": "already holding an open position on this market"
-    },
-    {
-      "ts": "2026-08-10T22:55:08.502Z",
-      "marketId": "0xf00cfaf8fc8f84f0a1d6151a5cf466c996901e9f",
-      "question": "Will NSIDC Arctic sea ice extent for 2026-08-12 (UTC) be below 5.88 million km²?",
-      "category": "miscellaneous",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": null,
-      "syntheticPrice": false,
-      "signals": {
-        "llm": null,
-        "gemini": null,
-        "polymarket": null
-      },
-      "disagreement": null,
-      "blendedProbs": [],
-      "confidence": 0,
-      "decision": "skip",
-      "outcomeIdx": null,
-      "edge": 0,
-      "thresholdUsed": 0,
-      "size": null,
-      "execution": null,
-      "skipReason": "already holding an open position on this market"
-    },
-    {
-      "ts": "2026-08-10T22:55:08.502Z",
-      "marketId": "0x7090dec53161de700627de95344adeb1f2182943",
-      "question": "Will NSÍ Runavík advance past FC Lugano in their 2026–27 UEFA Conference League qualifying tie (2nd leg 13 Aug 2026)?",
-      "category": "sports",
-      "outcomes": [
-        "NSÍ Runavík",
-        "FC Lugano"
-      ],
-      "rawPrice": null,
-      "syntheticPrice": false,
-      "signals": {
-        "llm": null,
-        "gemini": null,
-        "polymarket": null
-      },
-      "disagreement": null,
-      "blendedProbs": [],
-      "confidence": 0,
-      "decision": "skip",
-      "outcomeIdx": null,
-      "edge": 0,
-      "thresholdUsed": 0,
-      "size": null,
-      "execution": null,
-      "skipReason": "already holding an open position on this market"
-    },
-    {
-      "ts": "2026-08-10T22:55:08.501Z",
-      "marketId": "0x1db6058367342c4f604d1a0e01566ff2f6481b9d",
-      "question": "Will BLS show US average price for eggs (grade A, large, per dozen, series APU0000708111) rise from June to July 2026?",
-      "category": "economics",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.5121362791871963,
-        0.4878637208128037
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.58,
-            0.42
-          ],
-          "confidence": 0.46
-        },
-        "gemini": {
-          "probs": [
-            0.65,
-            0.35
+            0.62,
+            0.38
           ],
           "confidence": 0.4,
           "grounded": false
         },
         "polymarket": null
       },
-      "disagreement": 0.07000000000000006,
+      "disagreement": 0.040000000000000036,
       "blendedProbs": [
-        0.6,
-        0.39999999999999997
+        0.5914285714285714,
+        0.40857142857142864
       ],
-      "confidence": 0.46,
-      "decision": "skip",
+      "confidence": 0.56,
+      "decision": "trade",
       "outcomeIdx": 0,
-      "edge": 0.08786372081280369,
+      "edge": 0.17738473091733498,
       "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "bestEdge=0.088 < minEdge=0.13"
+      "size": 2.5766035331653265,
+      "execution": {
+        "txHash": "0x0bba6b77c8463efd7957c6000e849048ec11d925c6b166b607afbb3cbdfd9be0",
+        "quotedTokensIn": 2524990,
+        "sharesOut": "6060694850820273152",
+        "priceImpactPct": 0.0062
+      }
     },
     {
-      "ts": "2026-08-10T22:55:08.405Z",
+      "ts": "2026-08-11T03:45:14.036Z",
+      "marketId": "0xf00cfaf8fc8f84f0a1d6151a5cf466c996901e9f",
+      "question": "Will NSIDC Arctic sea ice extent for 2026-08-12 (UTC) be below 5.88 million km²?",
+      "category": "miscellaneous",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": null,
+      "syntheticPrice": false,
+      "signals": {
+        "llm": null,
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [],
+      "confidence": 0,
+      "decision": "skip",
+      "outcomeIdx": null,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": null,
+      "execution": null,
+      "skipReason": "already holding an open position on this market"
+    },
+    {
+      "ts": "2026-08-11T03:45:14.036Z",
       "marketId": "0x2907372d7be71fe8ea1573daafed1870fc9fcf68",
       "question": "Will the SILSO estimated sunspot number for 2026-08-12 UTC be 40 or higher?",
       "category": "miscellaneous",
@@ -804,7 +175,34 @@
       "skipReason": "already holding an open position on this market"
     },
     {
-      "ts": "2026-08-10T22:55:08.404Z",
+      "ts": "2026-08-11T03:45:14.036Z",
+      "marketId": "0x7090dec53161de700627de95344adeb1f2182943",
+      "question": "Will NSÍ Runavík advance past FC Lugano in their 2026–27 UEFA Conference League qualifying tie (2nd leg 13 Aug 2026)?",
+      "category": "sports",
+      "outcomes": [
+        "NSÍ Runavík",
+        "FC Lugano"
+      ],
+      "rawPrice": null,
+      "syntheticPrice": false,
+      "signals": {
+        "llm": null,
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [],
+      "confidence": 0,
+      "decision": "skip",
+      "outcomeIdx": null,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": null,
+      "execution": null,
+      "skipReason": "already holding an open position on this market"
+    },
+    {
+      "ts": "2026-08-11T03:45:14.036Z",
       "marketId": "0xbe5b366b4a66f7d811aa144248ca84f4db66451d",
       "question": "Will Juventus's men's first team win their match kicking off 10:00 UTC on Aug 11, 2026?",
       "category": "sports",
@@ -812,9 +210,171 @@
         "Yes",
         "No"
       ],
+      "rawPrice": null,
+      "syntheticPrice": false,
+      "signals": {
+        "llm": null,
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [],
+      "confidence": 0,
+      "decision": "skip",
+      "outcomeIdx": null,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": null,
+      "execution": null,
+      "skipReason": "already holding an open position on this market"
+    },
+    {
+      "ts": "2026-08-11T03:45:14.036Z",
+      "marketId": "0x9e51ae58500a3ad19017af2eb4d846359b1c7ae7",
+      "question": "Will US core CPI (YoY) exceed headline CPI (YoY) for July 2026, per the BLS CPI release?",
+      "category": "economics",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": null,
+      "syntheticPrice": false,
+      "signals": {
+        "llm": null,
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [],
+      "confidence": 0,
+      "decision": "skip",
+      "outcomeIdx": null,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": null,
+      "execution": null,
+      "skipReason": "already holding an open position on this market"
+    },
+    {
+      "ts": "2026-08-11T03:45:14.036Z",
+      "marketId": "0xa66a47aac290f8dec9c809166fc6cd703966d64b",
+      "question": "Will SpaceX launch the Dragon CRS-35 cargo mission before 00:00 UTC on Aug 14, 2026?",
+      "category": "tech",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": null,
+      "syntheticPrice": false,
+      "signals": {
+        "llm": null,
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [],
+      "confidence": 0,
+      "decision": "skip",
+      "outcomeIdx": null,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": null,
+      "execution": null,
+      "skipReason": "already holding an open position on this market"
+    },
+    {
+      "ts": "2026-08-11T03:45:14.036Z",
+      "marketId": "0x41026490b1882d909200bacab10ea15bb9a07314",
+      "question": "Will \"A Quiet Place: Day One\" be the #1 US movie in the Netflix Top 10 list published Aug 11, 2026?",
+      "category": "culture",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": null,
+      "syntheticPrice": false,
+      "signals": {
+        "llm": null,
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [],
+      "confidence": 0,
+      "decision": "skip",
+      "outcomeIdx": null,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": null,
+      "execution": null,
+      "skipReason": "already holding an open position on this market"
+    },
+    {
+      "ts": "2026-08-11T03:45:14.036Z",
+      "marketId": "0x260838dea933ec339270a8565cf8601b58a85db2",
+      "question": "Will Take-Two or Rockstar disclose a numeric GTA VI preorder figure by 03:59 UTC on Aug 14, 2026?",
+      "category": "tech",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": null,
+      "syntheticPrice": false,
+      "signals": {
+        "llm": null,
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [],
+      "confidence": 0,
+      "decision": "skip",
+      "outcomeIdx": null,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": null,
+      "execution": null,
+      "skipReason": "already holding an open position on this market"
+    },
+    {
+      "ts": "2026-08-11T03:45:14.036Z",
+      "marketId": "0x9b7e3199c73ca293626ab886d8e1601c33d58ccb",
+      "question": "Will OpenAI publicly release a model named Astra before 03:59 UTC on Aug 14, 2026?",
+      "category": "tech",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": null,
+      "syntheticPrice": false,
+      "signals": {
+        "llm": null,
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [],
+      "confidence": 0,
+      "decision": "skip",
+      "outcomeIdx": null,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": null,
+      "execution": null,
+      "skipReason": "already holding an open position on this market"
+    },
+    {
+      "ts": "2026-08-11T03:40:14.971Z",
+      "marketId": "0x1db6058367342c4f604d1a0e01566ff2f6481b9d",
+      "question": "Will BLS show US average price for eggs (grade A, large, per dozen, series APU0000708111) rise from June to July 2026?",
+      "category": "economics",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
       "rawPrice": [
-        0.6293961032388894,
-        0.37060389676111066
+        0.46955277381067223,
+        0.5304472261893277
       ],
       "syntheticPrice": false,
       "signals": {
@@ -823,24 +383,428 @@
             0.58,
             0.42
           ],
-          "confidence": 0.42
+          "confidence": 0.55
         },
+        "gemini": {
+          "probs": [
+            0.55,
+            0.45
+          ],
+          "confidence": 0.4,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.030000000000000027,
+      "blendedProbs": [
+        0.5714285714285715,
+        0.4285714285714286
+      ],
+      "confidence": 0.55,
+      "decision": "skip",
+      "outcomeIdx": 0,
+      "edge": 0.10187579761789928,
+      "thresholdUsed": 0.125,
+      "size": null,
+      "execution": null,
+      "skipReason": "bestEdge=0.102 < minEdge=0.13"
+    },
+    {
+      "ts": "2026-08-11T03:40:14.863Z",
+      "marketId": "0xf00cfaf8fc8f84f0a1d6151a5cf466c996901e9f",
+      "question": "Will NSIDC Arctic sea ice extent for 2026-08-12 (UTC) be below 5.88 million km²?",
+      "category": "miscellaneous",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": null,
+      "syntheticPrice": false,
+      "signals": {
+        "llm": null,
         "gemini": null,
         "polymarket": null
       },
       "disagreement": null,
-      "blendedProbs": [
-        0.58,
-        0.42
-      ],
-      "confidence": 0.42,
+      "blendedProbs": [],
+      "confidence": 0,
       "decision": "skip",
-      "outcomeIdx": 1,
-      "edge": 0.04939610323888932,
+      "outcomeIdx": null,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": null,
+      "execution": null,
+      "skipReason": "already holding an open position on this market"
+    },
+    {
+      "ts": "2026-08-11T03:40:14.863Z",
+      "marketId": "0x2907372d7be71fe8ea1573daafed1870fc9fcf68",
+      "question": "Will the SILSO estimated sunspot number for 2026-08-12 UTC be 40 or higher?",
+      "category": "miscellaneous",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": null,
+      "syntheticPrice": false,
+      "signals": {
+        "llm": null,
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [],
+      "confidence": 0,
+      "decision": "skip",
+      "outcomeIdx": null,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": null,
+      "execution": null,
+      "skipReason": "already holding an open position on this market"
+    },
+    {
+      "ts": "2026-08-11T03:40:14.863Z",
+      "marketId": "0x7090dec53161de700627de95344adeb1f2182943",
+      "question": "Will NSÍ Runavík advance past FC Lugano in their 2026–27 UEFA Conference League qualifying tie (2nd leg 13 Aug 2026)?",
+      "category": "sports",
+      "outcomes": [
+        "NSÍ Runavík",
+        "FC Lugano"
+      ],
+      "rawPrice": null,
+      "syntheticPrice": false,
+      "signals": {
+        "llm": null,
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [],
+      "confidence": 0,
+      "decision": "skip",
+      "outcomeIdx": null,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": null,
+      "execution": null,
+      "skipReason": "already holding an open position on this market"
+    },
+    {
+      "ts": "2026-08-11T03:40:14.863Z",
+      "marketId": "0xbe5b366b4a66f7d811aa144248ca84f4db66451d",
+      "question": "Will Juventus's men's first team win their match kicking off 10:00 UTC on Aug 11, 2026?",
+      "category": "sports",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": null,
+      "syntheticPrice": false,
+      "signals": {
+        "llm": null,
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [],
+      "confidence": 0,
+      "decision": "skip",
+      "outcomeIdx": null,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": null,
+      "execution": null,
+      "skipReason": "already holding an open position on this market"
+    },
+    {
+      "ts": "2026-08-11T03:40:14.863Z",
+      "marketId": "0xa66a47aac290f8dec9c809166fc6cd703966d64b",
+      "question": "Will SpaceX launch the Dragon CRS-35 cargo mission before 00:00 UTC on Aug 14, 2026?",
+      "category": "tech",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": null,
+      "syntheticPrice": false,
+      "signals": {
+        "llm": null,
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [],
+      "confidence": 0,
+      "decision": "skip",
+      "outcomeIdx": null,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": null,
+      "execution": null,
+      "skipReason": "already holding an open position on this market"
+    },
+    {
+      "ts": "2026-08-11T03:40:14.863Z",
+      "marketId": "0x41026490b1882d909200bacab10ea15bb9a07314",
+      "question": "Will \"A Quiet Place: Day One\" be the #1 US movie in the Netflix Top 10 list published Aug 11, 2026?",
+      "category": "culture",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": null,
+      "syntheticPrice": false,
+      "signals": {
+        "llm": null,
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [],
+      "confidence": 0,
+      "decision": "skip",
+      "outcomeIdx": null,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": null,
+      "execution": null,
+      "skipReason": "already holding an open position on this market"
+    },
+    {
+      "ts": "2026-08-11T03:40:14.863Z",
+      "marketId": "0x9e51ae58500a3ad19017af2eb4d846359b1c7ae7",
+      "question": "Will US core CPI (YoY) exceed headline CPI (YoY) for July 2026, per the BLS CPI release?",
+      "category": "economics",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": null,
+      "syntheticPrice": false,
+      "signals": {
+        "llm": null,
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [],
+      "confidence": 0,
+      "decision": "skip",
+      "outcomeIdx": null,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": null,
+      "execution": null,
+      "skipReason": "already holding an open position on this market"
+    },
+    {
+      "ts": "2026-08-11T03:40:14.863Z",
+      "marketId": "0x260838dea933ec339270a8565cf8601b58a85db2",
+      "question": "Will Take-Two or Rockstar disclose a numeric GTA VI preorder figure by 03:59 UTC on Aug 14, 2026?",
+      "category": "tech",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": null,
+      "syntheticPrice": false,
+      "signals": {
+        "llm": null,
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [],
+      "confidence": 0,
+      "decision": "skip",
+      "outcomeIdx": null,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": null,
+      "execution": null,
+      "skipReason": "already holding an open position on this market"
+    },
+    {
+      "ts": "2026-08-11T03:40:14.863Z",
+      "marketId": "0x9b7e3199c73ca293626ab886d8e1601c33d58ccb",
+      "question": "Will OpenAI publicly release a model named Astra before 03:59 UTC on Aug 14, 2026?",
+      "category": "tech",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": null,
+      "syntheticPrice": false,
+      "signals": {
+        "llm": null,
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [],
+      "confidence": 0,
+      "decision": "skip",
+      "outcomeIdx": null,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": null,
+      "execution": null,
+      "skipReason": "already holding an open position on this market"
+    },
+    {
+      "ts": "2026-08-11T03:35:13.803Z",
+      "marketId": "0x7090dec53161de700627de95344adeb1f2182943",
+      "question": "Will NSÍ Runavík advance past FC Lugano in their 2026–27 UEFA Conference League qualifying tie (2nd leg 13 Aug 2026)?",
+      "category": "sports",
+      "outcomes": [
+        "NSÍ Runavík",
+        "FC Lugano"
+      ],
+      "rawPrice": null,
+      "syntheticPrice": false,
+      "signals": {
+        "llm": null,
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [],
+      "confidence": 0,
+      "decision": "skip",
+      "outcomeIdx": null,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": null,
+      "execution": null,
+      "skipReason": "already holding an open position on this market"
+    },
+    {
+      "ts": "2026-08-11T03:35:13.803Z",
+      "marketId": "0x1db6058367342c4f604d1a0e01566ff2f6481b9d",
+      "question": "Will BLS show US average price for eggs (grade A, large, per dozen, series APU0000708111) rise from June to July 2026?",
+      "category": "economics",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.46955277381067223,
+        0.5304472261893277
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.58,
+            0.42
+          ],
+          "confidence": 0.55
+        },
+        "gemini": {
+          "probs": [
+            0.55,
+            0.45
+          ],
+          "confidence": 0.4,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.030000000000000027,
+      "blendedProbs": [
+        0.5714285714285715,
+        0.4285714285714286
+      ],
+      "confidence": 0.55,
+      "decision": "skip",
+      "outcomeIdx": 0,
+      "edge": 0.10187579761789928,
       "thresholdUsed": 0.125,
       "size": null,
       "execution": null,
-      "skipReason": "bestEdge=0.049 < minEdge=0.13"
+      "skipReason": "bestEdge=0.102 < minEdge=0.13"
+    },
+    {
+      "ts": "2026-08-11T03:35:13.699Z",
+      "marketId": "0xf00cfaf8fc8f84f0a1d6151a5cf466c996901e9f",
+      "question": "Will NSIDC Arctic sea ice extent for 2026-08-12 (UTC) be below 5.88 million km²?",
+      "category": "miscellaneous",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": null,
+      "syntheticPrice": false,
+      "signals": {
+        "llm": null,
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [],
+      "confidence": 0,
+      "decision": "skip",
+      "outcomeIdx": null,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": null,
+      "execution": null,
+      "skipReason": "already holding an open position on this market"
+    },
+    {
+      "ts": "2026-08-11T03:35:13.699Z",
+      "marketId": "0x2907372d7be71fe8ea1573daafed1870fc9fcf68",
+      "question": "Will the SILSO estimated sunspot number for 2026-08-12 UTC be 40 or higher?",
+      "category": "miscellaneous",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": null,
+      "syntheticPrice": false,
+      "signals": {
+        "llm": null,
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [],
+      "confidence": 0,
+      "decision": "skip",
+      "outcomeIdx": null,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": null,
+      "execution": null,
+      "skipReason": "already holding an open position on this market"
+    },
+    {
+      "ts": "2026-08-11T03:35:13.699Z",
+      "marketId": "0xbe5b366b4a66f7d811aa144248ca84f4db66451d",
+      "question": "Will Juventus's men's first team win their match kicking off 10:00 UTC on Aug 11, 2026?",
+      "category": "sports",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": null,
+      "syntheticPrice": false,
+      "signals": {
+        "llm": null,
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [],
+      "confidence": 0,
+      "decision": "skip",
+      "outcomeIdx": null,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": null,
+      "execution": null,
+      "skipReason": "already holding an open position on this market"
     }
   ]
 }
