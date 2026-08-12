@@ -96,7 +96,7 @@ async function main() {
   console.log(`Wallet: ${wallet}\n`);
 
   console.log("Fetching positions via listPositions({ wallet })…");
-  const rawPositions = await loadAllPositions("0xf5b2e0684c059421cb8ec41912cb66d8d6b3d7cd");
+  const rawPositions = await loadAllPositions(wallet);
   console.log(`  API returned ${rawPositions.length} row(s)\n`);
 
   const positions: PosRow[] = [];

@@ -116,7 +116,7 @@ export const CONFIG = {
   // disproportionate price impact on this market regardless of whether
   // the contract accepts them. Default 5 tokens; raise/lower via
   // MIN_TOKENS_PER_TRADE.
-  minTokensPerTrade: Number(process.env.MIN_TOKENS_PER_TRADE ?? 3),
+  minTokensPerTrade: Number(process.env.MIN_TOKENS_PER_TRADE ?? 1),
 
   // The market proxy contract enforces its own minimum trade size on-chain
   // (confirmed via a live revert: SharesOutBelowMinDelta(sharesOut,

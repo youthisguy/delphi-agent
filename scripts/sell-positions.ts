@@ -6,6 +6,7 @@
  *
  *   npx tsx scripts/sell-positions.ts
  *   npx tsx scripts/sell-positions.ts --market 0xabc...
+ *   npx tsx scripts/sell-positions.ts --market 0xabc... --outcome no
  *   npx tsx scripts/sell-positions.ts --sell
  *   npx tsx scripts/sell-positions.ts --sell --dry-run
  *   npx tsx scripts/sell-positions.ts --sell --slippage-bps 500
@@ -29,6 +30,12 @@ const DRY_RUN = process.argv.includes("--dry-run");
 
 const MARKET_FILTER =
   argValue("--market")?.toLowerCase() ?? null;
+
+// Filter by outcome label (e.g. "yes" / "no"), case-insensitive.
+// Lets you target a single leg of a market (e.g. sell only the
+// losing side) instead of every position in that market.
+const OUTCOME_FILTER =
+  argValue("--outcome")?.toLowerCase() ?? null;
 
 const SLIPPAGE_BPS =
   BigInt(argValue("--slippage-bps") ?? "300"); // 3%
@@ -155,6 +162,14 @@ async function main() {
     `sell-positions sell=${DO_SELL} dryRun=${DRY_RUN} slippageBps=${SLIPPAGE_BPS}`
   );
 
+  if (MARKET_FILTER) {
+    console.log(`marketFilter=${MARKET_FILTER}`);
+  }
+
+  if (OUTCOME_FILTER) {
+    console.log(`outcomeFilter=${OUTCOME_FILTER}`);
+  }
+
   console.log(
     `sharesDecimals=${SHARES_DECIMALS} collateralDecimals=${COLLATERAL_TOKEN_DECIMALS}\n`
   );
@@ -257,12 +272,23 @@ async function main() {
       }
     }
 
+    const outcomeLabel =
+      outcomes[outcomeIdx] ?? `#${outcomeIdx}`;
+
+    // Filter by outcome label if --outcome was passed. Matches
+    // against the resolved label (e.g. "Yes" / "No") case-insensitively.
+    if (
+      OUTCOME_FILTER &&
+      outcomeLabel.toLowerCase() !== OUTCOME_FILTER
+    ) {
+      continue;
+    }
+
     sellable.push({
       marketProxy,
       question,
       outcomeIdx,
-      outcomeLabel:
-        outcomes[outcomeIdx] ?? `#${outcomeIdx}`,
+      outcomeLabel,
       sharesRaw,
       sharesHuman: sharesToHuman(sharesRaw),
       status,
@@ -272,7 +298,7 @@ async function main() {
 
   if (sellable.length === 0) {
     console.log(
-      "No sellable (still-open) positions found."
+      "No sellable (still-open) positions found matching the given filters."
     );
 
     return;
@@ -324,7 +350,7 @@ async function main() {
 
       quotedTokensOut = quote.tokensOut;
 
-  
+
       const quotedHuman =
         collateralToHuman(quotedTokensOut);
 
