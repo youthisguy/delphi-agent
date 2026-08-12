@@ -1,13 +1,15 @@
 {
   "openMarkets": 8,
   "evaluated": 8,
-  "traded": 3,
-  "skipped": 5,
-  "errors": [],
+  "traded": 2,
+  "skipped": 6,
+  "errors": [
+    "trade failed for 0x9e51ae58500a3ad19017af2eb4d846359b1c7ae7: The contract function \"quoteBuyExactOut\" reverted with the following signature:\n0x5fca91fa\n\nUnable to decode signature \"0x5fca91fa\" as it was not found on the provided ABI.\nMake sure you are using the correct ABI and that the error exists on it.\nYou can look up the decoded signature here: https://4byte.sourcify.dev/?q=0x5fca91fa.\n \nContract Call:\n  address:   0x097599c9D966fF496284b892A8F13BF885b258ef\n  function:  quoteBuyExactOut(address marketProxy, uint256 outcomeIdx, uint256 sharesOut)\n  args:                      (0x9e51ae58500a3ad19017af2eb4d846359b1c7ae7, 0, 64439430330715104)\n\nDocs: https://viem.sh/docs/contract/decodeErrorResult\nDetails: execution reverted\nVersion: viem@2.55.10"
+  ],
   "dryRun": false,
   "running": true,
   "intervalMs": 300000,
-  "nextRunAt": 1786530672412,
-  "startedAt": "2026-08-12T10:26:12.412Z",
-  "updatedAt": "2026-08-12T10:26:12.412Z"
+  "nextRunAt": 1786530972511,
+  "startedAt": "2026-08-12T10:31:12.511Z",
+  "updatedAt": "2026-08-12T10:31:12.512Z"
 }
