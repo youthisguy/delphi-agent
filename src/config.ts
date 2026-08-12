@@ -75,7 +75,7 @@ export function setCompetitionTokenAddress(address: string | null): RuntimeConfi
 
 export const CONFIG = {
   loopIntervalMs: Number(process.env.LOOP_INTERVAL_MS ?? 5 * 60 * 1000),
-  maxTokensPerTrade: Number(process.env.MAX_TOKENS_PER_TRADE ?? 100),
+  maxTokensPerTrade: Number(process.env.MAX_TOKENS_PER_TRADE ?? 900),
   maxMarketsPerLoop: Number(process.env.MAX_MARKETS_PER_LOOP ?? 75),
 
   // Server
@@ -96,7 +96,7 @@ export const CONFIG = {
   // claim before conviction scaling. 0.05 = 5%. Kept deliberately small —
   // convictionScore below can multiply it up to ~3x for strong signals,
   // and maxTokensPerTrade is still a hard ceiling per trade.
-  bankrollFractionPerTrade: Number(process.env.BANKROLL_FRACTION_PER_TRADE ?? 0.15),
+  bankrollFractionPerTrade: Number(process.env.BANKROLL_FRACTION_PER_TRADE ?? 0.20),
   // Upper multiplier on bankrollFractionPerTrade for a maximally-confident,
   // maximally-over-threshold signal (edge/minEdge capped at this value).
   maxConvictionMultiplier: Number(process.env.MAX_CONVICTION_MULTIPLIER ?? 4),
