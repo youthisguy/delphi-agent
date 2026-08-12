@@ -387,6 +387,24 @@ async function decide(
   const desiredSize = remainingBudget * CONFIG.bankrollFractionPerTrade * convictionScore * sizeMultiplier;
   const tokensToSpend = Math.max(0, Math.min(desiredSize, CONFIG.maxTokensPerTrade, remainingBudget));
 
+  // The contract enforces its own minimum trade size on-chain
+  // (SharesOutBelowMinDelta — see config.ts's minTradeShares comment). A
+  // signal that only clears a sliver of a shrinking remainingBudget (now
+  // common with several previously-frozen markets competing for the same
+  // cycle budget) can size down to a fraction of a share. Catch that here
+  // — before returning a trade decision — so it becomes a clean skip
+  // receipt instead of reaching tradeOnMarket() and reverting on-chain.
+  const entryPriceForShareEstimate = Math.max(marketProbs[bestIdx] ?? 0.5, 0.01);
+  const estimatedShares = tokensToSpend / entryPriceForShareEstimate;
+  if (estimatedShares < CONFIG.minTradeShares) {
+    const skipReason = `sized trade too small to clear on-chain min trade size (≈${estimatedShares.toFixed(4)} shares < ${CONFIG.minTradeShares} floor; tokensToSpend=${tokensToSpend.toFixed(3)} of ${remainingBudget.toFixed(2)} remaining) — likely a shrinking cycle budget split across many markets this cycle`;
+    console.log(`  SKIP ${market.id}: ${skipReason}`);
+    return {
+      decision: null,
+      receipt: { ...receiptBase, decision: "skip", outcomeIdx: bestIdx, edge: bestEdge, thresholdUsed: minEdge, size: null, execution: null, skipReason },
+    };
+  }
+
   console.log(
     `  BUY signal ${market.id}: outcome=${bestIdx} edge=${bestEdge.toFixed(3)} conviction=${convictionScore.toFixed(2)} ` +
       `size≈${tokensToSpend.toFixed(2)} (of ${remainingBudget.toFixed(2)} remaining) ` +
@@ -423,6 +441,42 @@ interface TradeAttemptResult {
   declineReason?: string;
 }
 
+/**
+ * quoteBuy can legitimately revert on-chain for reasons that are a normal
+ * "this specific trade doesn't work, try smaller/different" outcome rather
+ * than a real bug — e.g. SharesOutBelowMinDelta (below the contract's
+ * minimum trade size) or other per-market proxy errors not covered by the
+ * SDK's shipped ABI (see the 0x5fca91fa incident: undecodable to viem, but
+ * still just a revert, not a thrown-outside-the-loop failure). The
+ * preventive minTradeShares check in decide() should catch most of these
+ * before we even get here, but this is the backstop for whatever it
+ * doesn't predict — a revert here should become a graceful decline, not an
+ * unhandled throw that lands in the Risk & Exception Log as a raw error.
+ */
+async function safeQuoteBuy(params: {
+  marketAddress: `0x${string}`;
+  outcomeIdx: number;
+  sharesOut: bigint;
+  label: string;
+}): Promise<{ ok: true; quote: Awaited<ReturnType<typeof client.quoteBuy>> } | { ok: false; reason: string }> {
+  try {
+    const quote = await withDelphiRetry(
+      () =>
+        client.quoteBuy({
+          marketAddress: params.marketAddress,
+          outcomeIdx: params.outcomeIdx,
+          sharesOut: params.sharesOut,
+        }),
+      { label: params.label, maxRetries: 2 }
+    );
+    return { ok: true, quote };
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.warn(`  [quoteBuy] ${params.label} reverted, declining trade instead of throwing:`, msg);
+    return { ok: false, reason: `quote reverted on-chain (see logs for raw error): ${msg.slice(0, 200)}` };
+  }
+}
+
 async function tradeOnMarket(market: Market, decision: TradeDecision, dryRun: boolean): Promise<TradeAttemptResult> {
   if (dryRun) {
     console.log(`[TRADE-EXEC] market=${market.id} dryRun=true result=SIMULATED outcome=${decision.outcomeIdx} tokens=${decision.tokensToSpend.toFixed(2)}`);
@@ -448,16 +502,19 @@ async function tradeOnMarket(market: Market, decision: TradeDecision, dryRun: bo
   const desiredShares = decision.tokensToSpend / entryPrice;
   const sharesOut = BigInt(Math.floor(desiredShares * 1e18));
 
-  const quote = await withDelphiRetry(
-    () =>
-      client.quoteBuy({
-        marketAddress: market.id as `0x${string}`,
-        outcomeIdx: decision.outcomeIdx,
-        sharesOut,
-      }),
-    { label: `quoteBuy(${market.id})` }
-  );
+  const quoteResult = await safeQuoteBuy({
+    marketAddress: market.id as `0x${string}`,
+    outcomeIdx: decision.outcomeIdx,
+    sharesOut,
+    label: `quoteBuy(${market.id})`,
+  });
 
+  if (!quoteResult.ok) {
+    console.log(`[TRADE-EXEC] market=${market.id} dryRun=false result=DECLINED reason=quote_reverted`);
+    return { filled: false, execution: null, declineReason: quoteResult.reason };
+  }
+
+  const quote = quoteResult.quote;
   let finalSharesOut = sharesOut;
   let finalQuote = quote;
 
@@ -474,15 +531,19 @@ async function tradeOnMarket(market: Market, decision: TradeDecision, dryRun: bo
       return { filled: false, execution: null, declineReason: "quoted cost exceeds max spend even at minimal size" };
     }
 
-    finalQuote = await withDelphiRetry(
-      () =>
-        client.quoteBuy({
-          marketAddress: market.id as `0x${string}`,
-          outcomeIdx: decision.outcomeIdx,
-          sharesOut: scaledShares,
-        }),
-      { label: `quoteBuy(retry:${market.id})` }
-    );
+    const retryResult = await safeQuoteBuy({
+      marketAddress: market.id as `0x${string}`,
+      outcomeIdx: decision.outcomeIdx,
+      sharesOut: scaledShares,
+      label: `quoteBuy(retry:${market.id})`,
+    });
+
+    if (!retryResult.ok) {
+      console.log(`[TRADE-EXEC] market=${market.id} dryRun=false result=DECLINED reason=quote_reverted_on_resize`);
+      return { filled: false, execution: null, declineReason: retryResult.reason };
+    }
+
+    finalQuote = retryResult.quote;
 
     if (finalQuote.tokensIn > maxTokensIn) {
       const reason = "quote_exceeds_max_spend";

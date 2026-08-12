@@ -108,6 +108,20 @@ export const CONFIG = {
   // exercise realistically instead of silently sizing against 0.
   dryRunVirtualBankroll: Number(process.env.DRY_RUN_VIRTUAL_BANKROLL ?? 1000),
 
+  // The market proxy contract enforces its own minimum trade size on-chain
+  // (confirmed via a live revert: SharesOutBelowMinDelta(sharesOut,
+  // minDelta) reverted with minDelta=10000000000000000 — i.e. 0.01 shares
+  // in 1e18 fixed-point). A signal that only clears a sliver of a shrinking
+  // per-cycle budget (common once several previously-frozen markets are
+  // all competing for the same remainingBudget in one cycle) can size down
+  // to a fraction of a share and revert on quoteBuyExactOut instead of
+  // failing gracefully. decide() now checks estimated shares against this
+  // floor BEFORE returning a trade decision, so it skips cleanly with a
+  // real reason instead of reaching tradeOnMarket() and reverting.
+  // Deliberately set slightly above the observed 0.01 on-chain minimum so
+  // legitimate float/rounding noise doesn't sit right on the boundary.
+  minTradeShares: Number(process.env.MIN_TRADE_SHARES ?? 0.012),
+
   // Previously ANY market with an open position was hard-skipped every
   // cycle — a real fix for a real bug (repeated same-side buys on a
   // stale, unmoving signal could otherwise silently pyramid exposure
