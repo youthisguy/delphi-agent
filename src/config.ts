@@ -108,6 +108,16 @@ export const CONFIG = {
   // exercise realistically instead of silently sizing against 0.
   dryRunVirtualBankroll: Number(process.env.DRY_RUN_VIRTUAL_BANKROLL ?? 1000),
 
+  // A trade sized under this many TOKENS is skipped outright, before it
+  // ever reaches a quote. This is separate from (and checked before)
+  // minTradeShares below: minTradeShares exists purely to dodge the
+  // contract's on-chain revert, but a trade can clear that floor in
+  // share-count terms and still be a bad idea — small token amounts eat
+  // disproportionate price impact on this market regardless of whether
+  // the contract accepts them. Default 5 tokens; raise/lower via
+  // MIN_TOKENS_PER_TRADE.
+  minTokensPerTrade: Number(process.env.MIN_TOKENS_PER_TRADE ?? 5),
+
   // The market proxy contract enforces its own minimum trade size on-chain
   // (confirmed via a live revert: SharesOutBelowMinDelta(sharesOut,
   // minDelta) reverted with minDelta=10000000000000000 — i.e. 0.01 shares

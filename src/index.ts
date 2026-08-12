@@ -387,6 +387,21 @@ async function decide(
   const desiredSize = remainingBudget * CONFIG.bankrollFractionPerTrade * convictionScore * sizeMultiplier;
   const tokensToSpend = Math.max(0, Math.min(desiredSize, CONFIG.maxTokensPerTrade, remainingBudget));
 
+  // Hard floor on trade size in TOKEN terms — a trade this small eats
+  // disproportionate price impact on this market regardless of whether
+  // it technically clears the contract's share-count minimum below, so
+  // it isn't worth attempting. Checked first since it's the more direct
+  // thing to reason about; the minTradeShares check right after it is
+  // the separate, narrower guard against the on-chain revert.
+  if (tokensToSpend < CONFIG.minTokensPerTrade) {
+    const skipReason = `sized trade too small (${tokensToSpend.toFixed(3)} tokens < ${CONFIG.minTokensPerTrade} token floor; of ${remainingBudget.toFixed(2)} remaining) — price impact isn't worth it at this size`;
+    console.log(`  SKIP ${market.id}: ${skipReason}`);
+    return {
+      decision: null,
+      receipt: { ...receiptBase, decision: "skip", outcomeIdx: bestIdx, edge: bestEdge, thresholdUsed: minEdge, size: null, execution: null, skipReason },
+    };
+  }
+
   // The contract enforces its own minimum trade size on-chain
   // (SharesOutBelowMinDelta — see config.ts's minTradeShares comment). A
   // signal that only clears a sliver of a shrinking remainingBudget (now
@@ -753,6 +768,25 @@ async function runCycle() {
           );
           decision.tokensToSpend = roomLeft;
           receipt.size = roomLeft;
+
+          // decide() already checked minTokensPerTrade — but against the
+          // PRE-clamp size. This clamp can shrink it further, so re-check
+          // here rather than letting a sub-floor trade slip through with
+          // exactly the price-impact problem the floor exists to avoid.
+          if (decision.tokensToSpend < CONFIG.minTokensPerTrade) {
+            const reason = `exposure-cap clamp shrank size to ${decision.tokensToSpend.toFixed(3)} tokens, below the ${CONFIG.minTokensPerTrade} token floor`;
+            console.log(`  SKIP ${market.id}: ${reason}`);
+            skipped++;
+            appendReceipt({
+              ...receipt,
+              decision: "skip",
+              outcomeIdx: null,
+              size: null,
+              execution: null,
+              skipReason: reason,
+            });
+            continue;
+          }
         }
 
         // Reserve the capital the moment it's decided, not after execution
