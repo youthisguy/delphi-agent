@@ -75,7 +75,7 @@ export function setCompetitionTokenAddress(address: string | null): RuntimeConfi
 
 export const CONFIG = {
   loopIntervalMs: Number(process.env.LOOP_INTERVAL_MS ?? 5 * 60 * 1000),
-  maxTokensPerTrade: Number(process.env.MAX_TOKENS_PER_TRADE ?? 500),
+  maxTokensPerTrade: Number(process.env.MAX_TOKENS_PER_TRADE ?? 100),
   maxMarketsPerLoop: Number(process.env.MAX_MARKETS_PER_LOOP ?? 75),
 
   // Server
@@ -124,6 +124,18 @@ export const CONFIG = {
   // deliberately, not by accident, since this is the knob that controls
   // how concentrated a single bad call can get.
   maxExposurePerMarket: Number(process.env.MAX_EXPOSURE_PER_MARKET ?? 200),
+
+  // Markets can still show status "open" via the listMarkets API after
+  // their on-chain resolution window has actually passed — the market
+  // proxy contract itself starts reverting quoteBuyExactOut/buyShares at
+  // that point (see the 0x5fca91fa incident: 4 previously-frozen markets
+  // all reverted the moment the per-market exposure ceiling let fresh
+  // signals reach them again). decide() now skips a market outright once
+  // msUntilResolve is inside this buffer, before spending an LLM/Gemini
+  // call or attempting an on-chain quote that's going to revert anyway.
+  // Default 10 min — comfortably longer than one loop tick so a market
+  // doesn't slip through right before closing and revert mid-cycle.
+  resolutionSafetyBufferMs: Number(process.env.RESOLUTION_SAFETY_BUFFER_MS ?? 10 * 60 * 1000),
 
   // --- Forecast cache ---
   // How long an LLM/Gemini forecast for a given market stays valid before

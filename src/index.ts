@@ -18,7 +18,7 @@ import { getErc20Balance, getErc20Decimals, hasContractCode, resolveWalletAddres
 import { getCachedForecast, setCachedForecast, pruneForecastCache } from "./forecastCache.js";
 import { runCheckpointScript } from "./checkpoint.js";
 import { withDelphiRetry } from "./delphiRetry.js";
-import { extractTradingFeePct } from "./marketFields.js";
+import { extractTradingFeePct, msUntilResolve } from "./marketFields.js";
 import { CONFIG, getDryRun, getCompetitionTokenAddress } from "./config.js";
 
 const client = new DelphiClient();
@@ -196,6 +196,48 @@ async function decide(
   const outcomes: string[] =
     (market as any).outcomes || (market as any).metadata?.outcomes || ["Yes", "No"];
   const category = (market as any).category;
+
+  // A market can still show status "open" via the API well after its
+  // on-chain resolution window has actually closed — the contract itself
+  // rejects buys once that happens (reverts quoteBuyExactOut), but the
+  // off-chain listing doesn't necessarily reflect that in real time.
+  // Checking this first, before any forecast calls, avoids burning an
+  // LLM/Gemini call and an on-chain quote/revert on a market that can't
+  // be traded regardless of what the signals say. A small safety buffer
+  // (not just msRemaining <= 0) also skips markets that are *about* to
+  // close mid-cycle, since a decide() → tradeOnMarket() round trip isn't
+  // instant and the window can close between the two.
+  const msRemaining = msUntilResolve(market);
+  if (msRemaining !== null && msRemaining <= CONFIG.resolutionSafetyBufferMs) {
+    const reason =
+      msRemaining <= 0
+        ? `market's resolution window has already passed (resolvesAt was ${Math.abs(msRemaining / 60000).toFixed(1)}m ago) — no longer tradable on-chain`
+        : `market resolves in ${(msRemaining / 60000).toFixed(1)}m, inside the ${(CONFIG.resolutionSafetyBufferMs / 60000).toFixed(0)}m safety buffer — skipping to avoid a closing-window revert`;
+    console.log(`  SKIP ${market.id}: ${reason}`);
+    return {
+      decision: null,
+      receipt: {
+        ts: new Date().toISOString(),
+        marketId: market.id,
+        question,
+        category,
+        outcomes: (market as any).outcomes || (market as any).metadata?.outcomes || ["Yes", "No"],
+        rawPrice: null,
+        syntheticPrice: false,
+        signals: { llm: null, gemini: null, polymarket: null },
+        disagreement: null,
+        blendedProbs: [],
+        confidence: 0,
+        decision: "skip",
+        outcomeIdx: null,
+        edge: 0,
+        thresholdUsed: 0,
+        size: null,
+        execution: null,
+        skipReason: reason,
+      },
+    };
+  }
 
   const rawProbs = market.spotImpliedProbabilities ?? [];
   const hasValidPrice =
