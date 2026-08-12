@@ -132,19 +132,13 @@ async function getReferenceTokenDecimals(): Promise<number> {
 
 /**
  * For markets with no valid order book (hasValidPrice === false in
- * decide()), 0.5 was previously just a guess — sizing against it can
- * diverge wildly from the real on-chain price, and that mismatch is
- * exactly what was tripping tradeOnMarket()'s "quoted cost exceeds max
- * spend" guard downstream: sizing thought the book was 50/50, the real
- * AMM price wasn't, and the two disagreed by the time the real
- * quoteBuy() ran at execution time.
- *
- * This asks the AMM directly for a tiny reference quote (1 share) on
+ * decide())
+ * 
+ * This asks the LMSR directly for a tiny reference quote (1 share) on
  * the candidate outcome and derives its implied price from that, so
  * decide()'s sizing and tradeOnMarket()'s real quote are working off
  * the same number. Returns null (caller falls back to 0.5, the old
- * behavior) if the call fails for any reason — e.g. a market that's
- * been announced but isn't actually live on-chain yet.
+ * behavior) if the call fails for any reason.
  */
 async function getReferenceEntryPrice(market: Market, outcomeIdx: number): Promise<number | null> {
   try {
@@ -290,7 +284,7 @@ async function decide(
   const minEdge = baseMinEdge * blend.edgeMultiplier + tradingFeePct;
 
 // A market can pass hasValidPrice and still be untraded — a freshly
-  // opened AMM pool starts at an exact 1/n price before any real trading,
+  // opened LMSR pool starts at an exact 1/n price before any real trading,
   // and that spot price is only accurate for infinitesimal size. Treat
   // "looks untouched" the same as "no book at all".
   const looksUntouched =
@@ -426,7 +420,7 @@ async function tradeOnMarket(market: Market, decision: TradeDecision, dryRun: bo
   let finalQuote = quote;
 
   if (quote.tokensIn > maxTokensIn) {
-    // Real AMM price impact on a meaningful-size buy — scale shares down
+    // Real LMSR price impact on a meaningful-size buy — scale shares down
     // to fit the budget instead of declining outright, then requote once
     // to confirm the smaller size actually fits.
     const scale = Number(maxTokensIn) / Number(quote.tokensIn);
@@ -604,25 +598,32 @@ async function runCycle() {
 
     console.log(`Evaluating ${markets.length} market(s)`);
 
-    // Markets we already hold an open (unresolved) trade on — computed
-    // once per cycle from the journal, no extra SDK calls. Prevents the
-    // same market from being traded repeatedly across cycles (previously
-    // nothing checked this, so a market that kept clearing the edge bar
-    // every cycle could accumulate many redundant same-side positions).
-    // Skipping BEFORE calling decide() also saves the OpenAI/Gemini call
-    // on markets we can't act on anyway.
+    // Per-market exposure so far this competition — not just a yes/no
+    // "do we hold this market" flag. Lets a held market still take on
+    // fresh capital up to CONFIG.maxExposurePerMarket instead of being
+    // frozen out entirely once any position exists. Mutated below as
+    // fills land, so a second candidate for the same market LATER IN
+    // THIS SAME CYCLE also respects the running total, not just what's
+    // already in the journal from prior cycles.
     const allReceiptsForHoldCheck = await readReceipts();
-    const heldMarketIds = new Set(
-      allReceiptsForHoldCheck
-        .filter((r) => r.decision === "trade" && !r.execution?.resolved)
-        .map((r) => r.marketId)
-    );
+    const openExposureByMarket = new Map<string, number>();
+    for (const r of allReceiptsForHoldCheck) {
+      if (r.decision === "trade" && !r.execution?.resolved) {
+        openExposureByMarket.set(r.marketId, (openExposureByMarket.get(r.marketId) ?? 0) + (r.size ?? 0));
+      }
+    }
 
     for (const market of markets) {
-      if (heldMarketIds.has(market.id)) {
-        console.log(`  SKIP ${market.id}: already holding an open position on this market`);
+      const alreadyCommitted = openExposureByMarket.get(market.id) ?? 0;
+      const roomLeft = CONFIG.maxExposurePerMarket - alreadyCommitted;
+      // <1 token of room isn't worth a trade (gas/fees would eat it) —
+      // treat it the same as being fully at cap. Guaranteed to leave
+      // roomLeft >= 1 for every market that proceeds past this point, so
+      // the clamp below never needs its own separate dust check.
+      if (roomLeft < 1) {
+        console.log(`  SKIP ${market.id}: at max exposure for this market (${alreadyCommitted.toFixed(2)}/${CONFIG.maxExposurePerMarket})`);
         skipped++;
-        appendReceipt(skipReceipt(market, "already holding an open position on this market"));
+        appendReceipt(skipReceipt(market, `already at max exposure for this market (${alreadyCommitted.toFixed(2)}/${CONFIG.maxExposurePerMarket} tokens)`));
         continue;
       }
 
@@ -632,6 +633,23 @@ async function runCycle() {
           appendReceipt(receipt);
           skipped++;
           continue;
+        }
+
+        // decide() sizes against the CYCLE budget — it has no idea this
+        // particular market already has capital in it. Clamp here so a
+        // fresh signal on a held market never pushes total exposure past
+        // the per-market cap. receipt.size is set independently inside
+        // decide() (not a live reference to decision.tokensToSpend), so
+        // it must be clamped too — forgetting this would silently record
+        // a bigger size in the journal than what's actually committed,
+        // which is exactly the drift that caused the SpaceX
+        // journal/on-chain mismatch earlier.
+        if (decision.tokensToSpend > roomLeft) {
+          console.log(
+            `  [loop] ${market.id}: clamping size ${decision.tokensToSpend.toFixed(2)} -> ${roomLeft.toFixed(2)} (per-market exposure cap)`
+          );
+          decision.tokensToSpend = roomLeft;
+          receipt.size = roomLeft;
         }
 
         // Reserve the capital the moment it's decided, not after execution
@@ -653,7 +671,7 @@ async function runCycle() {
           // Genuinely executed (or intentionally simulated in dry-run) —
           // this is a real trade.
           traded++;
-          heldMarketIds.add(market.id); // hold for the rest of THIS cycle too
+          openExposureByMarket.set(market.id, alreadyCommitted + decision.tokensToSpend); // reflect this fill for the rest of THIS cycle too
           appendReceipt({ ...receipt, execution: attempt.execution });
         } else {
           // Live, but tradeOnMarket declined without an on-chain call

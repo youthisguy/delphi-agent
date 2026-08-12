@@ -75,7 +75,7 @@ export function setCompetitionTokenAddress(address: string | null): RuntimeConfi
 
 export const CONFIG = {
   loopIntervalMs: Number(process.env.LOOP_INTERVAL_MS ?? 5 * 60 * 1000),
-  maxTokensPerTrade: Number(process.env.MAX_TOKENS_PER_TRADE ?? 100),
+  maxTokensPerTrade: Number(process.env.MAX_TOKENS_PER_TRADE ?? 500),
   maxMarketsPerLoop: Number(process.env.MAX_MARKETS_PER_LOOP ?? 75),
 
   // Server
@@ -88,7 +88,7 @@ export const CONFIG = {
 
   // Agreement / disagreement rules for blending LLM + Gemini + Polymarket
   disagreementSoftThreshold: Number(process.env.DISAGREEMENT_SOFT ?? 0.15), // raise edge bar
-  disagreementHardThreshold: Number(process.env.DISAGREEMENT_HARD ?? 0.30), // skip entirely
+  disagreementHardThreshold: Number(process.env.DISAGREEMENT_HARD ?? 0.20), // skip entirely
   disagreementEdgeMultiplier: Number(process.env.DISAGREEMENT_EDGE_MULT ?? 1.5),
 
   // --- Bankroll-based position sizing ---
@@ -107,6 +107,23 @@ export const CONFIG = {
   // no wallet configured yet in early testing) — lets sizing logic still
   // exercise realistically instead of silently sizing against 0.
   dryRunVirtualBankroll: Number(process.env.DRY_RUN_VIRTUAL_BANKROLL ?? 1000),
+
+  // Previously ANY market with an open position was hard-skipped every
+  // cycle — a real fix for a real bug (repeated same-side buys on a
+  // stale, unmoving signal could otherwise silently pyramid exposure
+  // with no visibility into total committed capital — see the SpaceX
+  // journal/on-chain drift incident). But it also means idle capital
+  // sits unused whenever the loop's freshest candidates happen to be
+  // markets already held, which is common late in a competition window
+  // when few genuinely NEW markets are opening.
+  //
+  // This replaces the all-or-nothing skip with a per-market ceiling: a
+  // held market can still receive additional capital on a fresh
+  // qualifying signal, but never past this total. Default is
+  // conservative (2x the default per-trade cap) — raise it
+  // deliberately, not by accident, since this is the knob that controls
+  // how concentrated a single bad call can get.
+  maxExposurePerMarket: Number(process.env.MAX_EXPOSURE_PER_MARKET ?? 200),
 
   // --- Forecast cache ---
   // How long an LLM/Gemini forecast for a given market stays valid before
