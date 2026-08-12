@@ -48,7 +48,12 @@ export interface OpenPosition {
   outcomeIdx: number;
   outcomeLabel: string;
   size: number; // tokens committed, SUMMED across every contributing receipt
-  entryPrice: number; // 0–1, size-weighted average implied probability across contributing receipts
+  /** 0–1, size-weighted average TRUE COST BASIS across contributing
+   * receipts — the market's pre-trade price adjusted by that receipt's
+   * recorded price impact (costBasisFor() below), not the raw pre-trade
+   * price. For dry-run receipts (no priceImpactPct) this is just the
+   * pre-trade price, same as before. */
+  entryPrice: number;
   currentPrice: number | null; // 0–1, same outcome's current implied probability; null if unavailable
   unrealizedPnl: number | null; // tokens; null when currentPrice is unavailable
   unrealizedPnlPct: number | null;
@@ -103,6 +108,34 @@ function entryPriceFor(r: Receipt): number {
     return r.rawPrice[r.outcomeIdx];
   }
   return 0.5;
+}
+
+/**
+ * True cost basis per receipt — what was actually paid per share, not
+ * just the market's pre-trade price. On a live trade with a recorded
+ * price impact, the fill happened at entryPriceFor(r) * (1 + impact):
+ * priceImpactPct is (quoted cost-per-share ÷ pre-trade price) − 1, so
+ * inverting that back out recovers the real per-share cost.
+ *
+ * Without this, `entryPrice` (and every P&L figure derived from it) was
+ * quietly assuming every trade filled at the frictionless pre-trade
+ * price — on a thin LMSR book that overstates unrealized P&L by roughly
+ * the impact cost, since priceImpactPct was tracked on the receipt but
+ * never actually folded into the cost basis (see the SILSO/NSIDC
+ * incidents: displayed entry sat at the pre-trade 0.085 when the real
+ * average fill was closer to 0.104).
+ *
+ * dry-run receipts never call buyShares() and so never get a
+ * priceImpactPct (see journal.ts) — those fall through to the raw
+ * pre-trade price unchanged, same as before.
+ */
+function costBasisFor(r: Receipt): number {
+  const rawEntry = entryPriceFor(r);
+  const impact = r.execution?.priceImpactPct;
+  if (typeof impact === "number" && Number.isFinite(impact)) {
+    return rawEntry * (1 + impact);
+  }
+  return rawEntry;
 }
 
 /** Same 1e18-fixed-point-vs-plain-float heuristic used in backtest.ts's
@@ -189,7 +222,11 @@ function aggregateReceipts(receipts: Receipt[]): Map<string, AggregatedInput> {
     const outcomeIdx = r.outcomeIdx as number;
     const key = `${r.marketId}::${outcomeIdx}`;
     const size = r.size ?? 0;
-    const entryPrice = entryPriceFor(r);
+    // Cost basis, not the raw pre-trade price — see costBasisFor() above.
+    // This is what feeds entryPriceWeightedSum below, so the "Entry"
+    // column and every P&L figure derived from it reflect what was
+    // actually paid, impact included.
+    const entryPrice = costBasisFor(r);
     const impact = r.execution?.priceImpactPct;
     const hasImpact = typeof impact === "number" && Number.isFinite(impact);
 

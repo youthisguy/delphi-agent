@@ -108,6 +108,19 @@ export const CONFIG = {
   // exercise realistically instead of silently sizing against 0.
   dryRunVirtualBankroll: Number(process.env.DRY_RUN_VIRTUAL_BANKROLL ?? 1000),
 
+  // Hard cap on price impact — how much more the quoted per-share cost is
+  // allowed to be than the market's pre-trade implied price. This is
+  // separate from (and checked AFTER) the maxTokensIn spend-cap resize in
+  // tradeOnMarket(): a trade can be well within the token spend budget and
+  // still eat a huge % because the LMSR curve on a thin market moves fast
+  // per share (the SILSO/NSIDC incidents — 22% and 13% impact on trades
+  // that were nowhere near the spend cap). tradeOnMarket() first tries
+  // shrinking shares to fit inside this cap (same shrink-and-requote
+  // pattern as the spend-cap resize) before declining outright, so a
+  // thin-but-real-edge market still gets a smaller bite instead of being
+  // skipped entirely. Default 5% — override via MAX_PRICE_IMPACT_PCT.
+  maxPriceImpactPct: Number(process.env.MAX_PRICE_IMPACT_PCT ?? 0.05),
+
   // A trade sized under this many TOKENS is skipped outright, before it
   // ever reaches a quote. This is separate from (and checked before)
   // minTradeShares below: minTradeShares exists purely to dodge the

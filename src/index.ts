@@ -569,6 +569,76 @@ async function tradeOnMarket(market: Market, decision: TradeDecision, dryRun: bo
     finalSharesOut = scaledShares;
   }
 
+  // --- Price-impact cap ---------------------------------------------------
+  // The spend-cap resize above only protects the token BUDGET — it says
+  // nothing about how thin the book is. A trade can be well within
+  // maxTokensIn and still eat a huge % because the LMSR curve on a thin
+  // market moves fast per share (the SILSO/NSIDC incidents: 22% and 13%
+  // impact on trades nowhere near the spend cap). Checked here, against
+  // the quote the spend-cap block just settled on, before any gas is
+  // spent on approval/buyShares.
+  const impactPctFor = (q: { tokensIn: bigint }, shares: bigint): number => {
+    const costPerShare = Number(q.tokensIn) / 10 ** decimals / (Number(shares) / 1e18);
+    return entryPrice > 0 ? (costPerShare - entryPrice) / entryPrice : 0;
+  };
+
+  let impactPct = impactPctFor(finalQuote, finalSharesOut);
+
+  if (impactPct > CONFIG.maxPriceImpactPct) {
+    // Thin book — try shrinking further to fit inside the impact cap
+    // instead of walking away from a good signal outright, same
+    // shrink-and-requote pattern as the spend-cap resize above. Scale
+    // shares down proportionally to how far over the cap the impact is,
+    // with a small extra margin, then requote once to confirm the
+    // smaller size actually clears it.
+    const scale = CONFIG.maxPriceImpactPct / impactPct;
+    const shrunkShares = BigInt(Math.floor(Number(finalSharesOut) * scale * 0.98));
+    const minSharesFixedPoint = BigInt(Math.floor(CONFIG.minTradeShares * 1e18));
+
+    if (shrunkShares <= 0n || shrunkShares < minSharesFixedPoint) {
+      const reason = "price_impact_too_high";
+      console.log(
+        `[TRADE-EXEC] market=${market.id} dryRun=false result=DECLINED reason=${reason} impact=${(impactPct * 100).toFixed(1)}%`
+      );
+      return {
+        filled: false,
+        execution: null,
+        declineReason: `price impact ${(impactPct * 100).toFixed(1)}% exceeds ${(CONFIG.maxPriceImpactPct * 100).toFixed(0)}% cap even at minimal size`,
+      };
+    }
+
+    const impactRetryResult = await safeQuoteBuy({
+      marketAddress: market.id as `0x${string}`,
+      outcomeIdx: decision.outcomeIdx,
+      sharesOut: shrunkShares,
+      label: `quoteBuy(impact-retry:${market.id})`,
+    });
+
+    if (!impactRetryResult.ok) {
+      console.log(`[TRADE-EXEC] market=${market.id} dryRun=false result=DECLINED reason=quote_reverted_on_impact_resize`);
+      return { filled: false, execution: null, declineReason: impactRetryResult.reason };
+    }
+
+    const shrunkQuote = impactRetryResult.quote;
+    const shrunkImpactPct = impactPctFor(shrunkQuote, shrunkShares);
+
+    if (shrunkImpactPct > CONFIG.maxPriceImpactPct || shrunkQuote.tokensIn > maxTokensIn) {
+      const reason = "price_impact_too_high";
+      console.log(
+        `[TRADE-EXEC] market=${market.id} dryRun=false result=DECLINED reason=${reason} impact=${(shrunkImpactPct * 100).toFixed(1)}%`
+      );
+      return {
+        filled: false,
+        execution: null,
+        declineReason: `price impact still ${(shrunkImpactPct * 100).toFixed(1)}% after resize, exceeds ${(CONFIG.maxPriceImpactPct * 100).toFixed(0)}% cap`,
+      };
+    }
+
+    finalQuote = shrunkQuote;
+    finalSharesOut = shrunkShares;
+    impactPct = shrunkImpactPct;
+  }
+
 // 1.5% slippage buffer above the quoted cost.
 const SLIPPAGE_BPS = 150n;
 let maxTokensInWithSlippage = finalQuote.tokensIn + (finalQuote.tokensIn * SLIPPAGE_BPS) / 10000n;
@@ -594,8 +664,7 @@ console.log(
   `[TRADE-EXEC] market=${market.id} dryRun=false result=FILLED tx=${result.transactionHash} shares=${finalSharesOut} quotedTokensIn=${finalQuote.tokensIn} cap=${maxTokensInWithSlippage}`
 );
 
-const costPerShare = Number(finalQuote.tokensIn) / 10 ** decimals / (Number(finalSharesOut) / 1e18);
-const priceImpactPct = entryPrice > 0 ? Number(((costPerShare - entryPrice) / entryPrice).toFixed(4)) : null;
+const priceImpactPct = entryPrice > 0 ? Number(impactPct.toFixed(4)) : null;
 
 return {
   filled: true,
