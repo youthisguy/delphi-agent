@@ -1,17 +1,13 @@
 {
-  "openMarkets": 8,
-  "evaluated": 8,
-  "traded": 0,
+  "openMarkets": 14,
+  "evaluated": 14,
+  "traded": 6,
   "skipped": 8,
-  "errors": [
-    "trade failed for 0x9b7e3199c73ca293626ab886d8e1601c33d58ccb: The contract function \"quoteBuyExactOut\" reverted with the following signature:\n0x5fca91fa\n\nUnable to decode signature \"0x5fca91fa\" as it was not found on the provided ABI.\nMake sure you are using the correct ABI and that the error exists on it.\nYou can look up the decoded signature here: https://4byte.sourcify.dev/?q=0x5fca91fa.\n \nContract Call:\n  address:   0x097599c9D966fF496284b892A8F13BF885b258ef\n  function:  quoteBuyExactOut(address marketProxy, uint256 outcomeIdx, uint256 sharesOut)\n  args:                      (0x9b7e3199c73ca293626ab886d8e1601c33d58ccb, 0, 41839660388126232)\n\nDocs: https://viem.sh/docs/contract/decodeErrorResult\nDetails: execution reverted\nVersion: viem@2.55.10",
-    "trade failed for 0x1db6058367342c4f604d1a0e01566ff2f6481b9d: The contract function \"quoteBuyExactOut\" reverted.\n\nError: SharesOutBelowMinDelta(uint256 sharesOut, uint256 minDelta)\n                             (8390311639139995, 10000000000000000)\n \nContract Call:\n  address:   0x097599c9D966fF496284b892A8F13BF885b258ef\n  function:  quoteBuyExactOut(address marketProxy, uint256 outcomeIdx, uint256 sharesOut)\n  args:                      (0x1db6058367342c4f604d1a0e01566ff2f6481b9d, 0, 8390311639139995)\n\nDocs: https://viem.sh/docs/contract/readContract\nDetails: execution reverted\nVersion: viem@2.55.10",
-    "trade failed for 0x2907372d7be71fe8ea1573daafed1870fc9fcf68: The contract function \"quoteBuyExactOut\" reverted with the following signature:\n0x5fca91fa\n\nUnable to decode signature \"0x5fca91fa\" as it was not found on the provided ABI.\nMake sure you are using the correct ABI and that the error exists on it.\nYou can look up the decoded signature here: https://4byte.sourcify.dev/?q=0x5fca91fa.\n \nContract Call:\n  address:   0x097599c9D966fF496284b892A8F13BF885b258ef\n  function:  quoteBuyExactOut(address marketProxy, uint256 outcomeIdx, uint256 sharesOut)\n  args:                      (0x2907372d7be71fe8ea1573daafed1870fc9fcf68, 1, 56055620244327216)\n\nDocs: https://viem.sh/docs/contract/decodeErrorResult\nDetails: execution reverted\nVersion: viem@2.55.10"
-  ],
+  "errors": [],
   "dryRun": false,
   "running": true,
   "intervalMs": 300000,
-  "nextRunAt": 1786546318721,
-  "startedAt": "2026-08-12T14:46:58.721Z",
-  "updatedAt": "2026-08-12T14:46:58.721Z"
+  "nextRunAt": 1786546831836,
+  "startedAt": "2026-08-12T14:55:31.836Z",
+  "updatedAt": "2026-08-12T14:55:31.836Z"
 }
