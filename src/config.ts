@@ -119,7 +119,7 @@ export const CONFIG = {
   // pattern as the spend-cap resize) before declining outright, so a
   // thin-but-real-edge market still gets a smaller bite instead of being
   // skipped entirely. Default 5% — override via MAX_PRICE_IMPACT_PCT.
-  maxPriceImpactPct: Number(process.env.MAX_PRICE_IMPACT_PCT ?? 0.05),
+  maxPriceImpactPct: Number(process.env.MAX_PRICE_IMPACT_PCT ?? 0.10),
 
   // A trade sized under this many TOKENS is skipped outright, before it
   // ever reaches a quote. This is separate from (and checked before)
