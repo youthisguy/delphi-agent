@@ -96,13 +96,13 @@ export const CONFIG = {
   // claim before conviction scaling. 0.05 = 5%. Kept deliberately small —
   // convictionScore below can multiply it up to ~3x for strong signals,
   // and maxTokensPerTrade is still a hard ceiling per trade.
-  bankrollFractionPerTrade: Number(process.env.BANKROLL_FRACTION_PER_TRADE ?? 0.05),
+  bankrollFractionPerTrade: Number(process.env.BANKROLL_FRACTION_PER_TRADE ?? 0.15),
   // Upper multiplier on bankrollFractionPerTrade for a maximally-confident,
   // maximally-over-threshold signal (edge/minEdge capped at this value).
-  maxConvictionMultiplier: Number(process.env.MAX_CONVICTION_MULTIPLIER ?? 3),
+  maxConvictionMultiplier: Number(process.env.MAX_CONVICTION_MULTIPLIER ?? 4),
   // Tokens always left undeployed as a buffer (gas, slippage, redemption
   // timing) — never counted as available capital for sizing.
-  bankrollReserveTokens: Number(process.env.BANKROLL_RESERVE_TOKENS ?? 5),
+  bankrollReserveTokens: Number(process.env.BANKROLL_RESERVE_TOKENS ?? 1),
   // Only used in dryRun when a live on-chain balance can't be read (e.g.
   // no wallet configured yet in early testing) — lets sizing logic still
   // exercise realistically instead of silently sizing against 0.

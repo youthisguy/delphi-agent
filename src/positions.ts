@@ -15,18 +15,30 @@ import {
  * computed on demand, whenever the dashboard asks for it via
  * GET /api/positions.
  *
- * All per-position getMarket() calls run in parallel (Promise.all) and
- * are capped at maxRetries: 2 — fail fast on a rate-limited market
- * rather than blocking the whole page for minutes. The tradeoff of
- * failing fast is that a live rate-limit storm can make EVERY position's
- * getMarket() call fail within its 2 retries simultaneously — without a
- * fallback, that would blank out PnL/current-price for the whole table
- * at once, flickering in and out with every rate-limit window. The
- * lastKnownSnapshot cache below fixes that: a transient failure falls
- * back to the last successfully-fetched price (marked `stale: true`)
- * instead of going blank, while a genuine 404 (market no longer exists)
- * still clears the cache and shows nothing, since there's no real value
- * to fall back to for a market that's actually gone.
+ * Rows are aggregated by `marketId + outcomeIdx` before any network call
+ * is made. The same market/outcome can accumulate multiple buy receipts
+ * across cycles (see maxExposurePerMarket in config.ts, which explicitly
+ * allows topping up a held position) — without aggregation those showed
+ * up as separate rows AND triggered one getMarket() call per receipt. So
+ * a market bought into 3 times fired 3 identical getMarket() calls and
+ * rendered 3 rows for what is, from a "what do I currently hold" point of
+ * view, one position. Grouping first fixes both: one row per unique
+ * market+outcome, and one getMarket() call per unique market regardless
+ * of how many receipts contributed to it.
+ *
+ * All per-market getMarket() calls run in parallel batches (not full
+ * Promise.all) and are capped at maxRetries: 2 — fail fast on a
+ * rate-limited market rather than blocking the whole page for minutes.
+ * The tradeoff of failing fast is that a live rate-limit storm can make
+ * EVERY position's getMarket() call fail within its 2 retries
+ * simultaneously — without a fallback, that would blank out PnL/current-
+ * price for the whole table at once, flickering in and out with every
+ * rate-limit window. The lastKnownSnapshot cache below fixes that: a
+ * transient failure falls back to the last successfully-fetched price
+ * (marked `stale: true`) instead of going blank, while a genuine 404
+ * (market no longer exists) still clears the cache and shows nothing,
+ * since there's no real value to fall back to for a market that's
+ * actually gone.
  */
 
 export interface OpenPosition {
@@ -35,16 +47,15 @@ export interface OpenPosition {
   category?: string;
   outcomeIdx: number;
   outcomeLabel: string;
-  size: number; // tokens committed (receipt.size — the sizing decision, dry-run or live)
-  entryPrice: number; // 0–1, the market's implied probability for this outcome at decision time
+  size: number; // tokens committed, SUMMED across every contributing receipt
+  entryPrice: number; // 0–1, size-weighted average implied probability across contributing receipts
   currentPrice: number | null; // 0–1, same outcome's current implied probability; null if unavailable
   unrealizedPnl: number | null; // tokens; null when currentPrice is unavailable
   unrealizedPnlPct: number | null;
-  /** Quoted cost-per-share vs. entryPrice at trade time — how thin the
-   * market was for the size actually traded. Passed straight through
-   * from the receipt's execution.priceImpactPct; null/undefined for
-   * dry-run positions (no real fill happened) or older receipts logged
-   * before this field existed. */
+  /** Size-weighted average of contributing receipts' execution.priceImpactPct
+   * (only receipts that have one are counted). null if none of the
+   * contributing receipts have a recorded price impact (e.g. all dry-run,
+   * or older receipts logged before this field existed). */
   priceImpactPct: number | null;
   marketStatus: string | null;
   /** Current liquidity/volume for this market, in tokens. */
@@ -65,8 +76,18 @@ export interface OpenPosition {
    * on a fresh successful read OR when marketNotFound is true (no
    * fallback value exists for a genuinely-gone market). */
   stale: boolean;
+  /** True only if EVERY contributing receipt was dry-run. A position
+   * built from a mix of live and dry-run buys (same market+outcome,
+   * bought once dry-run then once live, or vice versa) is real capital
+   * at that point and is reported as live rather than silently hidden
+   * behind a DRY badge. */
   isDryRun: boolean;
+  /** Timestamp of the most recent contributing receipt — "when was this
+   * position last added to", not when it was first opened. */
   ts: string;
+  /** How many journal receipts were folded into this row. 1 = a normal
+   * single-buy position; >1 = topped up across multiple cycles. */
+  receiptCount: number;
 }
 
 /** Same fallback the sizing logic itself uses for synthetic/no-book markets
@@ -107,33 +128,48 @@ function isNotFoundError(err: unknown): boolean {
  * lifetime as everything else in this file) so a transient failure on
  * one poll can fall back to real numbers from a recent successful poll
  * instead of going blank. Unbounded growth isn't a practical concern —
- * this only ever holds one entry per currently-open position, and open
- * positions are naturally bounded by bankroll/maxTokensPerTrade.
+ * this only ever holds one entry per currently-open market, and open
+ * markets are naturally bounded by bankroll/maxTokensPerTrade.
  */
 interface CachedMarketSnapshot {
-  currentPrice: number | null;
   marketStatus: string | null;
   liquidityTokens: number | null;
   volumeTokens: number | null;
   tradingFeePct: number | null;
   resolvesAt: string | null;
+  /** Raw spotImpliedProbabilities array off the market, so any outcome
+   * index sharing this market can be re-derived from one cached fetch. */
+  rawProbs: unknown[] | null;
   fetchedAt: number;
 }
 
 const lastKnownSnapshot = new Map<string, CachedMarketSnapshot>();
 
-/**
- * Every trade receipt that hasn't been marked resolved yet counts as
- * "open" — this covers both live trades still awaiting settlement AND
- * dry-run trades (execution is always null there, so nothing ever marks
- * them resolved; they're priced purely off the market's current implied
- * probability, never an actual fill).
- */
-export async function getOpenPositions(
-  client: DelphiClient
-): Promise<OpenPosition[]> {
-  const receipts = await readReceipts();
+/** One aggregated position-in-progress, keyed by `${marketId}::${outcomeIdx}`,
+ * before any network call happens. */
+interface AggregatedInput {
+  marketId: string;
+  outcomeIdx: number;
+  question: string;
+  category?: string;
+  outcomeLabel: string;
+  totalSize: number;
+  entryPriceWeightedSum: number; // Σ(size × entryPrice), divide by totalSize for the average
+  impactWeightedSum: number; // Σ(size × priceImpactPct) over receipts that have one
+  impactWeight: number; // Σ(size) over those same receipts — denominator for the above
+  allDryRun: boolean;
+  latestTs: string;
+  receiptCount: number;
+}
 
+/**
+ * Group open-trade receipts by market+outcome. Every not-yet-settled
+ * trade receipt counts as "open" — this covers both live trades still
+ * awaiting settlement AND dry-run trades (execution is always null
+ * there, so nothing ever marks them resolved; they're priced purely off
+ * the market's current implied probability, never an actual fill).
+ */
+function aggregateReceipts(receipts: Receipt[]): Map<string, AggregatedInput> {
   const openTrades = receipts.filter(
     (r) =>
       r.decision === "trade" &&
@@ -147,97 +183,150 @@ export async function getOpenPositions(
       !r.execution?.resolved
   );
 
-  if (openTrades.length === 0) return [];
+  const groups = new Map<string, AggregatedInput>();
 
-  // Firing every open position's getMarket() at once (old Promise.all
-  // over the full list) is what caused the rate-limit thundering herd:
-  // N simultaneous calls hit the same 429 window, all wait it out
+  for (const r of openTrades) {
+    const outcomeIdx = r.outcomeIdx as number;
+    const key = `${r.marketId}::${outcomeIdx}`;
+    const size = r.size ?? 0;
+    const entryPrice = entryPriceFor(r);
+    const impact = r.execution?.priceImpactPct;
+    const hasImpact = typeof impact === "number" && Number.isFinite(impact);
+
+    const existing = groups.get(key);
+    if (!existing) {
+      groups.set(key, {
+        marketId: r.marketId,
+        outcomeIdx,
+        question: r.question,
+        category: r.category,
+        outcomeLabel: r.outcomes?.[outcomeIdx] ?? `outcome #${outcomeIdx}`,
+        totalSize: size,
+        entryPriceWeightedSum: size * entryPrice,
+        impactWeightedSum: hasImpact ? size * (impact as number) : 0,
+        impactWeight: hasImpact ? size : 0,
+        allDryRun: !r.execution,
+        latestTs: r.ts,
+        receiptCount: 1,
+      });
+      continue;
+    }
+
+    existing.totalSize += size;
+    existing.entryPriceWeightedSum += size * entryPrice;
+    if (hasImpact) {
+      existing.impactWeightedSum += size * (impact as number);
+      existing.impactWeight += size;
+    }
+    if (r.execution) existing.allDryRun = false;
+    if (new Date(r.ts).getTime() > new Date(existing.latestTs).getTime()) {
+      existing.latestTs = r.ts;
+      // Prefer the most recent receipt's question/category/outcomeLabel
+      // in case any of those drifted (e.g. outcomes relabeled upstream).
+      existing.question = r.question;
+      existing.category = r.category;
+      existing.outcomeLabel = r.outcomes?.[outcomeIdx] ?? existing.outcomeLabel;
+    }
+    existing.receiptCount += 1;
+  }
+
+  return groups;
+}
+
+export async function getOpenPositions(
+  client: DelphiClient
+): Promise<OpenPosition[]> {
+  const receipts = await readReceipts();
+  const groups = aggregateReceipts(receipts);
+
+  if (groups.size === 0) return [];
+
+  // One getMarket() call per unique marketId, regardless of how many
+  // aggregated groups (outcomes) or original receipts reference it.
+  const uniqueMarketIds = [...new Set([...groups.values()].map((g) => g.marketId))];
+
+  interface MarketFetchResult {
+    marketStatus: string | null;
+    liquidityTokens: number | null;
+    volumeTokens: number | null;
+    tradingFeePct: number | null;
+    resolvesAt: string | null;
+    rawProbs: unknown[] | null;
+    marketNotFound: boolean;
+    stale: boolean;
+  }
+
+  const marketResults = new Map<string, MarketFetchResult>();
+
+  // Firing every unique market's getMarket() at once (old Promise.all
+  // over the full receipt list) is what caused the rate-limit thundering
+  // herd: N simultaneous calls hit the same 429 window, all wait it out
   // together, then all retry on the same tick, re-triggering it
   // indefinitely. Batching a few at a time keeps this endpoint fast
   // without hammering the API in one burst every 15s poll.
-  const POSITION_FETCH_CONCURRENCY = 3;
-  const positions: OpenPosition[] = [];
+  const MARKET_FETCH_CONCURRENCY = 3;
 
-  for (
-    let i = 0;
-    i < openTrades.length;
-    i += POSITION_FETCH_CONCURRENCY
-  ) {
-    const batch = openTrades.slice(
-      i,
-      i + POSITION_FETCH_CONCURRENCY
-    );
+  for (let i = 0; i < uniqueMarketIds.length; i += MARKET_FETCH_CONCURRENCY) {
+    const batch = uniqueMarketIds.slice(i, i + MARKET_FETCH_CONCURRENCY);
 
-    const batchResults = await Promise.all(
-      batch.map(async (r) => {
-        const outcomeIdx = r.outcomeIdx as number;
-        const entryPrice = entryPriceFor(r);
-        const outcomeLabel =
-          r.outcomes?.[outcomeIdx] ?? `outcome #${outcomeIdx}`;
-
-        let currentPrice: number | null = null;
-        let marketStatus: string | null = null;
-        let liquidityTokens: number | null = null;
-        let volumeTokens: number | null = null;
-        let tradingFeePct: number | null = null;
-        let resolvesAt: string | null = null;
-        let marketNotFound = false;
-        let stale = false;
-
+    await Promise.all(
+      batch.map(async (marketId) => {
         try {
           const market: Market | undefined = await withDelphiRetry(
             () =>
               client.getMarket({
-                id: r.marketId,
+                id: marketId,
                 pricesAndImpliedProbabilities: true,
               } as any),
             {
-              label: `getMarket(${r.marketId})`,
+              label: `getMarket(${marketId})`,
               maxRetries: 2,
             } // dashboard read on a 15s poll — fail fast
           );
 
           if (market) {
-            marketStatus = (market as any).status ?? null;
-            liquidityTokens = extractLiquidity(market);
-            volumeTokens = extractVolume(market);
-            tradingFeePct = extractTradingFeePct(market);
-            resolvesAt = extractResolvesAt(market);
-
-            const rawProbs =
-              (market as any).spotImpliedProbabilities as
-                | unknown[]
-                | undefined;
-
-            if (
-              rawProbs &&
-              rawProbs[outcomeIdx] !== undefined
-            ) {
-              currentPrice = normalizeProb(
-                rawProbs[outcomeIdx]
-              );
-            }
+            const result: MarketFetchResult = {
+              marketStatus: (market as any).status ?? null,
+              liquidityTokens: extractLiquidity(market),
+              volumeTokens: extractVolume(market),
+              tradingFeePct: extractTradingFeePct(market),
+              resolvesAt: extractResolvesAt(market),
+              rawProbs:
+                ((market as any).spotImpliedProbabilities as unknown[] | undefined) ?? null,
+              marketNotFound: false,
+              stale: false,
+            };
+            marketResults.set(marketId, result);
 
             // Fresh success — refresh the cache so a LATER transient
             // failure has something real to fall back to.
-            lastKnownSnapshot.set(r.marketId, {
-              currentPrice,
-              marketStatus,
-              liquidityTokens,
-              volumeTokens,
-              tradingFeePct,
-              resolvesAt,
+            lastKnownSnapshot.set(marketId, {
+              marketStatus: result.marketStatus,
+              liquidityTokens: result.liquidityTokens,
+              volumeTokens: result.volumeTokens,
+              tradingFeePct: result.tradingFeePct,
+              resolvesAt: result.resolvesAt,
+              rawProbs: result.rawProbs,
               fetchedAt: Date.now(),
+            });
+          } else {
+            marketResults.set(marketId, {
+              marketStatus: null,
+              liquidityTokens: null,
+              volumeTokens: null,
+              tradingFeePct: null,
+              resolvesAt: null,
+              rawProbs: null,
+              marketNotFound: false,
+              stale: false,
             });
           }
         } catch (err) {
-          marketNotFound = isNotFoundError(err);
+          const marketNotFound = isNotFoundError(err);
 
           console.warn(
-            `  [positions] couldn't fetch market ${r.marketId}${
-              marketNotFound
-                ? " (404 — market no longer exists server-side)"
-                : ""
+            `  [positions] couldn't fetch market ${marketId}${
+              marketNotFound ? " (404 — market no longer exists server-side)" : ""
             }:`,
             err instanceof Error ? err.message : err
           );
@@ -245,78 +334,99 @@ export async function getOpenPositions(
           if (marketNotFound) {
             // Genuinely gone — don't resurrect stale numbers for a market
             // that no longer exists on the API at all.
-            lastKnownSnapshot.delete(r.marketId);
+            lastKnownSnapshot.delete(marketId);
+            marketResults.set(marketId, {
+              marketStatus: null,
+              liquidityTokens: null,
+              volumeTokens: null,
+              tradingFeePct: null,
+              resolvesAt: null,
+              rawProbs: null,
+              marketNotFound: true,
+              stale: false,
+            });
           } else {
             // Transient (rate limit, timeout, etc.) — fall back to the
             // last successful read rather than showing a blank PnL that
             // flickers in and out with every rate-limit window.
-            const cached = lastKnownSnapshot.get(r.marketId);
-
-            if (cached) {
-              currentPrice = cached.currentPrice;
-              marketStatus = cached.marketStatus;
-              liquidityTokens = cached.liquidityTokens;
-              volumeTokens = cached.volumeTokens;
-              tradingFeePct = cached.tradingFeePct;
-              resolvesAt = cached.resolvesAt;
-              stale = true;
-            }
+            const cached = lastKnownSnapshot.get(marketId);
+            marketResults.set(marketId, {
+              marketStatus: cached?.marketStatus ?? null,
+              liquidityTokens: cached?.liquidityTokens ?? null,
+              volumeTokens: cached?.volumeTokens ?? null,
+              tradingFeePct: cached?.tradingFeePct ?? null,
+              resolvesAt: cached?.resolvesAt ?? null,
+              rawProbs: cached?.rawProbs ?? null,
+              marketNotFound: false,
+              stale: Boolean(cached),
+            });
           }
         }
-
-        // Recomputed fresh from resolvesAt every poll (even when
-        // resolvesAt itself came from the stale-fallback cache above) —
-        // it's a function of "now", so caching the ms delta itself would
-        // just grow staler than the resolvesAt timestamp it's derived
-        // from for no benefit.
-        const msUntilResolveVal = resolvesAt
-          ? new Date(resolvesAt).getTime() - Date.now()
-          : null;
-
-        const size = r.size ?? 0;
-
-        let unrealizedPnl: number | null = null;
-        let unrealizedPnlPct: number | null = null;
-
-        if (currentPrice !== null && entryPrice > 0) {
-          // 1 share pays out 1 token if this outcome wins, 0 otherwise,
-          // so a share's fair value tracks its implied probability
-          // directly — P&L% is just how much that probability has moved
-          // since entry.
-          unrealizedPnlPct =
-            (currentPrice - entryPrice) / entryPrice;
-          unrealizedPnl = size * unrealizedPnlPct;
-        }
-
-        return {
-          marketId: r.marketId,
-          question: r.question,
-          category: r.category,
-          outcomeIdx,
-          outcomeLabel,
-          size,
-          entryPrice,
-          currentPrice,
-          unrealizedPnl,
-          unrealizedPnlPct,
-          priceImpactPct:
-            r.execution?.priceImpactPct ?? null,
-          marketStatus,
-          liquidityTokens,
-          volumeTokens,
-          tradingFeePct,
-          resolvesAt,
-          msUntilResolve: msUntilResolveVal,
-          marketNotFound,
-          stale,
-          isDryRun: !r.execution,
-          ts: r.ts,
-        } satisfies OpenPosition;
       })
     );
-
-    positions.push(...batchResults);
   }
+
+  const positions: OpenPosition[] = [];
+
+  for (const g of groups.values()) {
+    const fetched = marketResults.get(g.marketId);
+
+    const entryPrice = g.totalSize > 0 ? g.entryPriceWeightedSum / g.totalSize : 0.5;
+    const priceImpactPct = g.impactWeight > 0 ? g.impactWeightedSum / g.impactWeight : null;
+
+    let currentPrice: number | null = null;
+    if (fetched?.rawProbs && fetched.rawProbs[g.outcomeIdx] !== undefined) {
+      currentPrice = normalizeProb(fetched.rawProbs[g.outcomeIdx]);
+    }
+
+    // Recomputed fresh from resolvesAt every poll (even when resolvesAt
+    // itself came from the stale-fallback cache) — it's a function of
+    // "now", so caching the ms delta itself would just grow staler than
+    // the resolvesAt timestamp it's derived from for no benefit.
+    const msUntilResolveVal = fetched?.resolvesAt
+      ? new Date(fetched.resolvesAt).getTime() - Date.now()
+      : null;
+
+    let unrealizedPnl: number | null = null;
+    let unrealizedPnlPct: number | null = null;
+
+    if (currentPrice !== null && entryPrice > 0) {
+      // 1 share pays out 1 token if this outcome wins, 0 otherwise, so a
+      // share's fair value tracks its implied probability directly —
+      // P&L% is just how much that probability has moved since the
+      // (size-weighted average) entry.
+      unrealizedPnlPct = (currentPrice - entryPrice) / entryPrice;
+      unrealizedPnl = g.totalSize * unrealizedPnlPct;
+    }
+
+    positions.push({
+      marketId: g.marketId,
+      question: g.question,
+      category: g.category,
+      outcomeIdx: g.outcomeIdx,
+      outcomeLabel: g.outcomeLabel,
+      size: g.totalSize,
+      entryPrice,
+      currentPrice,
+      unrealizedPnl,
+      unrealizedPnlPct,
+      priceImpactPct,
+      marketStatus: fetched?.marketStatus ?? null,
+      liquidityTokens: fetched?.liquidityTokens ?? null,
+      volumeTokens: fetched?.volumeTokens ?? null,
+      tradingFeePct: fetched?.tradingFeePct ?? null,
+      resolvesAt: fetched?.resolvesAt ?? null,
+      msUntilResolve: msUntilResolveVal,
+      marketNotFound: fetched?.marketNotFound ?? false,
+      stale: fetched?.stale ?? false,
+      isDryRun: g.allDryRun,
+      ts: g.latestTs,
+      receiptCount: g.receiptCount,
+    });
+  }
+
+  // Stable, readable default order — most recently touched first.
+  positions.sort((a, b) => new Date(b.ts).getTime() - new Date(a.ts).getTime());
 
   return positions;
 }
