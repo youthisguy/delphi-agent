@@ -2,10 +2,93 @@ import type { DelphiClient, Market } from "@gensyn-ai/gensyn-delphi-sdk";
 import { readReceipts, type Receipt } from "./journal.js";
 import { extractLiquidity, extractVolume } from "./marketFields.js";
 import { withDelphiRetry } from "./delphiRetry.js";
+import { resolveWalletAddress } from "./chainRead.js";
 import {
   extractTradingFeePct,
   extractResolvesAt,
 } from "./marketFields.js";
+
+/** Shares are fixed at 18 decimals — same convention as
+ * scripts/sell-positions.ts. */
+const SHARES_DECIMALS = 18;
+
+function sharesToHuman(raw: string | bigint): number {
+  try {
+    return Number(BigInt(raw)) / 10 ** SHARES_DECIMALS;
+  } catch {
+    const n = Number(raw);
+    return Number.isFinite(n) ? n / 10 ** SHARES_DECIMALS : 0;
+  }
+}
+
+/** Client-visitable competition page for a market. The on-chain address
+ * IS the id (confirmed: competition.delphi.fyi/markets/0x… uses the
+ * market's contract address directly), so this is always constructible
+ * without depending on marketUrl from the API (confirmed absent on this
+ * API version — see marketFields.ts's extractMarketUrl). */
+function competitionUrlFor(marketId: string): string {
+  return `https://competition.delphi.fyi/markets/${marketId}`;
+}
+
+/**
+ * On-chain source of truth for what the wallet actually still holds,
+ * keyed the same way as the journal-derived groups (`${marketId}::${outcomeIdx}`,
+ * marketId lowercased so casing differences between journal receipts and
+ * the API's own casing don't cause false misses).
+ * Same pagination loop as scripts/sell-positions.ts's loadAllPositions().
+ *
+ * The journal (aggregateReceipts) is still the source for entryPrice /
+ * cost-basis / category / question — a sell doesn't touch the journal,
+ * only the chain — so this is cross-checked against, not used to
+ * replace, the journal-derived groups. See getOpenPositions() below.
+ */
+async function loadOnChainPositions(
+  client: DelphiClient,
+  wallet: string
+): Promise<Map<string, bigint>> {
+  const byKey = new Map<string, bigint>();
+  let skip = 0;
+  const limit = 50;
+
+  for (;;) {
+    const res = await withDelphiRetry(
+      () =>
+        (client as any).listPositions({
+          wallet,
+          redeemedOrLiquidated: false,
+          skip,
+          limit,
+        }),
+      { label: `listPositions(skip=${skip})`, maxRetries: 2 }
+    );
+
+    const batch = (res as any)?.positions ?? (Array.isArray(res) ? res : []);
+    if (!Array.isArray(batch) || batch.length === 0) break;
+
+    for (const p of batch) {
+      const marketId = String(
+        p.marketProxy ?? p.marketId ?? p.marketAddress ?? p.market ?? ""
+      ).toLowerCase();
+      if (!marketId) continue;
+      const outcomeIdx = Number(p.outcomeIdx ?? p.outcome ?? 0);
+      let sharesRaw: bigint;
+      try {
+        sharesRaw = BigInt(String(p.shares ?? "0"));
+      } catch {
+        sharesRaw = 0n;
+      }
+      const key = `${marketId}::${outcomeIdx}`;
+      // A wallet could in principle have more than one row surface for
+      // the same market+outcome across pages — sum rather than overwrite.
+      byKey.set(key, (byKey.get(key) ?? 0n) + sharesRaw);
+    }
+
+    if (batch.length < limit) break;
+    skip += limit;
+  }
+
+  return byKey;
+}
 
 /**
  * Mark-to-market for still-open trades — deliberately NOT part of the
@@ -93,6 +176,23 @@ export interface OpenPosition {
   /** How many journal receipts were folded into this row. 1 = a normal
    * single-buy position; >1 = topped up across multiple cycles. */
   receiptCount: number;
+  /** Raw on-chain share balance (18-decimal fixed point), as a string —
+   * JS numbers can't safely hold a bigint from JSON. This is what the
+   * sell-quote/sell endpoints need as sharesIn; null if on-chain
+   * verification wasn't available this poll (wallet unresolved or the
+   * listPositions call failed), in which case `size` above still falls
+   * back to the journal-derived total. */
+  sharesRaw: string | null;
+  /** True if this row's `size`/`sharesRaw` were cross-checked against
+   * on-chain listPositions() this poll. False means the wallet couldn't
+   * be resolved or the on-chain call failed, so `size` is the journal's
+   * (potentially stale, e.g. after a sell made outside this dashboard)
+   * total instead. */
+  onChainVerified: boolean;
+  /** competition.delphi.fyi page for this market — always constructible
+   * client-side from the address, no dependency on marketUrl from the
+   * API (see marketFields.ts's extractMarketUrl, confirmed absent). */
+  marketUrl: string;
 }
 
 /** Same fallback the sizing logic itself uses for synthetic/no-book markets
@@ -187,6 +287,7 @@ interface AggregatedInput {
   category?: string;
   outcomeLabel: string;
   totalSize: number;
+  sharesRawSum: bigint;
   entryPriceWeightedSum: number; // Σ(size × entryPrice), divide by totalSize for the average
   impactWeightedSum: number; // Σ(size × priceImpactPct) over receipts that have one
   impactWeight: number; // Σ(size) over those same receipts — denominator for the above
@@ -222,6 +323,7 @@ function aggregateReceipts(receipts: Receipt[]): Map<string, AggregatedInput> {
     const outcomeIdx = r.outcomeIdx as number;
     const key = `${r.marketId}::${outcomeIdx}`;
     const size = r.size ?? 0;
+
     // Cost basis, not the raw pre-trade price — see costBasisFor() above.
     // This is what feeds entryPriceWeightedSum below, so the "Entry"
     // column and every P&L figure derived from it reflect what was
@@ -239,6 +341,9 @@ function aggregateReceipts(receipts: Receipt[]): Map<string, AggregatedInput> {
         category: r.category,
         outcomeLabel: r.outcomes?.[outcomeIdx] ?? `outcome #${outcomeIdx}`,
         totalSize: size,
+        sharesRawSum: r.execution?.sharesOut
+          ? BigInt(r.execution.sharesOut)
+          : 0n,
         entryPriceWeightedSum: size * entryPrice,
         impactWeightedSum: hasImpact ? size * (impact as number) : 0,
         impactWeight: hasImpact ? size : 0,
@@ -246,24 +351,38 @@ function aggregateReceipts(receipts: Receipt[]): Map<string, AggregatedInput> {
         latestTs: r.ts,
         receiptCount: 1,
       });
+
       continue;
     }
 
     existing.totalSize += size;
+
+    if (r.execution?.sharesOut) {
+      try {
+        existing.sharesRawSum += BigInt(r.execution.sharesOut);
+      } catch {}
+    }
+
     existing.entryPriceWeightedSum += size * entryPrice;
+
     if (hasImpact) {
       existing.impactWeightedSum += size * (impact as number);
       existing.impactWeight += size;
     }
+
     if (r.execution) existing.allDryRun = false;
+
     if (new Date(r.ts).getTime() > new Date(existing.latestTs).getTime()) {
       existing.latestTs = r.ts;
+
       // Prefer the most recent receipt's question/category/outcomeLabel
       // in case any of those drifted (e.g. outcomes relabeled upstream).
       existing.question = r.question;
       existing.category = r.category;
-      existing.outcomeLabel = r.outcomes?.[outcomeIdx] ?? existing.outcomeLabel;
+      existing.outcomeLabel =
+        r.outcomes?.[outcomeIdx] ?? existing.outcomeLabel;
     }
+
     existing.receiptCount += 1;
   }
 
@@ -277,6 +396,30 @@ export async function getOpenPositions(
   const groups = aggregateReceipts(receipts);
 
   if (groups.size === 0) return [];
+
+  // Cross-check against on-chain truth: selling doesn't touch the
+  // journal, so without this a sold position sat in the table forever
+  // until something separately patched the journal. Wallet resolution
+  // or the listPositions() call itself can fail (RPC hiccup, SDK signer
+  // not configured, etc.) — in that case we don't have ground truth this
+  // poll, so rows fall back to the journal's totals rather than being
+  // wrongly dropped.
+  let onChainMap: Map<string, bigint> | null = null;
+  try {
+    const wallet = await resolveWalletAddress(client);
+    if (wallet) {
+      onChainMap = await loadOnChainPositions(client, wallet);
+    } else {
+      console.warn(
+        "  [positions] couldn't resolve wallet address — showing journal-only totals, unverified"
+      );
+    }
+  } catch (err) {
+    console.warn(
+      "  [positions] on-chain listPositions() failed — showing journal-only totals, unverified:",
+      err instanceof Error ? err.message : err
+    );
+  }
 
   // One getMarket() call per unique marketId, regardless of how many
   // aggregated groups (outcomes) or original receipts reference it.
@@ -408,11 +551,51 @@ export async function getOpenPositions(
   for (const g of groups.values()) {
     const fetched = marketResults.get(g.marketId);
 
-    const entryPrice = g.totalSize > 0 ? g.entryPriceWeightedSum / g.totalSize : 0.5;
-    const priceImpactPct = g.impactWeight > 0 ? g.impactWeightedSum / g.impactWeight : null;
+    // Entry price is token cost per share and must be calculated before
+    // converting the verified on-chain share count back into the
+    // token-denominated SIZE used by the dashboard and P&L calculation.
+    const entryPrice =
+      g.totalSize > 0 ? g.entryPriceWeightedSum / g.totalSize : 0.5;
+
+    // On-chain cross-check. When we have a verified map for this poll,
+    // a group with no matching on-chain position (or zero shares there)
+    // means the wallet has actually sold/redeemed out of it — the
+    // journal just hasn't (and, by design, doesn't need to) catch up.
+    // Drop the row entirely rather than showing a stale "still open"
+    // position. When on-chain data isn't available this poll, fall back
+    // to the journal's total, unverified, rather than guessing.
+    let effectiveSize = g.totalSize;
+    let effectiveSharesRaw = g.sharesRawSum;
+    const onChainVerified = onChainMap !== null;
+
+    if (onChainMap) {
+      const onChainKey = `${g.marketId.toLowerCase()}::${g.outcomeIdx}`;
+      const onChainShares = onChainMap.get(onChainKey) ?? 0n;
+
+      if (onChainShares === 0n) {
+        continue; // sold/redeemed — drop the row
+      }
+
+      // Convert shares back into token terms so SIZE remains
+      // "tokens committed" and P&L is calculated in the same units.
+      effectiveSize = sharesToHuman(onChainShares) * entryPrice;
+
+      // Use on-chain truth for the Sell button. This prevents the
+      // dashboard from attempting to sell shares that were already
+      // sold/redeemed outside the dashboard.
+      effectiveSharesRaw = onChainShares;
+    }
+
+    const priceImpactPct =
+      g.impactWeight > 0
+        ? g.impactWeightedSum / g.impactWeight
+        : null;
 
     let currentPrice: number | null = null;
-    if (fetched?.rawProbs && fetched.rawProbs[g.outcomeIdx] !== undefined) {
+    if (
+      fetched?.rawProbs &&
+      fetched.rawProbs[g.outcomeIdx] !== undefined
+    ) {
       currentPrice = normalizeProb(fetched.rawProbs[g.outcomeIdx]);
     }
 
@@ -431,9 +614,10 @@ export async function getOpenPositions(
       // 1 share pays out 1 token if this outcome wins, 0 otherwise, so a
       // share's fair value tracks its implied probability directly —
       // P&L% is just how much that probability has moved since the
-      // (size-weighted average) entry.
+      // (size-weighted average) entry. effectiveSize is always in token
+      // terms, including when it was reconstructed from on-chain shares.
       unrealizedPnlPct = (currentPrice - entryPrice) / entryPrice;
-      unrealizedPnl = g.totalSize * unrealizedPnlPct;
+      unrealizedPnl = effectiveSize * unrealizedPnlPct;
     }
 
     positions.push({
@@ -442,7 +626,7 @@ export async function getOpenPositions(
       category: g.category,
       outcomeIdx: g.outcomeIdx,
       outcomeLabel: g.outcomeLabel,
-      size: g.totalSize,
+      size: effectiveSize,
       entryPrice,
       currentPrice,
       unrealizedPnl,
@@ -459,6 +643,12 @@ export async function getOpenPositions(
       isDryRun: g.allDryRun,
       ts: g.latestTs,
       receiptCount: g.receiptCount,
+      sharesRaw:
+        effectiveSharesRaw > 0n
+          ? effectiveSharesRaw.toString()
+          : null,
+      onChainVerified,
+      marketUrl: competitionUrlFor(g.marketId),
     });
   }
 

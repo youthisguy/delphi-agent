@@ -789,6 +789,7 @@
                 <th>FEE</th>
                 <th>RESOLVES</th>
                 <th>STATUS</th>
+                <th>ACTIONS</th>
               </tr>
             </thead>
 
@@ -846,6 +847,7 @@
                 <th>LIQUIDITY</th>
                 <th>VOLUME</th>
                 <th>STATUS</th>
+                <th>BUY</th>
               </tr>
             </thead>
 
@@ -1105,7 +1107,7 @@
           if (!positions.length) {
             $(
               "#positionsBody"
-            ).innerHTML = `<tr><td colspan="10"><div class="empty">no open positions</div></td></tr>`;
+            ).innerHTML = `<tr><td colspan="11"><div class="empty">no open positions</div></td></tr>`;
             return;
           }
 
@@ -1155,10 +1157,7 @@
                   ? (p.tradingFeePct * 100).toFixed(1) + "%"
                   : "—";
               const resolvesCell = fmtTimeUntil(p.msUntilResolve);
-              // marketNotFound (confirmed 404 — market no longer exists
-              // server-side) is a distinct state from "temporarily unreachable"
-              // (stale) or "still open" — surface it plainly rather than
-              // leaving CURRENT/P&L looking like a normal blank.
+
               const statusCell = p.marketNotFound
                 ? `<span class="pill gone" title="Market no longer exists on the API — likely expired/removed">GONE</span>`
                 : p.marketStatus
@@ -1178,18 +1177,33 @@
                   ? "&mdash;"
                   : "N/A";
 
+              const qCell = p.marketUrl
+                ? `<a href="${esc(
+                    p.marketUrl
+                  )}" target="_blank" rel="noopener" style="color:inherit; text-decoration:none;" title="${esc(
+                    p.question
+                  )}">${esc(p.question)}</a>`
+                : esc(p.question);
+              const actionsCell =
+                !p.isDryRun && p.sharesRaw && !p.marketNotFound
+                  ? `<button class="sell-btn" data-market="${esc(
+                      p.marketId
+                    )}" data-outcome="${p.outcomeIdx}" data-shares="${esc(
+                      p.sharesRaw
+                    )}">Sell</button>`
+                  : '<span style="color:var(--text-muted)">—</span>';
+
               return `
         <tr${p.marketNotFound ? ' style="opacity:0.55;"' : ""}>
-          <td class="q-cell" title="${esc(p.question)}">${esc(p.question)}</td>
+<td class="q-cell" title="${esc(p.question)}">${qCell}</td>
           <td>${esc(p.outcomeLabel)}</td>
           <td>${fmtNum(p.size, 2)}</td>
           <td>${fmtNum(p.entryPrice, 3)}</td>
           <td>${currentCell}</td>
           <td class="${pnlClass}">${pnlText}</td>
           <td class="${impactClass}">${impactText}</td>
-      <td>${feeCell}</td>
-<td>${resolvesCell}</td>
-
+          <td>${feeCell}</td>
+          <td>${resolvesCell}</td>
           <td>
             ${
               p.isDryRun
@@ -1198,6 +1212,7 @@
             }
             ${statusCell}
           </td>
+          <td>${actionsCell}</td>
         </tr>
       `;
             })
@@ -1205,12 +1220,11 @@
         } catch (e) {
           $(
             "#positionsBody"
-          ).innerHTML = `<tr><td colspan="10"><div class="empty">positions unavailable &mdash; ${esc(
+          ).innerHTML = `<tr><td colspan="11"><div class="empty">positions unavailable &mdash; ${esc(
             e.message
           )}</div></td></tr>`;
         }
       }
-
       // ---- Summary ----
       async function loadSummary() {
         try {
@@ -1440,7 +1454,7 @@
           if (!markets.length) {
             $("#marketsBody").innerHTML = `
         <tr>
-          <td colspan="9">
+          <td colspan="10">
             <div class="empty">no active market order books</div>
           </td>
         </tr>`;
@@ -1463,6 +1477,26 @@
                 ? outcomes.map((o) => esc(o)).join(" / ")
                 : esc(outcomes);
 
+              const buyCell =
+                Array.isArray(outcomes) && outcomes.length
+                  ? `
+  <select class="buy-outcome" data-market="${esc(m.id)}">
+    ${outcomes
+      .map((o, i) => `<option value="${i}">${esc(o)}</option>`)
+      .join("")}
+  </select>
+  <button class="buy-btn" data-market="${esc(
+    m.id
+  )}" data-amount="25">+25</button>
+  <button class="buy-btn" data-market="${esc(
+    m.id
+  )}" data-amount="50">+50</button>
+  <button class="buy-btn" data-market="${esc(
+    m.id
+  )}" data-amount="100">+100</button>
+`
+                  : "—";
+
               const hasLiq =
                 m.liquidityTokens !== null && m.liquidityTokens !== undefined;
 
@@ -1482,8 +1516,6 @@
                   }`
                 : "—";
 
-              // IMPORTANT:
-              // Volume is separate from liquidity.
               const volCell =
                 m.volumeTokens !== null && m.volumeTokens !== undefined
                   ? fmtNum(m.volumeTokens, 2)
@@ -1547,8 +1579,9 @@
 
             <td>${volCell}</td>
 
-     <td>${statusCell}</td>
+            <td>${statusCell}</td>
 
+            <td>${buyCell}</td>
           </tr>
         `;
             })
@@ -1556,7 +1589,7 @@
         } catch (e) {
           $("#marketsBody").innerHTML = `
       <tr>
-        <td colspan="9">
+        <td colspan="10">
           <div class="empty">
             market stream offline &mdash; ${esc(e.message)}
           </div>
@@ -1564,6 +1597,93 @@
       </tr>`;
         }
       }
+
+      async function handleSell(marketId, outcomeIdx, sharesIn) {
+        try {
+          const q = await j("/api/positions/quote-sell", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ marketId, outcomeIdx, sharesIn }),
+          });
+
+          if (
+            !confirm(
+              `Sell for ~${q.tokensOutHuman.toFixed(
+                4
+              )} tokens (3% slippage buffer)?`
+            )
+          ) {
+            return;
+          }
+
+          const r = await j("/api/positions/sell", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ marketId, outcomeIdx, sharesIn }),
+          });
+
+          alert(`Sold. tx=${r.transactionHash}`);
+          loadPositions();
+        } catch (e) {
+          alert("Sell failed: " + e.message);
+        }
+      }
+
+      async function handleBuy(marketId, outcomeIdx, amountTokens) {
+        try {
+          const q = await j("/api/markets/quote-buy", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ marketId, outcomeIdx, amountTokens }),
+          });
+
+          const shares = (Number(q.sharesOut) / 1e18).toFixed(4);
+          const msg = `${amountTokens} tokens → ${shares} shares on "${
+            q.outcomeLabel
+          }"\ncost≈${q.tokensInHuman.toFixed(4)} tokens, impact ${(
+            q.impactPct * 100
+          ).toFixed(2)}%\nConfirm buy?`;
+
+          if (!confirm(msg)) return;
+
+          const r = await j("/api/markets/buy", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ marketId, outcomeIdx, amountTokens }),
+          });
+
+          alert(`Bought. tx=${r.transactionHash}`);
+          loadMarkets();
+          loadPositions();
+        } catch (e) {
+          alert("Buy failed: " + e.message);
+        }
+      }
+
+      document.addEventListener("click", (e) => {
+        const sellBtn = e.target.closest(".sell-btn");
+
+        if (sellBtn) {
+          handleSell(
+            sellBtn.dataset.market,
+            Number(sellBtn.dataset.outcome),
+            sellBtn.dataset.shares
+          );
+          return;
+        }
+
+        const buyBtn = e.target.closest(".buy-btn");
+
+        if (buyBtn) {
+          const marketId = buyBtn.dataset.market;
+          const select = document.querySelector(
+            `.buy-outcome[data-market="${CSS.escape(marketId)}"]`
+          );
+          const outcomeIdx = select ? Number(select.value) : 0;
+
+          handleBuy(marketId, outcomeIdx, Number(buyBtn.dataset.amount));
+        }
+      });
 
       // ---- Boot Lifecycle ----
       async function refreshAll() {

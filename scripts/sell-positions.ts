@@ -5,7 +5,7 @@
  * panel and redeem.ts never tries to redeem it later.
  *
  *   npx tsx scripts/sell-positions.ts
- *   npx tsx scripts/sell-positions.ts --market 0xabc...
+ *   npx tsx scripts/sell-positions.ts --market 0xb13bc65ea2c2600f74a4634abf55c65deb6d0edc --sell --outcome no
  *   npx tsx scripts/sell-positions.ts --market 0xabc... --outcome no
  *   npx tsx scripts/sell-positions.ts --sell
  *   npx tsx scripts/sell-positions.ts --sell --dry-run

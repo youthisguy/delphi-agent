@@ -2,9 +2,9 @@
  * Discover positions via SDK listPositions({ wallet }), print them,
  * optionally redeem winners / liquidate failed|expired markets.
  *
- *   npx tsx scripts/recover-onchain.ts
- *   npx tsx scripts/recover-onchain.ts --redeem
- *   npx tsx scripts/recover-onchain.ts --redeem --dry-run
+ *   npx tsx scripts/recover-positions.ts
+ *   npx tsx scripts/recover-positions.ts --redeem
+ *   npx tsx scripts/recover-positions.ts --redeem --dry-run
  */
 import "dotenv/config";
 import { DelphiClient, type Market } from "@gensyn-ai/gensyn-delphi-sdk";
@@ -85,7 +85,7 @@ async function loadAllPositions(wallet: string): Promise<any[]> {
 }
 
 async function main() {
-  console.log(`recover-onchain  redeem=${DO_REDEEM}  dryRun=${DRY_RUN}\n`);
+  console.log(`recover-positions  redeem=${DO_REDEEM}  dryRun=${DRY_RUN}\n`);
 
   const wallet = await resolveWalletAddress(client);
   if (!wallet) {
