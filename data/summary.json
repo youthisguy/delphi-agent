@@ -1,24 +1,24 @@
 {
-  "updatedAt": "2026-08-13T05:00:52.023Z",
-  "totalReceipts": 1239,
-  "totalTrades": 102,
-  "totalSkips": 1137,
+  "updatedAt": "2026-08-13T05:06:13.750Z",
+  "totalReceipts": 1251,
+  "totalTrades": 103,
+  "totalSkips": 1148,
   "rollingAccuracy": {
-    "n": 37,
-    "hitRate": 0.918918918918919
+    "n": 40,
+    "hitRate": 0.85
   },
   "calibrationByConfidenceBucket": {
-    "mid(0.4-0.6)": {
-      "n": 9,
-      "hitRate": 0.7777777777777778
-    },
     "high(0.6-0.8)": {
       "n": 7,
       "hitRate": 1
     },
+    "mid(0.4-0.6)": {
+      "n": 9,
+      "hitRate": 0.7777777777777778
+    },
     "low(<0.4)": {
-      "n": 10,
-      "hitRate": 0.9
+      "n": 13,
+      "hitRate": 0.6923076923076923
     },
     "veryhigh(0.8+)": {
       "n": 11,
@@ -29,7 +29,7 @@
     "miscellaneous": {
       "n": 0,
       "hitRate": null,
-      "trades": 52
+      "trades": 53
     },
     "politics": {
       "n": 0,
@@ -42,7 +42,7 @@
       "trades": 4
     },
     "sports": {
-      "n": 1,
+      "n": 4,
       "hitRate": 0,
       "trades": 6
     },
@@ -62,7 +62,7 @@
       "trades": 1
     }
   },
-  "openExposureTokens": 616.3100911162568,
+  "openExposureTokens": 666.2909611603448,
   "tradePerformance": {
     "settled": 34,
     "wins": 34,
@@ -70,15 +70,557 @@
     "winRate": 1,
     "voidTrades": 0,
     "totalPnl": -0.1914,
-    "openTrades": 65
+    "openTrades": 63
   },
   "skipCalibration": {
-    "settled": 360,
+    "settled": 370,
     "wouldHaveWon": 178,
-    "wouldHaveWonRate": 0.49444444444444446,
+    "wouldHaveWonRate": 0.4810810810810811,
     "voidSkips": 0
   },
   "lastNDecisions": [
+    {
+      "ts": "2026-08-13T05:06:13.648Z",
+      "marketId": "0x58831cf8efdd2d9f3154de88dcfc1b094347f03b",
+      "question": "Will Al Ittihad vs Al Kholood (Saudi Pro League) be level at the end of regulation time on Aug 15, 2026 UTC?",
+      "category": "sports",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.32216051488348824,
+        0.6778394851165117
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.27,
+            0.73
+          ],
+          "confidence": 0.55
+        },
+        "gemini": {
+          "probs": [
+            0.22,
+            0.78
+          ],
+          "confidence": 0.4,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.050000000000000044,
+      "blendedProbs": [
+        0.2557142857142858,
+        0.7442857142857143
+      ],
+      "confidence": 0.55,
+      "decision": "skip",
+      "outcomeIdx": 1,
+      "edge": 0.06644622916920262,
+      "thresholdUsed": 0.125,
+      "size": null,
+      "execution": null,
+      "skipReason": "bestEdge=0.066 < minEdge=0.13"
+    },
+    {
+      "ts": "2026-08-13T05:06:13.555Z",
+      "marketId": "0x3ae4d2e7771e29a7b8d165798ed788eec82b62b6",
+      "question": "Will Ilves Tampere beat Rijeka at the end of regulation time in their UEFA Conference League match on Aug 13, 2026?",
+      "category": "sports",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.28416491556569173,
+        0.7158350844343082
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.34,
+            0.66
+          ],
+          "confidence": 0.46
+        },
+        "gemini": {
+          "probs": [
+            0.35,
+            0.65
+          ],
+          "confidence": 0.4,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.010000000000000009,
+      "blendedProbs": [
+        0.34285714285714286,
+        0.6571428571428573
+      ],
+      "confidence": 0.46,
+      "decision": "skip",
+      "outcomeIdx": 0,
+      "edge": 0.05869222729145113,
+      "thresholdUsed": 0.125,
+      "size": null,
+      "execution": null,
+      "skipReason": "bestEdge=0.059 < minEdge=0.13"
+    },
+    {
+      "ts": "2026-08-13T05:06:13.449Z",
+      "marketId": "0x76225fe8f2dd1aa4425a6e6f418d9eeab8d319dd",
+      "question": "Will the Jacksonville Jaguars win their Aug 15, 2026 (US Eastern) NFL preseason game by 2+ points?",
+      "category": "sports",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.4658740500762501,
+        0.5341259499237498
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.52,
+            0.48
+          ],
+          "confidence": 0.42
+        },
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [
+        0.52,
+        0.48
+      ],
+      "confidence": 0.42,
+      "decision": "skip",
+      "outcomeIdx": 0,
+      "edge": 0.054125949923749916,
+      "thresholdUsed": 0.125,
+      "size": null,
+      "execution": null,
+      "skipReason": "bestEdge=0.054 < minEdge=0.13"
+    },
+    {
+      "ts": "2026-08-13T05:06:13.141Z",
+      "marketId": "0x7090dec53161de700627de95344adeb1f2182943",
+      "question": "Will NSÍ Runavík advance past FC Lugano in their 2026–27 UEFA Conference League qualifying tie (2nd leg 13 Aug 2026)?",
+      "category": "sports",
+      "outcomes": [
+        "NSÍ Runavík",
+        "FC Lugano"
+      ],
+      "rawPrice": [
+        0.1220809009752192,
+        0.8779190990247808
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.5,
+            0.5
+          ],
+          "confidence": 0.25
+        },
+        "gemini": {
+          "probs": [
+            0.05,
+            0.95
+          ],
+          "confidence": 0.85,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.45,
+      "blendedProbs": [
+        0.29324324324324325,
+        0.7067567567567568
+      ],
+      "confidence": 0.25,
+      "decision": "skip",
+      "outcomeIdx": 0,
+      "edge": 0.17116234226802404,
+      "thresholdUsed": 0.125,
+      "size": null,
+      "execution": null,
+      "skipReason": "models disagree sharply (spread=0.45 >= hard threshold 0.2)"
+    },
+    {
+      "ts": "2026-08-13T05:06:12.864Z",
+      "marketId": "0xa9b716afe262c6ee69eee5979b553c95abead376",
+      "question": "Will a Mamdani non-emergency NYC executive order dated Aug 9-15, 2026 be publicly posted by settlement?",
+      "category": "politics",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.2923835713794823,
+        0.7076164286205177
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.5,
+            0.5
+          ],
+          "confidence": 0.25
+        },
+        "gemini": {
+          "probs": [
+            0.01,
+            0.99
+          ],
+          "confidence": 0.9,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.49,
+      "blendedProbs": [
+        0.2678947368421053,
+        0.7321052631578948
+      ],
+      "confidence": 0.25,
+      "decision": "skip",
+      "outcomeIdx": 1,
+      "edge": 0.024488834537377158,
+      "thresholdUsed": 0.125,
+      "size": null,
+      "execution": null,
+      "skipReason": "models disagree sharply (spread=0.49 >= hard threshold 0.2)"
+    },
+    {
+      "ts": "2026-08-13T05:06:07.926Z",
+      "marketId": "0xb8fcc2c60d686b3978dd002bc20e9a4a5868f5c5",
+      "question": "Will Trump send at least 5 nominations to the US Senate during Aug 9-15, 2026?",
+      "category": "politics",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.254739497826518,
+        0.7452605021734819
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.72,
+            0.28
+          ],
+          "confidence": 0.56
+        },
+        "gemini": {
+          "probs": [
+            0.05,
+            0.95
+          ],
+          "confidence": 0.8,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.6699999999999999,
+      "blendedProbs": [
+        0.4222222222222222,
+        0.5777777777777778
+      ],
+      "confidence": 0.56,
+      "decision": "skip",
+      "outcomeIdx": 0,
+      "edge": 0.16748272439570422,
+      "thresholdUsed": 0.125,
+      "size": null,
+      "execution": null,
+      "skipReason": "models disagree sharply (spread=0.67 >= hard threshold 0.2)"
+    },
+    {
+      "ts": "2026-08-13T05:06:00.139Z",
+      "marketId": "0xb13bc65ea2c2600f74a4634abf55c65deb6d0edc",
+      "question": "Will Wellington Airport (NZWN) hit a daily high of exactly 15°C on Aug 13, 2026 NZST (UTC+12) per Weather Underground?",
+      "category": "miscellaneous",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.7684679572540414,
+        0.23153204274595865
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.03,
+            0.97
+          ],
+          "confidence": 0.62
+        },
+        "gemini": {
+          "probs": [
+            0.03,
+            0.97
+          ],
+          "confidence": 0.85,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0,
+      "blendedProbs": [
+        0.029999999999999995,
+        0.97
+      ],
+      "confidence": 0.62,
+      "decision": "trade",
+      "outcomeIdx": 1,
+      "edge": 0.7384679572540414,
+      "thresholdUsed": 0.125,
+      "size": 121.47678162599573,
+      "execution": {
+        "txHash": "0xdf6855f2c8e61ab539830c8dec6964a252d091baddb2476a19afc264fa07749d",
+        "quotedTokensIn": 58389019,
+        "sharesOut": "229806715598221246464",
+        "priceImpactPct": 0.0974
+      }
+    },
+    {
+      "ts": "2026-08-13T05:05:57.867Z",
+      "marketId": "0xf00cfaf8fc8f84f0a1d6151a5cf466c996901e9f",
+      "question": "Will NSIDC Arctic sea ice extent for 2026-08-12 (UTC) be below 5.88 million km²?",
+      "category": "miscellaneous",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.893259795608582,
+        0.10674020439141796
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.18,
+            0.82
+          ],
+          "confidence": 0.74
+        },
+        "gemini": {
+          "probs": [
+            0.65,
+            0.35
+          ],
+          "confidence": 0.6,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.47000000000000003,
+      "blendedProbs": [
+        0.35625,
+        0.6437499999999999
+      ],
+      "confidence": 0.74,
+      "decision": "skip",
+      "outcomeIdx": 1,
+      "edge": 0.537009795608582,
+      "thresholdUsed": 0.085,
+      "size": null,
+      "execution": null,
+      "skipReason": "models disagree sharply (spread=0.47 >= hard threshold 0.2)"
+    },
+    {
+      "ts": "2026-08-13T05:05:57.841Z",
+      "marketId": "0x260838dea933ec339270a8565cf8601b58a85db2",
+      "question": "Will Take-Two or Rockstar disclose a numeric GTA VI preorder figure by 03:59 UTC on Aug 14, 2026?",
+      "category": "tech",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.15112836432092447,
+        0.8488716356790755
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.18,
+            0.82
+          ],
+          "confidence": 0.56
+        },
+        "gemini": {
+          "probs": [
+            0.08,
+            0.92
+          ],
+          "confidence": 0.85,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.10000000000000009,
+      "blendedProbs": [
+        0.13405405405405407,
+        0.865945945945946
+      ],
+      "confidence": 0.56,
+      "decision": "skip",
+      "outcomeIdx": 1,
+      "edge": 0.01707431026687045,
+      "thresholdUsed": 0.125,
+      "size": null,
+      "execution": null,
+      "skipReason": "bestEdge=0.017 < minEdge=0.13"
+    },
+    {
+      "ts": "2026-08-13T05:05:57.748Z",
+      "marketId": "0x2c178e08f98e5292a344bcb2bb557bedb3902e17",
+      "question": "Will Typhoon Dolphin hit Japan as a Very Strong Typhoon (85-104 kt, JMA 10-min mean) by Aug 16, 2026 09:00 UTC?",
+      "category": "miscellaneous",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.2694223581428743,
+        0.7305776418571258
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.18,
+            0.82
+          ],
+          "confidence": 0.42
+        },
+        "gemini": {
+          "probs": [
+            0.02,
+            0.98
+          ],
+          "confidence": 0.85,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.16000000000000003,
+      "blendedProbs": [
+        0.10648648648648648,
+        0.8935135135135135
+      ],
+      "confidence": 0.42,
+      "decision": "skip",
+      "outcomeIdx": 1,
+      "edge": 0.16293587165638768,
+      "thresholdUsed": 0.185,
+      "size": null,
+      "execution": null,
+      "skipReason": "bestEdge=0.163 < minEdge=0.18"
+    },
+    {
+      "ts": "2026-08-13T05:05:57.341Z",
+      "marketId": "0xa66a47aac290f8dec9c809166fc6cd703966d64b",
+      "question": "Will SpaceX launch the Dragon CRS-35 cargo mission before 00:00 UTC on Aug 14, 2026?",
+      "category": "tech",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.09899830411394907,
+        0.901001695886051
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.18,
+            0.82
+          ],
+          "confidence": 0.42
+        },
+        "gemini": {
+          "probs": [
+            0.05,
+            0.95
+          ],
+          "confidence": 0.8,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.13,
+      "blendedProbs": [
+        0.12222222222222222,
+        0.8777777777777778
+      ],
+      "confidence": 0.42,
+      "decision": "skip",
+      "outcomeIdx": 0,
+      "edge": 0.02322391810827315,
+      "thresholdUsed": 0.125,
+      "size": null,
+      "execution": null,
+      "skipReason": "bestEdge=0.023 < minEdge=0.13"
+    },
+    {
+      "ts": "2026-08-13T05:05:57.303Z",
+      "marketId": "0x9b7e3199c73ca293626ab886d8e1601c33d58ccb",
+      "question": "Will OpenAI publicly release a model named Astra before 03:59 UTC on Aug 14, 2026?",
+      "category": "tech",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.14003065255946487,
+        0.8599693474405352
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.08,
+            0.92
+          ],
+          "confidence": 0.42
+        },
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [
+        0.08,
+        0.92
+      ],
+      "confidence": 0.42,
+      "decision": "skip",
+      "outcomeIdx": 1,
+      "edge": 0.060030652559464825,
+      "thresholdUsed": 0.125,
+      "size": null,
+      "execution": null,
+      "skipReason": "bestEdge=0.060 < minEdge=0.13"
+    },
     {
       "ts": "2026-08-13T05:00:52.011Z",
       "marketId": "0x58831cf8efdd2d9f3154de88dcfc1b094347f03b",
@@ -666,556 +1208,6 @@
       "size": null,
       "execution": null,
       "skipReason": "models disagree sharply (spread=0.35 >= hard threshold 0.2)"
-    },
-    {
-      "ts": "2026-08-13T02:15:59.154Z",
-      "marketId": "0x3ae4d2e7771e29a7b8d165798ed788eec82b62b6",
-      "question": "Will Ilves Tampere beat Rijeka at the end of regulation time in their UEFA Conference League match on Aug 13, 2026?",
-      "category": "sports",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.286616295707556,
-        0.713383704292444
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.34,
-            0.66
-          ],
-          "confidence": 0.52
-        },
-        "gemini": {
-          "probs": [
-            0.35,
-            0.65
-          ],
-          "confidence": 0.4,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.010000000000000009,
-      "blendedProbs": [
-        0.34285714285714286,
-        0.6571428571428573
-      ],
-      "confidence": 0.52,
-      "decision": "skip",
-      "outcomeIdx": 0,
-      "edge": 0.05624084714958688,
-      "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "bestEdge=0.056 < minEdge=0.13"
-    },
-    {
-      "ts": "2026-08-13T02:15:56.190Z",
-      "marketId": "0x76225fe8f2dd1aa4425a6e6f418d9eeab8d319dd",
-      "question": "Will the Jacksonville Jaguars win their Aug 15, 2026 (US Eastern) NFL preseason game by 2+ points?",
-      "category": "sports",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.45677819241277484,
-        0.5432218075872252
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.49,
-            0.51
-          ],
-          "confidence": 0.34
-        },
-        "gemini": null,
-        "polymarket": null
-      },
-      "disagreement": null,
-      "blendedProbs": [
-        0.49,
-        0.51
-      ],
-      "confidence": 0.34,
-      "decision": "skip",
-      "outcomeIdx": 0,
-      "edge": 0.03322180758722515,
-      "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "bestEdge=0.033 < minEdge=0.13"
-    },
-    {
-      "ts": "2026-08-13T02:15:48.574Z",
-      "marketId": "0xb13bc65ea2c2600f74a4634abf55c65deb6d0edc",
-      "question": "Will Wellington Airport (NZWN) hit a daily high of exactly 15°C on Aug 13, 2026 NZST (UTC+12) per Weather Underground?",
-      "category": "miscellaneous",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.23198782946568797,
-        0.768012170534312
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.03,
-            0.97
-          ],
-          "confidence": 0.42
-        },
-        "gemini": {
-          "probs": [
-            0.03,
-            0.97
-          ],
-          "confidence": 0.8,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0,
-      "blendedProbs": [
-        0.03,
-        0.97
-      ],
-      "confidence": 0.42,
-      "decision": "trade",
-      "outcomeIdx": 1,
-      "edge": 0.20198782946568794,
-      "thresholdUsed": 0.125,
-      "size": 1.6855808217516406,
-      "execution": {
-        "txHash": "0x4eee4c9ab6dcc6bbb0017a4ec63d259312a6d3892eb93d8786a97c3b24050d1f",
-        "quotedTokensIn": 1651850,
-        "sharesOut": "2092881308488765440",
-        "priceImpactPct": 0.0277
-      }
-    },
-    {
-      "ts": "2026-08-13T02:15:45.444Z",
-      "marketId": "0x7090dec53161de700627de95344adeb1f2182943",
-      "question": "Will NSÍ Runavík advance past FC Lugano in their 2026–27 UEFA Conference League qualifying tie (2nd leg 13 Aug 2026)?",
-      "category": "sports",
-      "outcomes": [
-        "NSÍ Runavík",
-        "FC Lugano"
-      ],
-      "rawPrice": [
-        0.11463710805062252,
-        0.8853628919493776
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.08,
-            0.92
-          ],
-          "confidence": 0.74
-        },
-        "gemini": {
-          "probs": [
-            0.05,
-            0.95
-          ],
-          "confidence": 0.85,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.03,
-      "blendedProbs": [
-        0.0662162162162162,
-        0.9337837837837838
-      ],
-      "confidence": 0.74,
-      "decision": "skip",
-      "outcomeIdx": 1,
-      "edge": 0.04842089183440623,
-      "thresholdUsed": 0.085,
-      "size": null,
-      "execution": null,
-      "skipReason": "bestEdge=0.048 < minEdge=0.09"
-    },
-    {
-      "ts": "2026-08-13T02:15:39.595Z",
-      "marketId": "0xa9b716afe262c6ee69eee5979b553c95abead376",
-      "question": "Will a Mamdani non-emergency NYC executive order dated Aug 9-15, 2026 be publicly posted by settlement?",
-      "category": "politics",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.35316867945372155,
-        0.6468313205462785
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.18,
-            0.82
-          ],
-          "confidence": 0.42
-        },
-        "gemini": {
-          "probs": [
-            0.01,
-            0.99
-          ],
-          "confidence": 0.9,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.17000000000000004,
-      "blendedProbs": [
-        0.09947368421052633,
-        0.9005263157894736
-      ],
-      "confidence": 0.42,
-      "decision": "trade",
-      "outcomeIdx": 1,
-      "edge": 0.25369499524319516,
-      "thresholdUsed": 0.185,
-      "size": 1.6166840371324118,
-      "execution": {
-        "txHash": "0x1b2fca2ba246cb269e435676383f7026cfd97237309411ba81353d8a9896dae0",
-        "quotedTokensIn": 1603860,
-        "sharesOut": "2499390468239925248",
-        "priceImpactPct": -0.0079
-      }
-    },
-    {
-      "ts": "2026-08-13T02:15:36.282Z",
-      "marketId": "0xb8fcc2c60d686b3978dd002bc20e9a4a5868f5c5",
-      "question": "Will Trump send at least 5 nominations to the US Senate during Aug 9-15, 2026?",
-      "category": "politics",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.32335589129545617,
-        0.6766441087045437
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.72,
-            0.28
-          ],
-          "confidence": 0.58
-        },
-        "gemini": {
-          "probs": [
-            0.05,
-            0.95
-          ],
-          "confidence": 0.8,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.6699999999999999,
-      "blendedProbs": [
-        0.4222222222222222,
-        0.5777777777777778
-      ],
-      "confidence": 0.58,
-      "decision": "skip",
-      "outcomeIdx": 0,
-      "edge": 0.09886633092676606,
-      "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "models disagree sharply (spread=0.67 >= hard threshold 0.2)"
-    },
-    {
-      "ts": "2026-08-13T00:40:02.663Z",
-      "marketId": "0xf00cfaf8fc8f84f0a1d6151a5cf466c996901e9f",
-      "question": "Will NSIDC Arctic sea ice extent for 2026-08-12 (UTC) be below 5.88 million km²?",
-      "category": "miscellaneous",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.8794560071586754,
-        0.1205439928413246
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.22,
-            0.78
-          ],
-          "confidence": 0.72
-        },
-        "gemini": {
-          "probs": [
-            0.65,
-            0.35
-          ],
-          "confidence": 0.65,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.43000000000000005,
-      "blendedProbs": [
-        0.38939393939393935,
-        0.6106060606060606
-      ],
-      "confidence": 0.72,
-      "decision": "skip",
-      "outcomeIdx": 1,
-      "edge": 0.490062067764736,
-      "thresholdUsed": 0.085,
-      "size": null,
-      "execution": null,
-      "skipReason": "models disagree sharply (spread=0.43 >= hard threshold 0.2)"
-    },
-    {
-      "ts": "2026-08-13T00:16:38.639Z",
-      "marketId": "0x260838dea933ec339270a8565cf8601b58a85db2",
-      "question": "Will Take-Two or Rockstar disclose a numeric GTA VI preorder figure by 03:59 UTC on Aug 14, 2026?",
-      "category": "tech",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.15329503713947956,
-        0.8467049628605204
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.5,
-            0.5
-          ],
-          "confidence": 0.25
-        },
-        "gemini": {
-          "probs": [
-            0.08,
-            0.92
-          ],
-          "confidence": 0.8,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.42000000000000004,
-      "blendedProbs": [
-        0.31333333333333335,
-        0.6866666666666668
-      ],
-      "confidence": 0.25,
-      "decision": "skip",
-      "outcomeIdx": 0,
-      "edge": 0.1600382961938538,
-      "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "models disagree sharply (spread=0.42 >= hard threshold 0.2)"
-    },
-    {
-      "ts": "2026-08-13T00:16:28.789Z",
-      "marketId": "0x2c178e08f98e5292a344bcb2bb557bedb3902e17",
-      "question": "Will Typhoon Dolphin hit Japan as a Very Strong Typhoon (85-104 kt, JMA 10-min mean) by Aug 16, 2026 09:00 UTC?",
-      "category": "miscellaneous",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.28799803631577775,
-        0.7120019636842222
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.18,
-            0.82
-          ],
-          "confidence": 0.42
-        },
-        "gemini": {
-          "probs": [
-            0.01,
-            0.99
-          ],
-          "confidence": 0.85,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.17000000000000004,
-      "blendedProbs": [
-        0.1018918918918919,
-        0.8981081081081081
-      ],
-      "confidence": 0.42,
-      "decision": "trade",
-      "outcomeIdx": 1,
-      "edge": 0.18610614442388596,
-      "thresholdUsed": 0.185,
-      "size": 1.2954381442169807,
-      "execution": {
-        "txHash": "0x1919d799f355459a6c338bc71fa55cfcdcc66f14b34b31a2989bfef2465d4d56",
-        "quotedTokensIn": 1269526,
-        "sharesOut": "1773991506245051648",
-        "priceImpactPct": 0.0051
-      }
-    },
-    {
-      "ts": "2026-08-13T00:16:26.123Z",
-      "marketId": "0xa66a47aac290f8dec9c809166fc6cd703966d64b",
-      "question": "Will SpaceX launch the Dragon CRS-35 cargo mission before 00:00 UTC on Aug 14, 2026?",
-      "category": "tech",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.10546697381352929,
-        0.8945330261864707
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.72,
-            0.28
-          ],
-          "confidence": 0.56
-        },
-        "gemini": {
-          "probs": [
-            0.95,
-            0.05
-          ],
-          "confidence": 0.85,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.23000000000000004,
-      "blendedProbs": [
-        0.8256756756756757,
-        0.17432432432432435
-      ],
-      "confidence": 0.56,
-      "decision": "skip",
-      "outcomeIdx": 0,
-      "edge": 0.7202087018621464,
-      "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "models disagree sharply (spread=0.23 >= hard threshold 0.2)"
-    },
-    {
-      "ts": "2026-08-13T00:16:23.042Z",
-      "marketId": "0x9b7e3199c73ca293626ab886d8e1601c33d58ccb",
-      "question": "Will OpenAI publicly release a model named Astra before 03:59 UTC on Aug 14, 2026?",
-      "category": "tech",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.13439770174475624,
-        0.8656022982552438
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.08,
-            0.92
-          ],
-          "confidence": 0.42
-        },
-        "gemini": null,
-        "polymarket": null
-      },
-      "disagreement": null,
-      "blendedProbs": [
-        0.08,
-        0.92
-      ],
-      "confidence": 0.42,
-      "decision": "skip",
-      "outcomeIdx": 1,
-      "edge": 0.05439770174475622,
-      "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "bestEdge=0.054 < minEdge=0.13"
-    },
-    {
-      "ts": "2026-08-13T00:11:01.878Z",
-      "marketId": "0x58831cf8efdd2d9f3154de88dcfc1b094347f03b",
-      "question": "Will Al Ittihad vs Al Kholood (Saudi Pro League) be level at the end of regulation time on Aug 15, 2026 UTC?",
-      "category": "sports",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.3776466429144032,
-        0.6223533570855968
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.27,
-            0.73
-          ],
-          "confidence": 0.58
-        },
-        "gemini": {
-          "probs": [
-            0.12,
-            0.88
-          ],
-          "confidence": 0.8,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.15000000000000002,
-      "blendedProbs": [
-        0.2033333333333333,
-        0.7966666666666667
-      ],
-      "confidence": 0.58,
-      "decision": "skip",
-      "outcomeIdx": 1,
-      "edge": 0.17431330958106994,
-      "thresholdUsed": 0.185,
-      "size": null,
-      "execution": null,
-      "skipReason": "bestEdge=0.174 < minEdge=0.18"
     }
   ]
 }
