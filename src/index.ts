@@ -109,8 +109,8 @@ async function getCycleBudget(dryRun: boolean): Promise<CycleBudget> {
   const humanBalance = Number(rawBalance) / 10 ** decimals;
 
   const openPositions = await getOpenPositions(client);
-  const openExposure = openPositions.reduce((sum, p) => sum + p.size, 0);
-  const available = Math.max(0, humanBalance - openExposure - CONFIG.bankrollReserveTokens);
+  // const openExposure = openPositions.reduce((sum, p) => sum + p.size, 0);
+  const available = Math.max(0, humanBalance - CONFIG.bankrollReserveTokens);
   return { total: available, source: "on-chain" };
 }
 
