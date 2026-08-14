@@ -1,13 +1,13 @@
 {
-  "openMarkets": 12,
-  "evaluated": 12,
-  "traded": 0,
-  "skipped": 12,
+  "openMarkets": 18,
+  "evaluated": 18,
+  "traded": 1,
+  "skipped": 17,
   "errors": [],
   "dryRun": false,
   "running": true,
   "intervalMs": 300000,
-  "nextRunAt": 1786666485804,
-  "startedAt": "2026-08-14T00:09:45.804Z",
-  "updatedAt": "2026-08-14T00:09:45.804Z"
+  "nextRunAt": 1786674602332,
+  "startedAt": "2026-08-14T02:25:02.332Z",
+  "updatedAt": "2026-08-14T02:25:02.332Z"
 }
