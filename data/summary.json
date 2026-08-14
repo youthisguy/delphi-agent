@@ -1,24 +1,24 @@
 {
-  "updatedAt": "2026-08-14T14:00:47.437Z",
-  "totalReceipts": 1397,
-  "totalTrades": 136,
-  "totalSkips": 1261,
+  "updatedAt": "2026-08-14T17:30:18.036Z",
+  "totalReceipts": 1417,
+  "totalTrades": 143,
+  "totalSkips": 1274,
   "rollingAccuracy": {
-    "n": 89,
-    "hitRate": 0.550561797752809
+    "n": 94,
+    "hitRate": 0.574468085106383
   },
   "calibrationByConfidenceBucket": {
+    "low(<0.4)": {
+      "n": 18,
+      "hitRate": 0.7777777777777778
+    },
     "mid(0.4-0.6)": {
-      "n": 28,
-      "hitRate": 0.2857142857142857
+      "n": 30,
+      "hitRate": 0.3333333333333333
     },
     "high(0.6-0.8)": {
       "n": 35,
       "hitRate": 0.5428571428571428
-    },
-    "low(<0.4)": {
-      "n": 15,
-      "hitRate": 0.7333333333333333
     },
     "veryhigh(0.8+)": {
       "n": 11,
@@ -26,20 +26,20 @@
     }
   },
   "perCategory": {
+    "uncategorized": {
+      "n": 2,
+      "hitRate": 1,
+      "trades": 24
+    },
     "miscellaneous": {
       "n": 46,
       "hitRate": 0.2608695652173913,
-      "trades": 63
+      "trades": 64
     },
     "politics": {
       "n": 0,
       "hitRate": null,
       "trades": 8
-    },
-    "uncategorized": {
-      "n": 0,
-      "hitRate": null,
-      "trades": 18
     },
     "sports": {
       "n": 6,
@@ -47,7 +47,7 @@
       "trades": 7
     },
     "tech": {
-      "n": 1,
+      "n": 4,
       "hitRate": 1,
       "trades": 4
     },
@@ -67,23 +67,896 @@
       "trades": 1
     }
   },
-  "openExposureTokens": 1401.2271613350028,
+  "openExposureTokens": 1300.6753474636705,
   "tradePerformance": {
-    "settled": 72,
-    "wins": 49,
+    "settled": 77,
+    "wins": 54,
     "losses": 23,
-    "winRate": 0.6805555555555556,
+    "winRate": 0.7012987012987013,
     "voidTrades": 0,
     "totalPnl": -490.2202,
-    "openTrades": 47
+    "openTrades": 49
   },
   "skipCalibration": {
-    "settled": 860,
-    "wouldHaveWon": 543,
-    "wouldHaveWonRate": 0.6313953488372093,
+    "settled": 1115,
+    "wouldHaveWon": 798,
+    "wouldHaveWonRate": 0.715695067264574,
     "voidSkips": 0
   },
   "lastNDecisions": [
+    {
+      "ts": "2026-08-14T17:30:17.598Z",
+      "marketId": "0xc1a218461bd5170fd216f9ca552c4e83dc7ecb2b",
+      "question": "Will Arsenal and Manchester City both score in the FA Community Shield on 16 August 2026?",
+      "category": "sports",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.5470675525169809,
+        0.4529324474830191
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.58,
+            0.42
+          ],
+          "confidence": 0.56
+        },
+        "gemini": {
+          "probs": [
+            0.62,
+            0.38
+          ],
+          "confidence": 0.4,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.040000000000000036,
+      "blendedProbs": [
+        0.5914285714285714,
+        0.40857142857142864
+      ],
+      "confidence": 0.56,
+      "decision": "skip",
+      "outcomeIdx": 0,
+      "edge": 0.0443610189115905,
+      "thresholdUsed": 0.125,
+      "size": null,
+      "execution": null,
+      "skipReason": "bestEdge=0.044 < minEdge=0.13"
+    },
+    {
+      "ts": "2026-08-14T17:01:26.040Z",
+      "marketId": "0xbded091904a1984e5336972fadfe3c1a9b96c36c",
+      "question": "J1 League: will Kawasaki Frontale vs Kyoto Sanga, kicking off 10:00 UTC on Aug 15, 2026, produce 3+ goals?",
+      "category": "sports",
+      "outcomes": [
+        "Over 2.5 goals (3 or more)",
+        "Under 2.5 goals (2 or fewer)"
+      ],
+      "rawPrice": [
+        0.6147530459755087,
+        0.38524695402449133
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.54,
+            0.46
+          ],
+          "confidence": 0.58
+        },
+        "gemini": {
+          "probs": [
+            0.55,
+            0.45
+          ],
+          "confidence": 0.4,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.010000000000000009,
+      "blendedProbs": [
+        0.5428571428571429,
+        0.4571428571428572
+      ],
+      "confidence": 0.58,
+      "decision": "skip",
+      "outcomeIdx": 1,
+      "edge": 0.07189590311836586,
+      "thresholdUsed": 0.125,
+      "size": null,
+      "execution": null,
+      "skipReason": "bestEdge=0.072 < minEdge=0.13"
+    },
+    {
+      "ts": "2026-08-14T17:01:20.922Z",
+      "marketId": "0x76225fe8f2dd1aa4425a6e6f418d9eeab8d319dd",
+      "question": "Will the Jacksonville Jaguars win their Aug 15, 2026 (US Eastern) NFL preseason game by 2+ points?",
+      "category": "sports",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.5252154974727788,
+        0.4747845025272212
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.52,
+            0.48
+          ],
+          "confidence": 0.42
+        },
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [
+        0.52,
+        0.48
+      ],
+      "confidence": 0.42,
+      "decision": "skip",
+      "outcomeIdx": 1,
+      "edge": 0.005215497472778774,
+      "thresholdUsed": 0.125,
+      "size": null,
+      "execution": null,
+      "skipReason": "bestEdge=0.005 < minEdge=0.13"
+    },
+    {
+      "ts": "2026-08-14T17:01:18.025Z",
+      "marketId": "0x2002482530f0404c466f553a61ca4b0792e12e10",
+      "question": "Will Tesla (TSLA) trade at or below $325.00 during regular hours on Monday Aug 17, 2026?",
+      "category": "finance",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.3841566226892707,
+        0.6158433773107294
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.58,
+            0.42
+          ],
+          "confidence": 0.55
+        },
+        "gemini": {
+          "probs": [
+            0.45,
+            0.55
+          ],
+          "confidence": 0.35,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.13000000000000006,
+      "blendedProbs": [
+        0.5462962962962963,
+        0.4537037037037038
+      ],
+      "confidence": 0.55,
+      "decision": "skip",
+      "outcomeIdx": 0,
+      "edge": 0.16213967360702558,
+      "thresholdUsed": 0.125,
+      "size": null,
+      "execution": null,
+      "skipReason": "sized trade too small (0.622 tokens < 1 token floor; of 4.36 remaining) — price impact isn't worth it at this size"
+    },
+    {
+      "ts": "2026-08-14T17:01:14.414Z",
+      "marketId": "0xdc90c677aee2b74dd060bfa2eff00a27d4d4ca1b",
+      "question": "Will Ethereum's CoinGecko daily close on 2026-08-16 UTC be $1,890 or higher?",
+      "category": "crypto",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.44464750323618246,
+        0.5553524967638175
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.56,
+            0.44
+          ],
+          "confidence": 0.52
+        },
+        "gemini": {
+          "probs": [
+            0.65,
+            0.35
+          ],
+          "confidence": 0.4,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.09000000000000002,
+      "blendedProbs": [
+        0.5857142857142857,
+        0.41428571428571426
+      ],
+      "confidence": 0.52,
+      "decision": "skip",
+      "outcomeIdx": 0,
+      "edge": 0.14106678247810328,
+      "thresholdUsed": 0.125,
+      "size": null,
+      "execution": null,
+      "skipReason": "sized trade too small (0.511 tokens < 1 token floor; of 4.36 remaining) — price impact isn't worth it at this size"
+    },
+    {
+      "ts": "2026-08-14T17:01:10.862Z",
+      "marketId": "0x9face9fff97f8b240e5bf3be24f303742e2c040a",
+      "question": "Will the Federal Register publish 6+ Presidential documents with publication dates Aug 12-18, 2026?",
+      "category": "politics",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.42678561257131226,
+        0.5732143874286878
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.28,
+            0.72
+          ],
+          "confidence": 0.46
+        },
+        "gemini": {
+          "probs": [
+            0.65,
+            0.35
+          ],
+          "confidence": 0.4,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.37,
+      "blendedProbs": [
+        0.3857142857142858,
+        0.6142857142857143
+      ],
+      "confidence": 0.46,
+      "decision": "skip",
+      "outcomeIdx": 1,
+      "edge": 0.041071326857026524,
+      "thresholdUsed": 0.125,
+      "size": null,
+      "execution": null,
+      "skipReason": "models disagree sharply (spread=0.37 >= hard threshold 0.18)"
+    },
+    {
+      "ts": "2026-08-14T17:01:08.146Z",
+      "marketId": "0xacdb060b36b244dd8ccc2d0fceb04a8e04a7e3d2",
+      "question": "Which band will Bitcoin's CoinGecko daily close for 2026-08-17 UTC fall into?",
+      "category": "crypto",
+      "outcomes": [
+        "Below $62,000",
+        "$62,000 to $63,000",
+        "$63,000 to $64,000",
+        "$64,000 or above"
+      ],
+      "rawPrice": [
+        0.3180537567874382,
+        0.2970669627550925,
+        0.19352311035435626,
+        0.1913561701031131
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.18,
+            0.16,
+            0.17,
+            0.49
+          ],
+          "confidence": 0.34
+        },
+        "gemini": {
+          "probs": [
+            0.25,
+            0.25,
+            0.25,
+            0.25
+          ],
+          "confidence": 0.3,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.24,
+      "blendedProbs": [
+        0.19615384615384615,
+        0.18076923076923077,
+        0.18846153846153846,
+        0.43461538461538457
+      ],
+      "confidence": 0.34,
+      "decision": "skip",
+      "outcomeIdx": 3,
+      "edge": 0.24325921451227148,
+      "thresholdUsed": 0.125,
+      "size": null,
+      "execution": null,
+      "skipReason": "models disagree sharply (spread=0.24 >= hard threshold 0.18)"
+    },
+    {
+      "ts": "2026-08-14T17:01:05.145Z",
+      "marketId": "0x58831cf8efdd2d9f3154de88dcfc1b094347f03b",
+      "question": "Will Al Ittihad vs Al Kholood (Saudi Pro League) be level at the end of regulation time on Aug 15, 2026 UTC?",
+      "category": "sports",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.2814721683789859,
+        0.7185278316210142
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.27,
+            0.73
+          ],
+          "confidence": 0.55
+        },
+        "gemini": {
+          "probs": [
+            0.22,
+            0.78
+          ],
+          "confidence": 0.45,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.050000000000000044,
+      "blendedProbs": [
+        0.25448275862068964,
+        0.7455172413793103
+      ],
+      "confidence": 0.55,
+      "decision": "skip",
+      "outcomeIdx": 1,
+      "edge": 0.026989409758296112,
+      "thresholdUsed": 0.125,
+      "size": null,
+      "execution": null,
+      "skipReason": "bestEdge=0.027 < minEdge=0.13"
+    },
+    {
+      "ts": "2026-08-14T17:01:01.145Z",
+      "marketId": "0xdec196c2f18307998991ff30655a62ab97cb6369",
+      "question": "Will Tokyo's highest temperature on Aug 15, 2026 (Japan Standard Time) be above 31.5 °C?",
+      "category": "miscellaneous",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.3383533866824561,
+        0.6616466133175438
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.58,
+            0.42
+          ],
+          "confidence": 0.62
+        },
+        "gemini": {
+          "probs": [
+            0.72,
+            0.28
+          ],
+          "confidence": 0.65,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.14,
+      "blendedProbs": [
+        0.6351515151515152,
+        0.36484848484848487
+      ],
+      "confidence": 0.62,
+      "decision": "skip",
+      "outcomeIdx": null,
+      "edge": 0.2967981284690591,
+      "thresholdUsed": 0.125,
+      "size": null,
+      "execution": null,
+      "skipReason": "live execution declined: insufficient competition-token balance for desired spend"
+    },
+    {
+      "ts": "2026-08-14T15:34:39.386Z",
+      "marketId": "0xdec196c2f18307998991ff30655a62ab97cb6369",
+      "question": "Will Tokyo's highest temperature on Aug 15, 2026 (Japan Standard Time) be above 31.5 °C?",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.5,
+        0.7375635323275278
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": null,
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [
+        0,
+        1
+      ],
+      "confidence": 0,
+      "decision": "trade",
+      "outcomeIdx": 1,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": 2.939918,
+      "execution": {
+        "txHash": "0x652673713ab0af46d4fd4d7d0a42c01500734bdc0418963eccfa57a31ea303ec",
+        "quotedTokensIn": 2.939918,
+        "sharesOut": "3961941337173950464",
+        "priceImpactPct": 0.006068938791156385
+      },
+      "skipReason": "manual buy via dashboard"
+    },
+    {
+      "ts": "2026-08-14T15:34:06.569Z",
+      "marketId": "0xdec196c2f18307998991ff30655a62ab97cb6369",
+      "question": "Will Tokyo's highest temperature on Aug 15, 2026 (Japan Standard Time) be above 31.5 °C?",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.5,
+        0.7550263260304519
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": null,
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [
+        0,
+        1
+      ],
+      "confidence": 0,
+      "decision": "trade",
+      "outcomeIdx": 1,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": 2.939925,
+      "execution": {
+        "txHash": "0x98575b23ad1d26f6fb6ebb9446b9550b707251c5f40ad9f8adf3d4c05580cba7",
+        "quotedTokensIn": 2.939925,
+        "sharesOut": "3870669619393090560",
+        "priceImpactPct": 0.00597700333333342
+      },
+      "skipReason": "manual buy via dashboard"
+    },
+    {
+      "ts": "2026-08-14T15:33:10.260Z",
+      "marketId": "0xdec196c2f18307998991ff30655a62ab97cb6369",
+      "question": "Will Tokyo's highest temperature on Aug 15, 2026 (Japan Standard Time) be above 31.5 °C?",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.5,
+        0.7535889190916585
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": null,
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [
+        0,
+        1
+      ],
+      "confidence": 0,
+      "decision": "trade",
+      "outcomeIdx": 1,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": 2.939926,
+      "execution": {
+        "txHash": "0xaa5a086d927aa1e25c5faa7546a24b0b2f648d6ed864275103b16fde965f6c2c",
+        "quotedTokensIn": 2.939926,
+        "sharesOut": "3878024324201669120",
+        "priceImpactPct": 0.005984678659864018
+      },
+      "skipReason": "manual buy via dashboard"
+    },
+    {
+      "ts": "2026-08-14T15:32:51.190Z",
+      "marketId": "0xdec196c2f18307998991ff30655a62ab97cb6369",
+      "question": "Will Tokyo's highest temperature on Aug 15, 2026 (Japan Standard Time) be above 31.5 °C?",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.5,
+        0.752143078296495
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": null,
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [
+        0,
+        1
+      ],
+      "confidence": 0,
+      "decision": "trade",
+      "outcomeIdx": 1,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": 2.939925,
+      "execution": {
+        "txHash": "0x7b71426d9aa7ef0e6ab71baf93ee5874c3321db1068d5670de426840172d683d",
+        "quotedTokensIn": 2.939925,
+        "sharesOut": "3885449420052750848",
+        "priceImpactPct": 0.0059920029506803285
+      },
+      "skipReason": "manual buy via dashboard"
+    },
+    {
+      "ts": "2026-08-14T15:24:09.774Z",
+      "marketId": "0xdcaabdc8f3e4eef25a4ffac567d118d8ab0a3081",
+      "question": "Will at least 5 magnitude 4.5+ earthquakes occur worldwide from 12:00 to 20:00 UTC on Aug 16, 2026?",
+      "category": "miscellaneous",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.6327270637367465,
+        0.3672729362632535
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.5,
+            0.5
+          ],
+          "confidence": 0.25
+        },
+        "gemini": {
+          "probs": [
+            0.75,
+            0.25
+          ],
+          "confidence": 0.8,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.25,
+      "blendedProbs": [
+        0.6111111111111112,
+        0.38888888888888884
+      ],
+      "confidence": 0.25,
+      "decision": "skip",
+      "outcomeIdx": 1,
+      "edge": 0.021615952625635315,
+      "thresholdUsed": 0.125,
+      "size": null,
+      "execution": null,
+      "skipReason": "models disagree sharply (spread=0.25 >= hard threshold 0.18)"
+    },
+    {
+      "ts": "2026-08-14T15:24:01.848Z",
+      "marketId": "0xb4ded804c9a64fb142313ca171f7c2dfa97baefe",
+      "question": "Will Mississippi River discharge at Baton Rouge at 12:00 UTC on Aug 16, 2026 be below 220,000 cfs?",
+      "category": "miscellaneous",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.1915152963747896,
+        0.8084847036252104
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.72,
+            0.28
+          ],
+          "confidence": 0.58
+        },
+        "gemini": {
+          "probs": [
+            0.65,
+            0.35
+          ],
+          "confidence": 0.4,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.06999999999999995,
+      "blendedProbs": [
+        0.7000000000000001,
+        0.30000000000000004
+      ],
+      "confidence": 0.58,
+      "decision": "trade",
+      "outcomeIdx": 0,
+      "edge": 0.5084847036252105,
+      "thresholdUsed": 0.125,
+      "size": 5.517071140337357,
+      "execution": {
+        "txHash": "0x7ff22ee1a25578ebd3db1e6b18601674c865cd8d3ddac2eb8d190d8c8b9319dd",
+        "quotedTokensIn": 5405368,
+        "sharesOut": "27872912923436228608",
+        "priceImpactPct": 0.0126
+      }
+    },
+    {
+      "ts": "2026-08-14T15:23:58.649Z",
+      "marketId": "0xa9b716afe262c6ee69eee5979b553c95abead376",
+      "question": "Will a Mamdani non-emergency NYC executive order dated Aug 9-15, 2026 be publicly posted by settlement?",
+      "category": "politics",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.09827364741869501,
+        0.901726352581305
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.18,
+            0.82
+          ],
+          "confidence": 0.42
+        },
+        "gemini": {
+          "probs": [
+            0.01,
+            0.99
+          ],
+          "confidence": 0.9,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.17000000000000004,
+      "blendedProbs": [
+        0.09947368421052633,
+        0.9005263157894736
+      ],
+      "confidence": 0.42,
+      "decision": "skip",
+      "outcomeIdx": 0,
+      "edge": 0.0012000367918313104,
+      "thresholdUsed": 0.185,
+      "size": null,
+      "execution": null,
+      "skipReason": "bestEdge=0.001 < minEdge=0.18"
+    },
+    {
+      "ts": "2026-08-14T15:23:55.028Z",
+      "marketId": "0xb8fcc2c60d686b3978dd002bc20e9a4a5868f5c5",
+      "question": "Will Trump send at least 5 nominations to the US Senate during Aug 9-15, 2026?",
+      "category": "politics",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.18647122837410823,
+        0.8135287716258918
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.72,
+            0.28
+          ],
+          "confidence": 0.58
+        },
+        "gemini": {
+          "probs": [
+            0.05,
+            0.95
+          ],
+          "confidence": 0.8,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.6699999999999999,
+      "blendedProbs": [
+        0.4222222222222222,
+        0.5777777777777778
+      ],
+      "confidence": 0.58,
+      "decision": "skip",
+      "outcomeIdx": 0,
+      "edge": 0.235750993848114,
+      "thresholdUsed": 0.125,
+      "size": null,
+      "execution": null,
+      "skipReason": "models disagree sharply (spread=0.67 >= hard threshold 0.18)"
+    },
+    {
+      "ts": "2026-08-14T15:23:52.112Z",
+      "marketId": "0x2c178e08f98e5292a344bcb2bb557bedb3902e17",
+      "question": "Will Typhoon Dolphin hit Japan as a Very Strong Typhoon (85-104 kt, JMA 10-min mean) by Aug 16, 2026 09:00 UTC?",
+      "category": "miscellaneous",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.2378720547812969,
+        0.7621279452187031
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.18,
+            0.82
+          ],
+          "confidence": 0.42
+        },
+        "gemini": {
+          "probs": [
+            0.01,
+            0.99
+          ],
+          "confidence": 0.85,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.17000000000000004,
+      "blendedProbs": [
+        0.1018918918918919,
+        0.8981081081081081
+      ],
+      "confidence": 0.42,
+      "decision": "skip",
+      "outcomeIdx": 1,
+      "edge": 0.13598016288940507,
+      "thresholdUsed": 0.185,
+      "size": null,
+      "execution": null,
+      "skipReason": "bestEdge=0.136 < minEdge=0.18"
+    },
+    {
+      "ts": "2026-08-14T15:23:48.035Z",
+      "marketId": "0xdec196c2f18307998991ff30655a62ab97cb6369",
+      "question": "Will Tokyo's highest temperature on Aug 15, 2026 (Japan Standard Time) be above 31.5 °C?",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.5,
+        0.6596613222447789
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": null,
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [
+        0,
+        1
+      ],
+      "confidence": 0,
+      "decision": "trade",
+      "outcomeIdx": 1,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": 2.939881,
+      "execution": {
+        "txHash": "0x65ec17935b4d6da0859cc1184a777c555eecc38928bae3cd715472f1b3d94cd7",
+        "quotedTokensIn": 2.939881,
+        "sharesOut": "4427701147968710144",
+        "priceImpactPct": 0.006538590836507861
+      },
+      "skipReason": "manual buy via dashboard"
+    },
+    {
+      "ts": "2026-08-14T15:23:07.438Z",
+      "marketId": "0xdec196c2f18307998991ff30655a62ab97cb6369",
+      "question": "Will Tokyo's highest temperature on Aug 15, 2026 (Japan Standard Time) be above 31.5 °C?",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.5,
+        0.6576643834721102
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": null,
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [
+        0,
+        1
+      ],
+      "confidence": 0,
+      "decision": "trade",
+      "outcomeIdx": 1,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": 2.939879,
+      "execution": {
+        "txHash": "0xdc47dad48600f2f6b6b16576cb584e635c0deb6c5640bbbd6949cb5edfe0659f",
+        "quotedTokensIn": 2.939879,
+        "sharesOut": "4441083695654780416",
+        "priceImpactPct": 0.0065519055124716305
+      },
+      "skipReason": "manual buy via dashboard"
+    },
     {
       "ts": "2026-08-14T14:00:47.332Z",
       "marketId": "0xc1a218461bd5170fd216f9ca552c4e83dc7ecb2b",
@@ -306,963 +1179,6 @@
       "size": null,
       "execution": null,
       "skipReason": "bestEdge=0.085 < minEdge=0.13"
-    },
-    {
-      "ts": "2026-08-14T13:31:36.291Z",
-      "marketId": "0xdec196c2f18307998991ff30655a62ab97cb6369",
-      "question": "Will Tokyo's highest temperature on Aug 15, 2026 (Japan Standard Time) be above 31.5 °C?",
-      "category": "miscellaneous",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.22539151905223673,
-        0.7746084809477632
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.58,
-            0.42
-          ],
-          "confidence": 0.55
-        },
-        "gemini": {
-          "probs": [
-            0.68,
-            0.32
-          ],
-          "confidence": 0.45,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.10000000000000009,
-      "blendedProbs": [
-        0.6110344827586207,
-        0.38896551724137934
-      ],
-      "confidence": 0.55,
-      "decision": "trade",
-      "outcomeIdx": 0,
-      "edge": 0.38564296370638396,
-      "thresholdUsed": 0.125,
-      "size": 1.9359791917376792,
-      "execution": {
-        "txHash": "0x3c87683473b6ea55a917f625ec3c139739554f7f2f8483c575426fd2de75bff1",
-        "quotedTokensIn": 1271941,
-        "sharesOut": "8589405670090882048",
-        "priceImpactPct": -0.343
-      }
-    },
-    {
-      "ts": "2026-08-14T13:31:33.828Z",
-      "marketId": "0x58831cf8efdd2d9f3154de88dcfc1b094347f03b",
-      "question": "Will Al Ittihad vs Al Kholood (Saudi Pro League) be level at the end of regulation time on Aug 15, 2026 UTC?",
-      "category": "sports",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.33736734709875804,
-        0.662632652901242
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.27,
-            0.73
-          ],
-          "confidence": 0.62
-        },
-        "gemini": {
-          "probs": [
-            0.22,
-            0.78
-          ],
-          "confidence": 0.4,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.050000000000000044,
-      "blendedProbs": [
-        0.2557142857142858,
-        0.7442857142857143
-      ],
-      "confidence": 0.62,
-      "decision": "skip",
-      "outcomeIdx": 1,
-      "edge": 0.08165306138447237,
-      "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "bestEdge=0.082 < minEdge=0.13"
-    },
-    {
-      "ts": "2026-08-14T13:31:31.400Z",
-      "marketId": "0x9face9fff97f8b240e5bf3be24f303742e2c040a",
-      "question": "Will the Federal Register publish 6+ Presidential documents with publication dates Aug 12-18, 2026?",
-      "category": "politics",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.39097577691069907,
-        0.609024223089301
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.58,
-            0.42
-          ],
-          "confidence": 0.46
-        },
-        "gemini": {
-          "probs": [
-            0.65,
-            0.35
-          ],
-          "confidence": 0.4,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.07000000000000006,
-      "blendedProbs": [
-        0.6,
-        0.39999999999999997
-      ],
-      "confidence": 0.46,
-      "decision": "skip",
-      "outcomeIdx": 0,
-      "edge": 0.2090242230893009,
-      "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "sized trade too small (0.878 tokens < 1 token floor; of 5.70 remaining) — price impact isn't worth it at this size"
-    },
-    {
-      "ts": "2026-08-14T13:31:26.923Z",
-      "marketId": "0xacdb060b36b244dd8ccc2d0fceb04a8e04a7e3d2",
-      "question": "Which band will Bitcoin's CoinGecko daily close for 2026-08-17 UTC fall into?",
-      "category": "crypto",
-      "outcomes": [
-        "Below $62,000",
-        "$62,000 to $63,000",
-        "$63,000 to $64,000",
-        "$64,000 or above"
-      ],
-      "rawPrice": [
-        0.23881056477303744,
-        0.28318772539886183,
-        0.22838499578542537,
-        0.24961671404267535
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.02,
-            0.03,
-            0.05,
-            0.9
-          ],
-          "confidence": 0.58
-        },
-        "gemini": {
-          "probs": [
-            0.25,
-            0.25,
-            0.25,
-            0.25
-          ],
-          "confidence": 0.3,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.65,
-      "blendedProbs": [
-        0.07307692307692308,
-        0.08076923076923076,
-        0.09615384615384615,
-        0.75
-      ],
-      "confidence": 0.58,
-      "decision": "skip",
-      "outcomeIdx": 3,
-      "edge": 0.5003832859573246,
-      "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "models disagree sharply (spread=0.65 >= hard threshold 0.18)"
-    },
-    {
-      "ts": "2026-08-14T11:48:32.987Z",
-      "marketId": "0xdcaabdc8f3e4eef25a4ffac567d118d8ab0a3081",
-      "question": "Will at least 5 magnitude 4.5+ earthquakes occur worldwide from 12:00 to 20:00 UTC on Aug 16, 2026?",
-      "category": "miscellaneous",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.6428301149960475,
-        0.3571698850039525
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.5,
-            0.5
-          ],
-          "confidence": 0.25
-        },
-        "gemini": {
-          "probs": [
-            0.72,
-            0.28
-          ],
-          "confidence": 0.8,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.21999999999999997,
-      "blendedProbs": [
-        0.5977777777777779,
-        0.4022222222222222
-      ],
-      "confidence": 0.25,
-      "decision": "skip",
-      "outcomeIdx": 1,
-      "edge": 0.04505233721826968,
-      "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "models disagree sharply (spread=0.22 >= hard threshold 0.18)"
-    },
-    {
-      "ts": "2026-08-14T11:48:22.913Z",
-      "marketId": "0xb4ded804c9a64fb142313ca171f7c2dfa97baefe",
-      "question": "Will Mississippi River discharge at Baton Rouge at 12:00 UTC on Aug 16, 2026 be below 220,000 cfs?",
-      "category": "miscellaneous",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.23673017375711677,
-        0.7632698262428832
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.72,
-            0.28
-          ],
-          "confidence": 0.58
-        },
-        "gemini": {
-          "probs": [
-            0.65,
-            0.35
-          ],
-          "confidence": 0.4,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.06999999999999995,
-      "blendedProbs": [
-        0.7000000000000001,
-        0.30000000000000004
-      ],
-      "confidence": 0.58,
-      "decision": "trade",
-      "outcomeIdx": 0,
-      "edge": 0.46326982624288326,
-      "thresholdUsed": 0.125,
-      "size": 4.302040750752758,
-      "execution": {
-        "txHash": "0xd25a2b8551c226ecdf0a4561c3e424f86ceedb64c0dd281cf0e5cda72a35fac2",
-        "quotedTokensIn": 4215427,
-        "sharesOut": "17638526417209047040",
-        "priceImpactPct": 0.0095
-      }
-    },
-    {
-      "ts": "2026-08-14T11:48:20.033Z",
-      "marketId": "0xa9b716afe262c6ee69eee5979b553c95abead376",
-      "question": "Will a Mamdani non-emergency NYC executive order dated Aug 9-15, 2026 be publicly posted by settlement?",
-      "category": "politics",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.19616255305968475,
-        0.8038374469403152
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.18,
-            0.82
-          ],
-          "confidence": 0.42
-        },
-        "gemini": {
-          "probs": [
-            0.01,
-            0.99
-          ],
-          "confidence": 0.9,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.17000000000000004,
-      "blendedProbs": [
-        0.09947368421052633,
-        0.9005263157894736
-      ],
-      "confidence": 0.42,
-      "decision": "skip",
-      "outcomeIdx": 1,
-      "edge": 0.0966888688491584,
-      "thresholdUsed": 0.185,
-      "size": null,
-      "execution": null,
-      "skipReason": "bestEdge=0.097 < minEdge=0.18"
-    },
-    {
-      "ts": "2026-08-14T11:48:17.021Z",
-      "marketId": "0xb8fcc2c60d686b3978dd002bc20e9a4a5868f5c5",
-      "question": "Will Trump send at least 5 nominations to the US Senate during Aug 9-15, 2026?",
-      "category": "politics",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.20501998569392355,
-        0.7949800143060765
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.72,
-            0.28
-          ],
-          "confidence": 0.58
-        },
-        "gemini": {
-          "probs": [
-            0.05,
-            0.95
-          ],
-          "confidence": 0.8,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.6699999999999999,
-      "blendedProbs": [
-        0.4222222222222222,
-        0.5777777777777778
-      ],
-      "confidence": 0.58,
-      "decision": "skip",
-      "outcomeIdx": 0,
-      "edge": 0.21720223652829868,
-      "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "models disagree sharply (spread=0.67 >= hard threshold 0.18)"
-    },
-    {
-      "ts": "2026-08-14T11:48:13.835Z",
-      "marketId": "0x2c178e08f98e5292a344bcb2bb557bedb3902e17",
-      "question": "Will Typhoon Dolphin hit Japan as a Very Strong Typhoon (85-104 kt, JMA 10-min mean) by Aug 16, 2026 09:00 UTC?",
-      "category": "miscellaneous",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.2382947547867044,
-        0.7617052452132956
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.18,
-            0.82
-          ],
-          "confidence": 0.34
-        },
-        "gemini": {
-          "probs": [
-            0.01,
-            0.99
-          ],
-          "confidence": 0.85,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.17000000000000004,
-      "blendedProbs": [
-        0.1018918918918919,
-        0.8981081081081081
-      ],
-      "confidence": 0.34,
-      "decision": "skip",
-      "outcomeIdx": 1,
-      "edge": 0.13640286289481252,
-      "thresholdUsed": 0.185,
-      "size": null,
-      "execution": null,
-      "skipReason": "bestEdge=0.136 < minEdge=0.18"
-    },
-    {
-      "ts": "2026-08-14T09:33:42.256Z",
-      "marketId": "0x2002482530f0404c466f553a61ca4b0792e12e10",
-      "question": "Will Tesla (TSLA) trade at or below $325.00 during regular hours on Monday Aug 17, 2026?",
-      "category": "finance",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.505697574173224,
-        0.4943024258267759
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.5,
-            0.5
-          ],
-          "confidence": 0.25
-        },
-        "gemini": {
-          "probs": [
-            0.35,
-            0.65
-          ],
-          "confidence": 0.4,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.15000000000000002,
-      "blendedProbs": [
-        0.4571428571428572,
-        0.5428571428571429
-      ],
-      "confidence": 0.25,
-      "decision": "skip",
-      "outcomeIdx": 1,
-      "edge": 0.04855471703036701,
-      "thresholdUsed": 0.185,
-      "size": null,
-      "execution": null,
-      "skipReason": "bestEdge=0.049 < minEdge=0.18"
-    },
-    {
-      "ts": "2026-08-14T09:33:37.238Z",
-      "marketId": "0xbded091904a1984e5336972fadfe3c1a9b96c36c",
-      "question": "J1 League: will Kawasaki Frontale vs Kyoto Sanga, kicking off 10:00 UTC on Aug 15, 2026, produce 3+ goals?",
-      "category": "sports",
-      "outcomes": [
-        "Over 2.5 goals (3 or more)",
-        "Under 2.5 goals (2 or fewer)"
-      ],
-      "rawPrice": [
-        0.5177036957102449,
-        0.48229630428975506
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.56,
-            0.44
-          ],
-          "confidence": 0.58
-        },
-        "gemini": {
-          "probs": [
-            0.55,
-            0.45
-          ],
-          "confidence": 0.4,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.010000000000000009,
-      "blendedProbs": [
-        0.5571428571428572,
-        0.4428571428571429
-      ],
-      "confidence": 0.58,
-      "decision": "skip",
-      "outcomeIdx": 0,
-      "edge": 0.03943916143261228,
-      "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "bestEdge=0.039 < minEdge=0.13"
-    },
-    {
-      "ts": "2026-08-14T09:33:34.191Z",
-      "marketId": "0xc1a218461bd5170fd216f9ca552c4e83dc7ecb2b",
-      "question": "Will Arsenal and Manchester City both score in the FA Community Shield on 16 August 2026?",
-      "category": "sports",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.5463511178545886,
-        0.45364888214541144
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.58,
-            0.42
-          ],
-          "confidence": 0.56
-        },
-        "gemini": {
-          "probs": [
-            0.58,
-            0.42
-          ],
-          "confidence": 0.4,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0,
-      "blendedProbs": [
-        0.58,
-        0.42
-      ],
-      "confidence": 0.56,
-      "decision": "skip",
-      "outcomeIdx": 0,
-      "edge": 0.033648882145411396,
-      "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "bestEdge=0.034 < minEdge=0.13"
-    },
-    {
-      "ts": "2026-08-14T09:33:26.599Z",
-      "marketId": "0xdec196c2f18307998991ff30655a62ab97cb6369",
-      "question": "Will Tokyo's highest temperature on Aug 15, 2026 (Japan Standard Time) be above 31.5 °C?",
-      "category": "miscellaneous",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.2758048147593672,
-        0.7241951852406329
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.58,
-            0.42
-          ],
-          "confidence": 0.56
-        },
-        "gemini": {
-          "probs": [
-            0.72,
-            0.28
-          ],
-          "confidence": 0.65,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.14,
-      "blendedProbs": [
-        0.6351515151515152,
-        0.36484848484848487
-      ],
-      "confidence": 0.56,
-      "decision": "trade",
-      "outcomeIdx": 0,
-      "edge": 0.35934670039214806,
-      "thresholdUsed": 0.125,
-      "size": 1.5790220192628612,
-      "execution": {
-        "txHash": "0xc76bd6abe4e1a89d839ef83f8420f62f1280f8f48082d5542339286894805a55",
-        "quotedTokensIn": 1547272,
-        "sharesOut": "5574012486167905280",
-        "priceImpactPct": 0.0065
-      }
-    },
-    {
-      "ts": "2026-08-14T09:33:23.045Z",
-      "marketId": "0xdc90c677aee2b74dd060bfa2eff00a27d4d4ca1b",
-      "question": "Will Ethereum's CoinGecko daily close on 2026-08-16 UTC be $1,890 or higher?",
-      "category": "crypto",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.4774440752678439,
-        0.5225559247321561
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.58,
-            0.42
-          ],
-          "confidence": 0.46
-        },
-        "gemini": {
-          "probs": [
-            0.55,
-            0.45
-          ],
-          "confidence": 0.35,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.030000000000000027,
-      "blendedProbs": [
-        0.5722222222222222,
-        0.42777777777777776
-      ],
-      "confidence": 0.46,
-      "decision": "skip",
-      "outcomeIdx": 0,
-      "edge": 0.0947781469543783,
-      "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "bestEdge=0.095 < minEdge=0.13"
-    },
-    {
-      "ts": "2026-08-14T09:33:20.809Z",
-      "marketId": "0x76225fe8f2dd1aa4425a6e6f418d9eeab8d319dd",
-      "question": "Will the Jacksonville Jaguars win their Aug 15, 2026 (US Eastern) NFL preseason game by 2+ points?",
-      "category": "sports",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.520570622840582,
-        0.47942937715941797
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.49,
-            0.51
-          ],
-          "confidence": 0.34
-        },
-        "gemini": null,
-        "polymarket": null
-      },
-      "disagreement": null,
-      "blendedProbs": [
-        0.49,
-        0.51
-      ],
-      "confidence": 0.34,
-      "decision": "skip",
-      "outcomeIdx": 1,
-      "edge": 0.03057062284058204,
-      "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "bestEdge=0.031 < minEdge=0.13"
-    },
-    {
-      "ts": "2026-08-14T07:55:34.221Z",
-      "marketId": "0xdcaabdc8f3e4eef25a4ffac567d118d8ab0a3081",
-      "question": "Will at least 5 magnitude 4.5+ earthquakes occur worldwide from 12:00 to 20:00 UTC on Aug 16, 2026?",
-      "category": "miscellaneous",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.5805456911585141,
-        0.419454308841486
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.78,
-            0.22
-          ],
-          "confidence": 0.74
-        },
-        "gemini": {
-          "probs": [
-            0.72,
-            0.28
-          ],
-          "confidence": 0.8,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.06000000000000005,
-      "blendedProbs": [
-        0.7533333333333333,
-        0.24666666666666673
-      ],
-      "confidence": 0.74,
-      "decision": "trade",
-      "outcomeIdx": 0,
-      "edge": 0.17278764217481923,
-      "thresholdUsed": 0.085,
-      "size": 2.1103474668479762,
-      "execution": {
-        "txHash": "0x1b1160e77e67e20a37b07a47e88efd87eebe8fbd79770fb4d71d1ebfbebda867",
-        "quotedTokensIn": 2068094,
-        "sharesOut": "3472268737011161600",
-        "priceImpactPct": 0.0259
-      }
-    },
-    {
-      "ts": "2026-08-14T07:55:27.321Z",
-      "marketId": "0x9face9fff97f8b240e5bf3be24f303742e2c040a",
-      "question": "Will the Federal Register publish 6+ Presidential documents with publication dates Aug 12-18, 2026?",
-      "category": "politics",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.4242607570228626,
-        0.5757392429771374
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.72,
-            0.28
-          ],
-          "confidence": 0.54
-        },
-        "gemini": {
-          "probs": [
-            0.65,
-            0.35
-          ],
-          "confidence": 0.4,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.06999999999999995,
-      "blendedProbs": [
-        0.7000000000000001,
-        0.30000000000000004
-      ],
-      "confidence": 0.54,
-      "decision": "trade",
-      "outcomeIdx": 0,
-      "edge": 0.2757392429771375,
-      "thresholdUsed": 0.125,
-      "size": 2.1937741707055602,
-      "execution": {
-        "txHash": "0x17e6e735cb9f25b5fac91c40c8ce68920d764490d93a0bfb9432ff8072818ae1",
-        "quotedTokensIn": 2164290,
-        "sharesOut": "5170815670296232960",
-        "priceImpactPct": -0.0134
-      }
-    },
-    {
-      "ts": "2026-08-14T07:55:24.631Z",
-      "marketId": "0xacdb060b36b244dd8ccc2d0fceb04a8e04a7e3d2",
-      "question": "Which band will Bitcoin's CoinGecko daily close for 2026-08-17 UTC fall into?",
-      "category": "crypto",
-      "outcomes": [
-        "Below $62,000",
-        "$62,000 to $63,000",
-        "$63,000 to $64,000",
-        "$64,000 or above"
-      ],
-      "rawPrice": [
-        0.18300331325709757,
-        0.21065914065587443,
-        0.3046501730305619,
-        0.3016873730564661
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.25,
-            0.25,
-            0.25,
-            0.25
-          ],
-          "confidence": 0.25
-        },
-        "gemini": {
-          "probs": [
-            0.25,
-            0.25,
-            0.25,
-            0.25
-          ],
-          "confidence": 0.3,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0,
-      "blendedProbs": [
-        0.25,
-        0.25,
-        0.25,
-        0.25
-      ],
-      "confidence": 0.25,
-      "decision": "skip",
-      "outcomeIdx": 0,
-      "edge": 0.06699668674290243,
-      "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "bestEdge=0.067 < minEdge=0.13"
-    },
-    {
-      "ts": "2026-08-14T07:55:14.291Z",
-      "marketId": "0xb4ded804c9a64fb142313ca171f7c2dfa97baefe",
-      "question": "Will Mississippi River discharge at Baton Rouge at 12:00 UTC on Aug 16, 2026 be below 220,000 cfs?",
-      "category": "miscellaneous",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.2702710793444757,
-        0.7297289206555242
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.72,
-            0.28
-          ],
-          "confidence": 0.58
-        },
-        "gemini": {
-          "probs": [
-            0.65,
-            0.35
-          ],
-          "confidence": 0.4,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.06999999999999995,
-      "blendedProbs": [
-        0.7000000000000001,
-        0.30000000000000004
-      ],
-      "confidence": 0.58,
-      "decision": "trade",
-      "outcomeIdx": 0,
-      "edge": 0.42972892065552437,
-      "thresholdUsed": 0.125,
-      "size": 6.107940988701478,
-      "execution": {
-        "txHash": "0x16985e562b5547cdf27f943ad8162490ef59b55e6d160a29ab24daccf689fa69",
-        "quotedTokensIn": 5942860,
-        "sharesOut": "22599314005463986176",
-        "priceImpactPct": -0.027
-      }
-    },
-    {
-      "ts": "2026-08-14T07:55:11.278Z",
-      "marketId": "0x58831cf8efdd2d9f3154de88dcfc1b094347f03b",
-      "question": "Will Al Ittihad vs Al Kholood (Saudi Pro League) be level at the end of regulation time on Aug 15, 2026 UTC?",
-      "category": "sports",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.3025600918789308,
-        0.6974399081210692
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.27,
-            0.73
-          ],
-          "confidence": 0.58
-        },
-        "gemini": {
-          "probs": [
-            0.22,
-            0.78
-          ],
-          "confidence": 0.4,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.050000000000000044,
-      "blendedProbs": [
-        0.2557142857142858,
-        0.7442857142857143
-      ],
-      "confidence": 0.58,
-      "decision": "skip",
-      "outcomeIdx": 1,
-      "edge": 0.046845806164645176,
-      "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "bestEdge=0.047 < minEdge=0.13"
     }
   ]
 }
