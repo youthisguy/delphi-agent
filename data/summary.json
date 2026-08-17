@@ -1,24 +1,24 @@
 {
-  "updatedAt": "2026-08-16T21:07:22.685Z",
-  "totalReceipts": 1447,
-  "totalTrades": 151,
-  "totalSkips": 1296,
+  "updatedAt": "2026-08-17T04:35:17.225Z",
+  "totalReceipts": 1478,
+  "totalTrades": 174,
+  "totalSkips": 1304,
   "rollingAccuracy": {
-    "n": 126,
-    "hitRate": 0.5317460317460317
+    "n": 146,
+    "hitRate": 0.5068493150684932
   },
   "calibrationByConfidenceBucket": {
-    "mid(0.4-0.6)": {
-      "n": 39,
-      "hitRate": 0.41025641025641024
-    },
     "low(<0.4)": {
-      "n": 41,
-      "hitRate": 0.5121951219512195
+      "n": 49,
+      "hitRate": 0.4489795918367347
+    },
+    "mid(0.4-0.6)": {
+      "n": 50,
+      "hitRate": 0.44
     },
     "high(0.6-0.8)": {
-      "n": 35,
-      "hitRate": 0.5428571428571428
+      "n": 36,
+      "hitRate": 0.5277777777777778
     },
     "veryhigh(0.8+)": {
       "n": 11,
@@ -26,30 +26,30 @@
     }
   },
   "perCategory": {
+    "miscellaneous": {
+      "n": 65,
+      "hitRate": 0.35384615384615387,
+      "trades": 66
+    },
+    "uncategorized": {
+      "n": 27,
+      "hitRate": 0.14814814814814814,
+      "trades": 49
+    },
     "finance": {
       "n": 0,
       "hitRate": null,
       "trades": 1
     },
     "politics": {
-      "n": 0,
-      "hitRate": null,
+      "n": 7,
+      "hitRate": 1,
       "trades": 10
     },
     "crypto": {
       "n": 1,
       "hitRate": 0,
       "trades": 2
-    },
-    "uncategorized": {
-      "n": 20,
-      "hitRate": 0.2,
-      "trades": 27
-    },
-    "miscellaneous": {
-      "n": 59,
-      "hitRate": 0.3898305084745763,
-      "trades": 65
     },
     "sports": {
       "n": 7,
@@ -72,25 +72,25 @@
       "trades": 1
     }
   },
-  "openExposureTokens": 458.13472209356866,
+  "openExposureTokens": 1663.1994270092907,
   "tradePerformance": {
-    "settled": 109,
-    "wins": 67,
-    "losses": 42,
-    "winRate": 0.6146788990825688,
+    "settled": 129,
+    "wins": 74,
+    "losses": 55,
+    "winRate": 0.5736434108527132,
     "voidTrades": 0,
-    "totalPnl": -490.2202,
-    "openTrades": 25
+    "totalPnl": -570.1171,
+    "openTrades": 28
   },
   "skipCalibration": {
-    "settled": 1193,
-    "wouldHaveWon": 847,
-    "wouldHaveWonRate": 0.7099748533109808,
+    "settled": 1256,
+    "wouldHaveWon": 895,
+    "wouldHaveWonRate": 0.7125796178343949,
     "voidSkips": 0
   },
   "lastNDecisions": [
     {
-      "ts": "2026-08-16T21:07:22.592Z",
+      "ts": "2026-08-17T04:35:16.742Z",
       "marketId": "0x2632e058b6d6dd0cd9fde366dc85e4d84271fec9",
       "question": "Will NOAA buoy 46002 report a significant wave height above 1.55 m between 18:00 and 23:50 UTC on 2026-08-18?",
       "category": "miscellaneous",
@@ -99,54 +99,8 @@
         "No"
       ],
       "rawPrice": [
-        0.4579355052656695,
-        0.5420644947343305
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.42,
-            0.58
-          ],
-          "confidence": 0.34
-        },
-        "gemini": {
-          "probs": [
-            0.35,
-            0.65
-          ],
-          "confidence": 0.4,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.07000000000000006,
-      "blendedProbs": [
-        0.39999999999999997,
-        0.6
-      ],
-      "confidence": 0.34,
-      "decision": "skip",
-      "outcomeIdx": 1,
-      "edge": 0.057935505265669485,
-      "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "bestEdge=0.058 < minEdge=0.13"
-    },
-    {
-      "ts": "2026-08-16T21:07:20.005Z",
-      "marketId": "0xbf1712ec2db688bc0fb8c34c48d95b4d35675a65",
-      "question": "Will Great Britain's carbon intensity for the 20:00-20:30 UTC settlement period on 2026-08-18 be above 190 gCO2/kWh?",
-      "category": "miscellaneous",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.33709020311748267,
-        0.6629097968825174
+        0.08043130795487008,
+        0.9195686920451298
       ],
       "syntheticPrice": false,
       "signals": {
@@ -175,14 +129,14 @@
       "confidence": 0.25,
       "decision": "skip",
       "outcomeIdx": 0,
-      "edge": 0.12005265402537452,
+      "edge": 0.3767115491879871,
       "thresholdUsed": 0.125,
       "size": null,
       "execution": null,
-      "skipReason": "models disagree sharply (spread=0.15 >= hard threshold 0.11)"
+      "skipReason": "models disagree sharply (spread=0.15 >= hard threshold 0.13)"
     },
     {
-      "ts": "2026-08-16T21:07:15.214Z",
+      "ts": "2026-08-17T04:35:11.416Z",
       "marketId": "0x7fb6eb62585de2fde740bfe4b4bae0c279919021",
       "question": "Will the English Wikipedia article \"Chess\" receive more than 2,250 pageviews on 2026-08-18 UTC?",
       "category": "culture",
@@ -191,63 +145,63 @@
         "No"
       ],
       "rawPrice": [
-        0.7657545045750049,
-        0.23424549542499506
+        0.7080825587721236,
+        0.2919174412278765
       ],
       "syntheticPrice": false,
       "signals": {
         "llm": {
           "probs": [
-            0.97,
-            0.03
+            0.92,
+            0.08
           ],
           "confidence": 0.74
         },
         "gemini": {
           "probs": [
-            0.85,
-            0.15
+            0.75,
+            0.25
           ],
-          "confidence": 0.8,
+          "confidence": 0.65,
           "grounded": false
         },
         "polymarket": null
       },
-      "disagreement": 0.12,
+      "disagreement": 0.17000000000000004,
       "blendedProbs": [
-        0.9166666666666666,
-        0.08333333333333333
+        0.853030303030303,
+        0.14696969696969694
       ],
       "confidence": 0.74,
       "decision": "skip",
       "outcomeIdx": 0,
-      "edge": 0.1509121620916617,
+      "edge": 0.14494774425817947,
       "thresholdUsed": 0.085,
       "size": null,
       "execution": null,
-      "skipReason": "models disagree sharply (spread=0.12 >= hard threshold 0.11)"
+      "skipReason": "models disagree sharply (spread=0.17 >= hard threshold 0.13)"
     },
     {
-      "ts": "2026-08-16T21:07:11.817Z",
-      "marketId": "0x2002482530f0404c466f553a61ca4b0792e12e10",
-      "question": "Will Tesla (TSLA) trade at or below $325.00 during regular hours on Monday Aug 17, 2026?",
-      "category": "finance",
+      "ts": "2026-08-17T04:35:05.782Z",
+      "marketId": "0xbf1712ec2db688bc0fb8c34c48d95b4d35675a65",
+      "question": "Will Great Britain's carbon intensity for the 20:00-20:30 UTC settlement period on 2026-08-18 be above 190 gCO2/kWh?",
+      "category": "miscellaneous",
       "outcomes": [
         "Yes",
         "No"
       ],
       "rawPrice": [
-        0.24574456398565028,
-        0.7542554360143497
+        0.15146435450831644,
+        0.8485356454916836
       ],
       "syntheticPrice": false,
       "signals": {
         "llm": {
           "probs": [
-            0.58,
-            0.42
+            0.42,
+            0.58
           ],
-          "confidence": 0.46
+          "confidence": 0.34
         },
         "gemini": {
           "probs": [
@@ -259,78 +213,36 @@
         },
         "polymarket": null
       },
-      "disagreement": 0.23000000000000004,
+      "disagreement": 0.07000000000000006,
       "blendedProbs": [
-        0.5142857142857143,
-        0.4857142857142857
+        0.39999999999999997,
+        0.6
       ],
-      "confidence": 0.46,
-      "decision": "skip",
+      "confidence": 0.34,
+      "decision": "trade",
       "outcomeIdx": 0,
-      "edge": 0.2685411503000641,
+      "edge": 0.24853564549168353,
       "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "models disagree sharply (spread=0.23 >= hard threshold 0.11)"
+      "size": 25,
+      "execution": {
+        "txHash": "0x81fa7bd2f1f650cd7bbd42c1bbf712e4f76bc588fecfabc67d3b5eacfdbbc639",
+        "quotedTokensIn": 24420391,
+        "sharesOut": "153590151408220176384",
+        "priceImpactPct": 0.0497
+      }
     },
     {
-      "ts": "2026-08-16T21:07:08.970Z",
-      "marketId": "0x9face9fff97f8b240e5bf3be24f303742e2c040a",
-      "question": "Will the Federal Register publish 6+ Presidential documents with publication dates Aug 12-18, 2026?",
-      "category": "politics",
+      "ts": "2026-08-17T04:35:02.901Z",
+      "marketId": "0x2002482530f0404c466f553a61ca4b0792e12e10",
+      "question": "Will Tesla (TSLA) trade at or below $325.00 during regular hours on Monday Aug 17, 2026?",
+      "category": "finance",
       "outcomes": [
         "Yes",
         "No"
       ],
       "rawPrice": [
-        0.22319766409929065,
-        0.7768023359007094
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.18,
-            0.82
-          ],
-          "confidence": 0.58
-        },
-        "gemini": {
-          "probs": [
-            0.65,
-            0.35
-          ],
-          "confidence": 0.4,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.47000000000000003,
-      "blendedProbs": [
-        0.31428571428571433,
-        0.6857142857142857
-      ],
-      "confidence": 0.58,
-      "decision": "skip",
-      "outcomeIdx": 0,
-      "edge": 0.09108805018642369,
-      "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "models disagree sharply (spread=0.47 >= hard threshold 0.11)"
-    },
-    {
-      "ts": "2026-08-16T21:07:05.622Z",
-      "marketId": "0xdc90c677aee2b74dd060bfa2eff00a27d4d4ca1b",
-      "question": "Will Ethereum's CoinGecko daily close on 2026-08-16 UTC be $1,890 or higher?",
-      "category": "crypto",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.3811253746835588,
-        0.6188746253164412
+        0.13255233326612786,
+        0.8674476667338721
       ],
       "syntheticPrice": false,
       "signals": {
@@ -343,30 +255,30 @@
         },
         "gemini": {
           "probs": [
-            0.55,
-            0.45
+            0.45,
+            0.55
           ],
-          "confidence": 0.35,
+          "confidence": 0.4,
           "grounded": false
         },
         "polymarket": null
       },
-      "disagreement": 0.030000000000000027,
+      "disagreement": 0.13000000000000006,
       "blendedProbs": [
-        0.5722222222222222,
-        0.42777777777777776
+        0.5428571428571429,
+        0.4571428571428572
       ],
       "confidence": 0.46,
       "decision": "skip",
       "outcomeIdx": 0,
-      "edge": 0.1910968475386634,
+      "edge": 0.41030480959101506,
       "thresholdUsed": 0.125,
       "size": null,
       "execution": null,
-      "skipReason": "sized trade too small (0.554 tokens < 1 token floor; of 5.25 remaining) — price impact isn't worth it at this size"
+      "skipReason": "models disagree sharply (spread=0.13 >= hard threshold 0.13)"
     },
     {
-      "ts": "2026-08-16T20:43:16.343Z",
+      "ts": "2026-08-17T04:34:59.991Z",
       "marketId": "0xacdb060b36b244dd8ccc2d0fceb04a8e04a7e3d2",
       "question": "Which band will Bitcoin's CoinGecko daily close for 2026-08-17 UTC fall into?",
       "category": "crypto",
@@ -377,10 +289,10 @@
         "$64,000 or above"
       ],
       "rawPrice": [
-        0.25242178602621546,
-        0.4004142343861841,
-        0.23569835597831656,
-        0.11146562360928386
+        0.10165896774342995,
+        0.17689591224242093,
+        0.5712668114887189,
+        0.15017830852543018
       ],
       "syntheticPrice": false,
       "signals": {
@@ -415,202 +327,189 @@
       "confidence": 0.34,
       "decision": "skip",
       "outcomeIdx": 3,
-      "edge": 0.3077651456214854,
+      "edge": 0.26905246070533906,
       "thresholdUsed": 0.125,
       "size": null,
       "execution": null,
-      "skipReason": "models disagree sharply (spread=0.22 >= hard threshold 0.11)"
+      "skipReason": "models disagree sharply (spread=0.22 >= hard threshold 0.13)"
     },
     {
-      "ts": "2026-08-16T18:53:52.651Z",
-      "marketId": "0x2632e058b6d6dd0cd9fde366dc85e4d84271fec9",
-      "question": "Will NOAA buoy 46002 report a significant wave height above 1.55 m between 18:00 and 23:50 UTC on 2026-08-18?",
-      "category": "miscellaneous",
+      "ts": "2026-08-17T04:34:56.231Z",
+      "marketId": "0x9face9fff97f8b240e5bf3be24f303742e2c040a",
+      "question": "Will the Federal Register publish 6+ Presidential documents with publication dates Aug 12-18, 2026?",
+      "category": "politics",
       "outcomes": [
         "Yes",
         "No"
       ],
-      "rawPrice": [
-        0.45429377320851433,
-        0.5457062267914857
-      ],
+      "rawPrice": null,
       "syntheticPrice": false,
       "signals": {
-        "llm": {
-          "probs": [
-            0.42,
-            0.58
-          ],
-          "confidence": 0.46
-        },
-        "gemini": {
-          "probs": [
-            0.35,
-            0.65
-          ],
-          "confidence": 0.4,
-          "grounded": false
-        },
+        "llm": null,
+        "gemini": null,
         "polymarket": null
       },
-      "disagreement": 0.07000000000000006,
-      "blendedProbs": [
-        0.39999999999999997,
-        0.6
-      ],
-      "confidence": 0.46,
+      "disagreement": null,
+      "blendedProbs": [],
+      "confidence": 0,
       "decision": "skip",
-      "outcomeIdx": 1,
-      "edge": 0.05429377320851425,
-      "thresholdUsed": 0.125,
+      "outcomeIdx": null,
+      "edge": 0,
+      "thresholdUsed": 0,
       "size": null,
       "execution": null,
-      "skipReason": "bestEdge=0.054 < minEdge=0.13"
+      "skipReason": "already at max exposure for this market (1623.67/800 tokens)"
     },
     {
-      "ts": "2026-08-16T18:53:48.284Z",
-      "marketId": "0xbf1712ec2db688bc0fb8c34c48d95b4d35675a65",
-      "question": "Will Great Britain's carbon intensity for the 20:00-20:30 UTC settlement period on 2026-08-18 be above 190 gCO2/kWh?",
-      "category": "miscellaneous",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.34158695993471216,
-        0.6584130400652878
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.58,
-            0.42
-          ],
-          "confidence": 0.42
-        },
-        "gemini": {
-          "probs": [
-            0.35,
-            0.65
-          ],
-          "confidence": 0.4,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.23000000000000004,
-      "blendedProbs": [
-        0.5142857142857143,
-        0.4857142857142857
-      ],
-      "confidence": 0.42,
-      "decision": "skip",
-      "outcomeIdx": 0,
-      "edge": 0.17269875435100218,
-      "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "models disagree sharply (spread=0.23 >= hard threshold 0.11)"
-    },
-    {
-      "ts": "2026-08-16T18:40:20.878Z",
+      "ts": "2026-08-17T03:32:16.973Z",
       "marketId": "0x7fb6eb62585de2fde740bfe4b4bae0c279919021",
       "question": "Will the English Wikipedia article \"Chess\" receive more than 2,250 pageviews on 2026-08-18 UTC?",
-      "category": "culture",
       "outcomes": [
         "Yes",
         "No"
       ],
       "rawPrice": [
-        0.7489541055885816,
-        0.2510458944114185
+        0.6817302327149286,
+        0.5
       ],
       "syntheticPrice": false,
       "signals": {
-        "llm": {
-          "probs": [
-            0.5,
-            0.5
-          ],
-          "confidence": 0.25
-        },
-        "gemini": {
-          "probs": [
-            0.82,
-            0.18
-          ],
-          "confidence": 0.8,
-          "grounded": false
-        },
+        "llm": null,
+        "gemini": null,
         "polymarket": null
       },
-      "disagreement": 0.32,
+      "disagreement": null,
       "blendedProbs": [
-        0.6422222222222222,
-        0.3577777777777778
+        1,
+        0
       ],
-      "confidence": 0.25,
-      "decision": "skip",
-      "outcomeIdx": 1,
-      "edge": 0.1067318833663593,
-      "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "models disagree sharply (spread=0.32 >= hard threshold 0.11)"
-    },
-    {
-      "ts": "2026-08-16T18:40:08.041Z",
-      "marketId": "0x2002482530f0404c466f553a61ca4b0792e12e10",
-      "question": "Will Tesla (TSLA) trade at or below $325.00 during regular hours on Monday Aug 17, 2026?",
-      "category": "finance",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.24516043112845382,
-        0.7548395688715462
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.58,
-            0.42
-          ],
-          "confidence": 0.55
-        },
-        "gemini": {
-          "probs": [
-            0.65,
-            0.35
-          ],
-          "confidence": 0.45,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.07000000000000006,
-      "blendedProbs": [
-        0.6017241379310345,
-        0.39827586206896554
-      ],
-      "confidence": 0.55,
+      "confidence": 0,
       "decision": "trade",
       "outcomeIdx": 0,
-      "edge": 0.3565637068025807,
-      "thresholdUsed": 0.125,
-      "size": 1.5878896101868694,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": 2.939948,
       "execution": {
-        "txHash": "0xae370da95991bed8924bdbd2ea2c3fe2625bda7dc8c1a207c77e8fb9fd634ca1",
-        "quotedTokensIn": 1556081,
-        "sharesOut": "6307942850003161088",
-        "priceImpactPct": 0.0062
-      }
+        "txHash": "0x863f224f0bd87effb5506634fefad9a06480ceda08557770696551455e8b35b6",
+        "quotedTokensIn": 2.939948,
+        "sharesOut": "4287991809591887360",
+        "priceImpactPct": 0.005710878268480529
+      },
+      "skipReason": "manual buy via dashboard"
     },
     {
-      "ts": "2026-08-16T18:40:01.490Z",
+      "ts": "2026-08-17T03:09:52.511Z",
+      "marketId": "0x9face9fff97f8b240e5bf3be24f303742e2c040a",
+      "question": "Will the Federal Register publish 6+ Presidential documents with publication dates Aug 12-18, 2026?",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.5,
+        0.7415342276154814
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": null,
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [
+        0,
+        1
+      ],
+      "confidence": 0,
+      "decision": "trade",
+      "outcomeIdx": 1,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": 97.972469,
+      "execution": {
+        "txHash": "0x992dd2f37b559aad9191b182f8f0107e29dcbdfaff7c370158bdbf3823fbeeef",
+        "quotedTokensIn": 97.972469,
+        "sharesOut": "130373969808300523520",
+        "priceImpactPct": 0.013402476288982071
+      },
+      "skipReason": "manual buy via dashboard"
+    },
+    {
+      "ts": "2026-08-17T02:51:18.138Z",
+      "marketId": "0x9face9fff97f8b240e5bf3be24f303742e2c040a",
+      "question": "Will the Federal Register publish 6+ Presidential documents with publication dates Aug 12-18, 2026?",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.5,
+        0.7601847841548282
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": null,
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [
+        0,
+        1
+      ],
+      "confidence": 0,
+      "decision": "trade",
+      "outcomeIdx": 1,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": 48.994536,
+      "execution": {
+        "txHash": "0x6c862619cde56adc363ce6362cdf7aefe0de49b4fc375f8a09d0815a8a997aca",
+        "quotedTokensIn": 48.994536,
+        "sharesOut": "63885236217533816832",
+        "priceImpactPct": 0.008853190028881634
+      },
+      "skipReason": "manual buy via dashboard"
+    },
+    {
+      "ts": "2026-08-17T02:49:51.242Z",
+      "marketId": "0x9face9fff97f8b240e5bf3be24f303742e2c040a",
+      "question": "Will the Federal Register publish 6+ Presidential documents with publication dates Aug 12-18, 2026?",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.5,
+        0.7437426958321244
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": null,
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [
+        0,
+        1
+      ],
+      "confidence": 0,
+      "decision": "trade",
+      "outcomeIdx": 1,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": 97.972864,
+      "execution": {
+        "txHash": "0x2ef1ab0f86145fffba04451a4856e0c0d4871e503856071ec181c2660862a48e",
+        "quotedTokensIn": 97.972864,
+        "sharesOut": "129999670990955479040",
+        "priceImpactPct": 0.013306519778403391
+      },
+      "skipReason": "manual buy via dashboard"
+    },
+    {
+      "ts": "2026-08-17T02:40:41.956Z",
       "marketId": "0x9face9fff97f8b240e5bf3be24f303742e2c040a",
       "question": "Will the Federal Register publish 6+ Presidential documents with publication dates Aug 12-18, 2026?",
       "category": "politics",
@@ -619,561 +518,8 @@
         "No"
       ],
       "rawPrice": [
-        0.22500859031884202,
-        0.774991409681158
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.72,
-            0.28
-          ],
-          "confidence": 0.55
-        },
-        "gemini": {
-          "probs": [
-            0.65,
-            0.35
-          ],
-          "confidence": 0.4,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.06999999999999995,
-      "blendedProbs": [
-        0.7000000000000001,
-        0.30000000000000004
-      ],
-      "confidence": 0.55,
-      "decision": "trade",
-      "outcomeIdx": 0,
-      "edge": 0.47499140968115805,
-      "thresholdUsed": 0.125,
-      "size": 3.0812348282246425,
-      "execution": {
-        "txHash": "0xd416c72d73216ad7347f7771e72fc9fda317bf604d29641326a8301a9d889473",
-        "quotedTokensIn": 3019389,
-        "sharesOut": "13317490787580880896",
-        "priceImpactPct": 0.0076
-      }
-    },
-    {
-      "ts": "2026-08-16T18:39:58.359Z",
-      "marketId": "0xdc90c677aee2b74dd060bfa2eff00a27d4d4ca1b",
-      "question": "Will Ethereum's CoinGecko daily close on 2026-08-16 UTC be $1,890 or higher?",
-      "category": "crypto",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.3987366023381214,
-        0.6012633976618785
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.54,
-            0.46
-          ],
-          "confidence": 0.42
-        },
-        "gemini": {
-          "probs": [
-            0.55,
-            0.45
-          ],
-          "confidence": 0.35,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.010000000000000009,
-      "blendedProbs": [
-        0.5425925925925926,
-        0.45740740740740743
-      ],
-      "confidence": 0.42,
-      "decision": "skip",
-      "outcomeIdx": 0,
-      "edge": 0.1438559902544712,
-      "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "sized trade too small (0.713 tokens < 1 token floor; of 9.83 remaining) — price impact isn't worth it at this size"
-    },
-    {
-      "ts": "2026-08-16T18:39:55.136Z",
-      "marketId": "0xacdb060b36b244dd8ccc2d0fceb04a8e04a7e3d2",
-      "question": "Which band will Bitcoin's CoinGecko daily close for 2026-08-17 UTC fall into?",
-      "category": "crypto",
-      "outcomes": [
-        "Below $62,000",
-        "$62,000 to $63,000",
-        "$63,000 to $64,000",
-        "$64,000 or above"
-      ],
-      "rawPrice": [
-        0.25242178602621546,
-        0.4004142343861841,
-        0.23569835597831656,
-        0.11146562360928386
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.18,
-            0.16,
-            0.17,
-            0.49
-          ],
-          "confidence": 0.42
-        },
-        "gemini": {
-          "probs": [
-            0.25,
-            0.25,
-            0.25,
-            0.25
-          ],
-          "confidence": 0.3,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.24,
-      "blendedProbs": [
-        0.19615384615384615,
-        0.18076923076923077,
-        0.18846153846153846,
-        0.43461538461538457
-      ],
-      "confidence": 0.42,
-      "decision": "skip",
-      "outcomeIdx": 3,
-      "edge": 0.3231497610061007,
-      "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "models disagree sharply (spread=0.24 >= hard threshold 0.11)"
-    },
-    {
-      "ts": "2026-08-15T23:35:03.008Z",
-      "marketId": "0x2632e058b6d6dd0cd9fde366dc85e4d84271fec9",
-      "question": "Will NOAA buoy 46002 report a significant wave height above 1.55 m between 18:00 and 23:50 UTC on 2026-08-18?",
-      "category": "miscellaneous",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.48663504100307114,
-        0.5133649589969288
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.5,
-            0.5
-          ],
-          "confidence": 0.25
-        },
-        "gemini": {
-          "probs": [
-            0.35,
-            0.65
-          ],
-          "confidence": 0.4,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.15000000000000002,
-      "blendedProbs": [
-        0.4571428571428572,
-        0.5428571428571429
-      ],
-      "confidence": 0.25,
-      "decision": "skip",
-      "outcomeIdx": 1,
-      "edge": 0.029492183860214127,
-      "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "models disagree sharply (spread=0.15 >= hard threshold 0.11)"
-    },
-    {
-      "ts": "2026-08-15T23:34:57.934Z",
-      "marketId": "0xbf1712ec2db688bc0fb8c34c48d95b4d35675a65",
-      "question": "Will Great Britain's carbon intensity for the 20:00-20:30 UTC settlement period on 2026-08-18 be above 190 gCO2/kWh?",
-      "category": "miscellaneous",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.3689757847992224,
-        0.6310242152007776
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.42,
-            0.58
-          ],
-          "confidence": 0.46
-        },
-        "gemini": {
-          "probs": [
-            0.35,
-            0.65
-          ],
-          "confidence": 0.4,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.07000000000000006,
-      "blendedProbs": [
-        0.39999999999999997,
-        0.6
-      ],
-      "confidence": 0.46,
-      "decision": "skip",
-      "outcomeIdx": 0,
-      "edge": 0.031024215200777583,
-      "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "bestEdge=0.031 < minEdge=0.13"
-    },
-    {
-      "ts": "2026-08-15T23:34:45.664Z",
-      "marketId": "0xc1a218461bd5170fd216f9ca552c4e83dc7ecb2b",
-      "question": "Will Arsenal and Manchester City both score in the FA Community Shield on 16 August 2026?",
-      "category": "sports",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.585663559160084,
-        0.41433644083991594
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.58,
-            0.42
-          ],
-          "confidence": 0.55
-        },
-        "gemini": {
-          "probs": [
-            0.62,
-            0.38
-          ],
-          "confidence": 0.35,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.040000000000000036,
-      "blendedProbs": [
-        0.5903703703703704,
-        0.4096296296296296
-      ],
-      "confidence": 0.55,
-      "decision": "skip",
-      "outcomeIdx": 0,
-      "edge": 0.004706811210286488,
-      "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "bestEdge=0.005 < minEdge=0.13"
-    },
-    {
-      "ts": "2026-08-15T23:34:34.784Z",
-      "marketId": "0xdc90c677aee2b74dd060bfa2eff00a27d4d4ca1b",
-      "question": "Will Ethereum's CoinGecko daily close on 2026-08-16 UTC be $1,890 or higher?",
-      "category": "crypto",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.414131795801397,
-        0.585868204198603
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.56,
-            0.44
-          ],
-          "confidence": 0.42
-        },
-        "gemini": {
-          "probs": [
-            0.55,
-            0.45
-          ],
-          "confidence": 0.35,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.010000000000000009,
-      "blendedProbs": [
-        0.5574074074074075,
-        0.4425925925925926
-      ],
-      "confidence": 0.42,
-      "decision": "trade",
-      "outcomeIdx": 0,
-      "edge": 0.1432756116060105,
-      "thresholdUsed": 0.125,
-      "size": 10,
-      "execution": {
-        "txHash": "0x3afe52ffeba8f8840c3462c09fca8fe894f70d9ebf8b0174f8f86d7ac29a0042",
-        "quotedTokensIn": 9839133,
-        "sharesOut": "24146902269720064000",
-        "priceImpactPct": -0.0161
-      }
-    },
-    {
-      "ts": "2026-08-15T23:34:31.516Z",
-      "marketId": "0x7fb6eb62585de2fde740bfe4b4bae0c279919021",
-      "question": "Will the English Wikipedia article \"Chess\" receive more than 2,250 pageviews on 2026-08-18 UTC?",
-      "category": "culture",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.6916461712552708,
-        0.3083538287447292
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.97,
-            0.03
-          ],
-          "confidence": 0.74
-        },
-        "gemini": {
-          "probs": [
-            0.85,
-            0.15
-          ],
-          "confidence": 0.8,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.12,
-      "blendedProbs": [
-        0.9166666666666666,
-        0.08333333333333333
-      ],
-      "confidence": 0.74,
-      "decision": "skip",
-      "outcomeIdx": 0,
-      "edge": 0.2250204954113958,
-      "thresholdUsed": 0.085,
-      "size": null,
-      "execution": null,
-      "skipReason": "models disagree sharply (spread=0.12 >= hard threshold 0.11)"
-    },
-    {
-      "ts": "2026-08-15T23:34:29.594Z",
-      "marketId": "0xacdb060b36b244dd8ccc2d0fceb04a8e04a7e3d2",
-      "question": "Which band will Bitcoin's CoinGecko daily close for 2026-08-17 UTC fall into?",
-      "category": "crypto",
-      "outcomes": [
-        "Below $62,000",
-        "$62,000 to $63,000",
-        "$63,000 to $64,000",
-        "$64,000 or above"
-      ],
-      "rawPrice": [
-        0.24823262345738553,
-        0.19730835190146334,
-        0.38075009244338637,
-        0.1737089321977648
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.18,
-            0.16,
-            0.17,
-            0.49
-          ],
-          "confidence": 0.42
-        },
-        "gemini": {
-          "probs": [
-            0.25,
-            0.25,
-            0.25,
-            0.25
-          ],
-          "confidence": 0.3,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.24,
-      "blendedProbs": [
-        0.19615384615384615,
-        0.18076923076923077,
-        0.18846153846153846,
-        0.43461538461538457
-      ],
-      "confidence": 0.42,
-      "decision": "skip",
-      "outcomeIdx": 3,
-      "edge": 0.2609064524176198,
-      "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "models disagree sharply (spread=0.24 >= hard threshold 0.11)"
-    },
-    {
-      "ts": "2026-08-15T22:23:50.955Z",
-      "marketId": "0xdcaabdc8f3e4eef25a4ffac567d118d8ab0a3081",
-      "question": "Will at least 5 magnitude 4.5+ earthquakes occur worldwide from 12:00 to 20:00 UTC on Aug 16, 2026?",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.5,
-        0.46057664772462203
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": null,
-        "gemini": null,
-        "polymarket": null
-      },
-      "disagreement": null,
-      "blendedProbs": [
-        0,
-        1
-      ],
-      "confidence": 0,
-      "decision": "trade",
-      "outcomeIdx": 1,
-      "edge": 0,
-      "thresholdUsed": 0,
-      "size": 2.93991,
-      "execution": {
-        "txHash": "0xeab6c0f53e4f9ec295656509a67f9ea4e8286b31249c7a418fc0aeca6abf7fdc",
-        "quotedTokensIn": 2.93991,
-        "sharesOut": "6343952929458919424",
-        "priceImpactPct": 0.006171864544217633
-      },
-      "skipReason": "manual buy via dashboard"
-    },
-    {
-      "ts": "2026-08-15T22:22:50.565Z",
-      "marketId": "0xdcaabdc8f3e4eef25a4ffac567d118d8ab0a3081",
-      "question": "Will at least 5 magnitude 4.5+ earthquakes occur worldwide from 12:00 to 20:00 UTC on Aug 16, 2026?",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.5,
-        0.4595236704478689
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": null,
-        "gemini": null,
-        "polymarket": null
-      },
-      "disagreement": null,
-      "blendedProbs": [
-        0,
-        1
-      ],
-      "confidence": 0,
-      "decision": "trade",
-      "outcomeIdx": 1,
-      "edge": 0,
-      "thresholdUsed": 0,
-      "size": 2.93991,
-      "execution": {
-        "txHash": "0x93b668f9a9dc50b29d9c391b090b9ba29c6435f6f23b46b96bdb5f44f70faea7",
-        "quotedTokensIn": 2.93991,
-        "sharesOut": "6358458208416203776",
-        "priceImpactPct": 0.006176864391156331
-      },
-      "skipReason": "manual buy via dashboard"
-    },
-    {
-      "ts": "2026-08-15T22:13:45.124Z",
-      "marketId": "0xdcaabdc8f3e4eef25a4ffac567d118d8ab0a3081",
-      "question": "Will at least 5 magnitude 4.5+ earthquakes occur worldwide from 12:00 to 20:00 UTC on Aug 16, 2026?",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.5,
-        0.45846863781909664
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": null,
-        "gemini": null,
-        "polymarket": null
-      },
-      "disagreement": null,
-      "blendedProbs": [
-        0,
-        1
-      ],
-      "confidence": 0,
-      "decision": "trade",
-      "outcomeIdx": 1,
-      "edge": 0,
-      "thresholdUsed": 0,
-      "size": 2.93991,
-      "execution": {
-        "txHash": "0xdee9d965d2a3682795c4bb379bce2cb24875234e6620e75844aea8e6e401bd5a",
-        "quotedTokensIn": 2.93991,
-        "sharesOut": "6373058687529698304",
-        "priceImpactPct": 0.0061818642380951265
-      },
-      "skipReason": "manual buy via dashboard"
-    },
-    {
-      "ts": "2026-08-15T21:51:36.331Z",
-      "marketId": "0x9face9fff97f8b240e5bf3be24f303742e2c040a",
-      "question": "Will the Federal Register publish 6+ Presidential documents with publication dates Aug 12-18, 2026?",
-      "category": "politics",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.30021170525572305,
-        0.6997882947442768
+        0.23452329787041581,
+        0.7654767021295843
       ],
       "syntheticPrice": false,
       "signals": {
@@ -1182,7 +528,7 @@
             0.18,
             0.82
           ],
-          "confidence": 0.62
+          "confidence": 0.55
         },
         "gemini": {
           "probs": [
@@ -1199,60 +545,532 @@
         0.31428571428571433,
         0.6857142857142857
       ],
-      "confidence": 0.62,
+      "confidence": 0.55,
       "decision": "skip",
       "outcomeIdx": 0,
-      "edge": 0.014074009029991286,
+      "edge": 0.07976241641529852,
       "thresholdUsed": 0.125,
       "size": null,
       "execution": null,
       "skipReason": "models disagree sharply (spread=0.47 >= hard threshold 0.11)"
     },
     {
-      "ts": "2026-08-15T21:51:33.726Z",
-      "marketId": "0x2002482530f0404c466f553a61ca4b0792e12e10",
-      "question": "Will Tesla (TSLA) trade at or below $325.00 during regular hours on Monday Aug 17, 2026?",
-      "category": "finance",
+      "ts": "2026-08-17T01:40:11.010Z",
+      "marketId": "0x9face9fff97f8b240e5bf3be24f303742e2c040a",
+      "question": "Will the Federal Register publish 6+ Presidential documents with publication dates Aug 12-18, 2026?",
       "outcomes": [
         "Yes",
         "No"
       ],
       "rawPrice": [
-        0.20031259924195488,
-        0.7996874007580452
+        0.5,
+        0.7726391441093687
       ],
       "syntheticPrice": false,
       "signals": {
-        "llm": {
-          "probs": [
-            0.58,
-            0.42
-          ],
-          "confidence": 0.46
-        },
-        "gemini": {
-          "probs": [
-            0.45,
-            0.55
-          ],
-          "confidence": 0.4,
-          "grounded": false
-        },
+        "llm": null,
+        "gemini": null,
         "polymarket": null
       },
-      "disagreement": 0.13000000000000006,
+      "disagreement": null,
       "blendedProbs": [
-        0.5428571428571429,
-        0.4571428571428572
+        0,
+        1
       ],
-      "confidence": 0.46,
-      "decision": "skip",
-      "outcomeIdx": 0,
-      "edge": 0.34254454361518805,
-      "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "models disagree sharply (spread=0.13 >= hard threshold 0.11)"
+      "confidence": 0,
+      "decision": "trade",
+      "outcomeIdx": 1,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": 48.994949,
+      "execution": {
+        "txHash": "0xf3c63dea4fc9019aa79652e6d9112b8974441668d2a3762b9f611e5fa36b259f",
+        "quotedTokensIn": 48.994949,
+        "sharesOut": "62871998604173180928",
+        "priceImpactPct": 0.008596221536526515
+      },
+      "skipReason": "manual buy via dashboard"
+    },
+    {
+      "ts": "2026-08-17T01:38:31.511Z",
+      "marketId": "0x9face9fff97f8b240e5bf3be24f303742e2c040a",
+      "question": "Will the Federal Register publish 6+ Presidential documents with publication dates Aug 12-18, 2026?",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.5,
+        0.7612823629315909
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": null,
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [
+        0,
+        1
+      ],
+      "confidence": 0,
+      "decision": "trade",
+      "outcomeIdx": 1,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": 97.97586,
+      "execution": {
+        "txHash": "0x200181d0d043d35329f57ccf3731dc24b5e7c8331ad497b0573186132ee72dc5",
+        "quotedTokensIn": 97.97586,
+        "sharesOut": "127101546371400155136",
+        "priceImpactPct": 0.012563997169314296
+      },
+      "skipReason": "manual buy via dashboard"
+    },
+    {
+      "ts": "2026-08-17T01:37:58.141Z",
+      "marketId": "0x9face9fff97f8b240e5bf3be24f303742e2c040a",
+      "question": "Will the Federal Register publish 6+ Presidential documents with publication dates Aug 12-18, 2026?",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.5,
+        0.7493585557631768
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": null,
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [
+        0,
+        1
+      ],
+      "confidence": 0,
+      "decision": "trade",
+      "outcomeIdx": 1,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": 97.973851,
+      "execution": {
+        "txHash": "0xae08db0912c7c987122f2ca2c2169b86780bf79653f5260627df084cbcce4b74",
+        "quotedTokensIn": 97.973851,
+        "sharesOut": "129057479187644465152",
+        "priceImpactPct": 0.013065045222866603
+      },
+      "skipReason": "manual buy via dashboard"
+    },
+    {
+      "ts": "2026-08-17T01:36:21.226Z",
+      "marketId": "0x9face9fff97f8b240e5bf3be24f303742e2c040a",
+      "question": "Will the Federal Register publish 6+ Presidential documents with publication dates Aug 12-18, 2026?",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.5,
+        0.7368394541686696
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": null,
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [
+        0,
+        1
+      ],
+      "confidence": 0,
+      "decision": "trade",
+      "outcomeIdx": 1,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": 97.971615,
+      "execution": {
+        "txHash": "0xdaee35838fee86cb80cc9d70a7e2a10b7aa55f9f17dc6275e280226f7c05c84e",
+        "quotedTokensIn": 97.971615,
+        "sharesOut": "131176855258930069504",
+        "priceImpactPct": 0.013608350522064374
+      },
+      "skipReason": "manual buy via dashboard"
+    },
+    {
+      "ts": "2026-08-17T01:33:43.039Z",
+      "marketId": "0x9face9fff97f8b240e5bf3be24f303742e2c040a",
+      "question": "Will the Federal Register publish 6+ Presidential documents with publication dates Aug 12-18, 2026?",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.5,
+        0.7616911858489249
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": null,
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [
+        0,
+        1
+      ],
+      "confidence": 0,
+      "decision": "trade",
+      "outcomeIdx": 1,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": 48.994587,
+      "execution": {
+        "txHash": "0xcfbb8504b76408910eaf4b9b08f6bba176e5ec79750554902e3fb301a0d36e1c",
+        "quotedTokensIn": 48.994587,
+        "sharesOut": "63760948835975782400",
+        "priceImpactPct": 0.008821663775947841
+      },
+      "skipReason": "manual buy via dashboard"
+    },
+    {
+      "ts": "2026-08-17T01:32:56.272Z",
+      "marketId": "0x9face9fff97f8b240e5bf3be24f303742e2c040a",
+      "question": "Will the Federal Register publish 6+ Presidential documents with publication dates Aug 12-18, 2026?",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.5,
+        0.7558111069131457
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": null,
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [
+        0,
+        1
+      ],
+      "confidence": 0,
+      "decision": "trade",
+      "outcomeIdx": 1,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": 48.994386,
+      "execution": {
+        "txHash": "0x487aef24c6f64f23bf163fd9d52fc7ec88eb123ed9509c00a945a2c573948fca",
+        "quotedTokensIn": 48.994386,
+        "sharesOut": "64248851982031683584",
+        "priceImpactPct": 0.008945430435131409
+      },
+      "skipReason": "manual buy via dashboard"
+    },
+    {
+      "ts": "2026-08-17T01:32:27.228Z",
+      "marketId": "0x9face9fff97f8b240e5bf3be24f303742e2c040a",
+      "question": "Will the Federal Register publish 6+ Presidential documents with publication dates Aug 12-18, 2026?",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.5,
+        0.743614142451274
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": null,
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [
+        0,
+        1
+      ],
+      "confidence": 0,
+      "decision": "trade",
+      "outcomeIdx": 1,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": 97.972841,
+      "execution": {
+        "txHash": "0x9aa610e51f8a6218135b617342361b27ddf372d21ae50a2e3cb0b9e4cfe39219",
+        "quotedTokensIn": 97.972841,
+        "sharesOut": "130021399576093868032",
+        "priceImpactPct": 0.01331209028555716
+      },
+      "skipReason": "manual buy via dashboard"
+    },
+    {
+      "ts": "2026-08-17T01:32:04.490Z",
+      "marketId": "0x9face9fff97f8b240e5bf3be24f303742e2c040a",
+      "question": "Will the Federal Register publish 6+ Presidential documents with publication dates Aug 12-18, 2026?",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.5,
+        0.7308082683095197
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": null,
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [
+        0,
+        1
+      ],
+      "confidence": 0,
+      "decision": "trade",
+      "outcomeIdx": 1,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": 97.970488,
+      "execution": {
+        "txHash": "0x79200cfed82c8e8af91d5176dba9ab5d441caf9f493590406d28fe89843c731e",
+        "quotedTokensIn": 97.970488,
+        "sharesOut": "132222906472341340160",
+        "priceImpactPct": 0.013876646316788475
+      },
+      "skipReason": "manual buy via dashboard"
+    },
+    {
+      "ts": "2026-08-17T00:46:32.192Z",
+      "marketId": "0x9face9fff97f8b240e5bf3be24f303742e2c040a",
+      "question": "Will the Federal Register publish 6+ Presidential documents with publication dates Aug 12-18, 2026?",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.5,
+        0.7417232336487392
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": null,
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [
+        0,
+        1
+      ],
+      "confidence": 0,
+      "decision": "trade",
+      "outcomeIdx": 1,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": 97.972502,
+      "execution": {
+        "txHash": "0xe55f103718f67e3bf3a5103dd0495a1d264e1f483183a58d2533577a1fb2bb6d",
+        "quotedTokensIn": 97.972502,
+        "sharesOut": "130341851125280538624",
+        "priceImpactPct": 0.01339424004012608
+      },
+      "skipReason": "manual buy via dashboard"
+    },
+    {
+      "ts": "2026-08-17T00:36:50.988Z",
+      "marketId": "0x9face9fff97f8b240e5bf3be24f303742e2c040a",
+      "question": "Will the Federal Register publish 6+ Presidential documents with publication dates Aug 12-18, 2026?",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.5,
+        0.739802781868655
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": null,
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [
+        0,
+        1
+      ],
+      "confidence": 0,
+      "decision": "trade",
+      "outcomeIdx": 1,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": 97.972155,
+      "execution": {
+        "txHash": "0xe59a667fdfab2b66e98c6b9b199f8f947c34f17891b75227e255a68421270aa2",
+        "quotedTokensIn": 97.972155,
+        "sharesOut": "130668929759102091264",
+        "priceImpactPct": 0.01347809593705816
+      },
+      "skipReason": "manual buy via dashboard"
+    },
+    {
+      "ts": "2026-08-17T00:32:53.695Z",
+      "marketId": "0x9face9fff97f8b240e5bf3be24f303742e2c040a",
+      "question": "Will the Federal Register publish 6+ Presidential documents with publication dates Aug 12-18, 2026?",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.5,
+        0.726806643179359
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": null,
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [
+        0,
+        1
+      ],
+      "confidence": 0,
+      "decision": "trade",
+      "outcomeIdx": 1,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": 97.969722,
+      "execution": {
+        "txHash": "0xf84488c26bda6f6d9a451c9040d4952389316e32430be4fe07f8ac45e98935eb",
+        "quotedTokensIn": 97.969722,
+        "sharesOut": "132926198741429387264",
+        "priceImpactPct": 0.014057080924556946
+      },
+      "skipReason": "manual buy via dashboard"
+    },
+    {
+      "ts": "2026-08-17T00:26:22.692Z",
+      "marketId": "0x9face9fff97f8b240e5bf3be24f303742e2c040a",
+      "question": "Will the Federal Register publish 6+ Presidential documents with publication dates Aug 12-18, 2026?",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.5,
+        0.713161771935269
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": null,
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [
+        0,
+        1
+      ],
+      "confidence": 0,
+      "decision": "trade",
+      "outcomeIdx": 1,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": 97.966996,
+      "execution": {
+        "txHash": "0x6cb5df950f5cae608fea32f68ba3e20983d502b4b07dbaf84b25cc1431fce146",
+        "quotedTokensIn": 97.966996,
+        "sharesOut": "135381546681332137984",
+        "priceImpactPct": 0.01468739301319459
+      },
+      "skipReason": "manual buy via dashboard"
+    },
+    {
+      "ts": "2026-08-17T00:22:56.815Z",
+      "marketId": "0x9face9fff97f8b240e5bf3be24f303742e2c040a",
+      "question": "Will the Federal Register publish 6+ Presidential documents with publication dates Aug 12-18, 2026?",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.5,
+        0.7094772221036677
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": null,
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [
+        0,
+        1
+      ],
+      "confidence": 0,
+      "decision": "trade",
+      "outcomeIdx": 1,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": 97.966229,
+      "execution": {
+        "txHash": "0x2dbd2ec71ee4aff7a0e786dfb825d71996a0c01d8824434a1dd5a7a3bca49543",
+        "quotedTokensIn": 97.966229,
+        "sharesOut": "136060187291030683648",
+        "priceImpactPct": 0.014861716024563789
+      },
+      "skipReason": "manual buy via dashboard"
+    },
+    {
+      "ts": "2026-08-17T00:20:50.958Z",
+      "marketId": "0x9face9fff97f8b240e5bf3be24f303742e2c040a",
+      "question": "Will the Federal Register publish 6+ Presidential documents with publication dates Aug 12-18, 2026?",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.5,
+        0.7381206614142213
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": null,
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [
+        0,
+        1
+      ],
+      "confidence": 0,
+      "decision": "trade",
+      "outcomeIdx": 1,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": 48.993753,
+      "execution": {
+        "txHash": "0xb811cdcf0a2003f500f2c4e89deee77c371ae5e376bac9fbea6ec875682f4556",
+        "quotedTokensIn": 48.993753,
+        "sharesOut": "65762805836376940544",
+        "priceImpactPct": 0.009329604367344849
+      },
+      "skipReason": "manual buy via dashboard"
     }
   ]
 }
