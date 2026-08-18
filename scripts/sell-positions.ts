@@ -17,6 +17,7 @@ import { DelphiClient, type Market } from "@gensyn-ai/gensyn-delphi-sdk";
 import { resolveWalletAddress } from "../src/chainRead.js";
 import { withDelphiRetry } from "../src/delphiRetry.js";
 import { patchReceiptExecution } from "../src/journal.js";
+import { markLegClosed } from "../src/closedLegs.js";
 
 function argValue(flag: string): string | null {
   const i = process.argv.indexOf(flag);
@@ -454,16 +455,24 @@ async function main() {
       const exitAmountHuman =
         collateralToHuman(quotedTokensOut);
 
-      patchReceiptExecution(
-        pos.marketProxy,
-        {
-          resolved: true,
-          redeemedTxHash:
-            result.transactionHash,
-          redeemedAmount:
-            exitAmountHuman.toFixed(6),
-        }
-      );
+        patchReceiptExecution(
+          pos.marketProxy,
+          {
+            resolved: true,
+            redeemedTxHash:
+              result.transactionHash,
+            redeemedAmount:
+              exitAmountHuman.toFixed(6),
+            exitReason: "manual-sell",
+          }
+        );
+  
+        markLegClosed(
+          pos.marketProxy,
+          pos.outcomeIdx,
+          "manual-sell",
+          "sold via scripts/sell-positions.ts"
+        );
 
       console.log(
         `  journal: marked resolved, silent ` +

@@ -4,7 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { DelphiClient } from "@gensyn-ai/gensyn-delphi-sdk";
 import { CONFIG, getDryRun, setDryRun, getCompetitionTokenAddress, setCompetitionTokenAddress } from "./config.js";
-import { readReceipts, readPinnedSummary, recomputeSummary } from "./journal.js";
+import { readReceipts, readPinnedSummary, recomputeSummary, patchReceiptExecution } from "./journal.js";
 import { runBacktest, listBacktestRuns, readBacktestRun } from "./backtest.js";
 import { getAllNodesView, getPoolSummary, runHealthCheck } from "./keyPool.js";
 import { getNativeBalance, getErc20Balance, getErc20Decimals, hasContractCode, getChainId, resolveWalletAddress } from "./chainRead.js";
@@ -24,6 +24,10 @@ import {
   msUntilResolve,
 } from "./marketFields.js";
 import { withDelphiRetry } from "./delphiRetry.js";
+import { runPositionWatcherPass, readWatcherLog, readWatcherState } from "./positionWatcher.js";
+import { getAllClosedLegs, reopenLeg, markLegClosed } from "./closedLegs.js";
+
+
 
 const app = express();
 app.use(express.json());
@@ -280,20 +284,28 @@ app.post("/api/positions/sell", requireDashboardPassword, async (req: any, res: 
     const minTokensOut =
       quote.tokensOut - (quote.tokensOut * SELL_SLIPPAGE_BPS) / 10_000n;
 
-    const result = await withDelphiRetry(
-      () =>
-        client.sellShares({
-          marketAddress: marketId as `0x${string}`,
-          outcomeIdx,
-          sharesIn: sharesInRaw,
-          minTokensOut,
-        }),
-      { label: `sellShares(${marketId})`, maxRetries: 1 }
-    );
-
-    const decimals = CONFIG.competitionTokenDecimals ?? 6;
-
-    res.json({
+      const result = await withDelphiRetry(
+        () =>
+          client.sellShares({
+            marketAddress: marketId as `0x${string}`,
+            outcomeIdx,
+            sharesIn: sharesInRaw,
+            minTokensOut,
+          }),
+        { label: `sellShares(${marketId})`, maxRetries: 1 }
+      );
+  
+      patchReceiptExecution(marketId, {
+        resolved: true,
+        redeemedTxHash: result.transactionHash,
+        redeemedAmount: (Number(quote.tokensOut) / 10 ** (CONFIG.competitionTokenDecimals ?? 6)).toFixed(6),
+        exitReason: "manual-sell",
+      });
+      markLegClosed(marketId, outcomeIdx, "manual-sell", "sold via dashboard");
+  
+      const decimals = CONFIG.competitionTokenDecimals ?? 6;
+  
+      res.json({
       transactionHash: result.transactionHash,
       tokensOut: quote.tokensOut.toString(),
       tokensOutHuman: Number(quote.tokensOut) / 10 ** decimals,
@@ -303,6 +315,35 @@ app.post("/api/positions/sell", requireDashboardPassword, async (req: any, res: 
   } catch (err) {
     res.status(500).json({ error: err instanceof Error ? err.message : String(err) });
   }
+});
+
+app.get("/api/watcher/log", (req: any, res: any) => {
+  const limit = Number(req.query.limit ?? 100);
+  res.json({ entries: readWatcherLog(limit) });
+});
+
+app.get("/api/watcher/state", (_req: any, res: any) => {
+  res.json({ state: readWatcherState() });
+});
+
+app.post("/api/watcher/run", requireDashboardPassword, async (_req: any, res: any) => {
+  try {
+    res.json(await runPositionWatcherPass(client, getDryRun()));
+  } catch (err) {
+    res.status(500).json({ error: err instanceof Error ? err.message : String(err) });
+  }
+});
+
+app.get("/api/closed-legs", (_req: any, res: any) => {
+  res.json({ legs: getAllClosedLegs() });
+});
+
+app.post("/api/closed-legs/reopen", requireDashboardPassword, (req: any, res: any) => {
+  const { marketId, outcomeIdx } = req.body ?? {};
+  if (typeof marketId !== "string" || !Number.isInteger(outcomeIdx)) {
+    return res.status(400).json({ error: "body must be { marketId: string, outcomeIdx: integer }" });
+  }
+  res.json({ reopened: reopenLeg(marketId, outcomeIdx) });
 });
 
 // --- markets: quote/buy -----------------------------------------------

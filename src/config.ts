@@ -40,7 +40,9 @@ function readRuntimeConfig(): RuntimeConfig {
     return {
       dryRun: typeof parsed.dryRun === "boolean" ? parsed.dryRun : true,
       competitionTokenAddress:
-        typeof parsed.competitionTokenAddress === "string" ? parsed.competitionTokenAddress : null,
+        typeof parsed.competitionTokenAddress === "string"
+          ? parsed.competitionTokenAddress
+          : null,
     };
   } catch {
     return { dryRun: true, competitionTokenAddress: null };
@@ -66,9 +68,14 @@ export function getCompetitionTokenAddress(): string | null {
 }
 
 /** Pass null to clear back to "unknown" (e.g. if you swap CAs mid-competition). */
-export function setCompetitionTokenAddress(address: string | null): RuntimeConfig {
+export function setCompetitionTokenAddress(
+  address: string | null
+): RuntimeConfig {
   ensureDataDir();
-  const cfg: RuntimeConfig = { ...readRuntimeConfig(), competitionTokenAddress: address };
+  const cfg: RuntimeConfig = {
+    ...readRuntimeConfig(),
+    competitionTokenAddress: address,
+  };
   fs.writeFileSync(RUNTIME_CONFIG_PATH, JSON.stringify(cfg, null, 2));
   return cfg;
 }
@@ -78,17 +85,74 @@ export const CONFIG = {
   maxTokensPerTrade: Number(process.env.MAX_TOKENS_PER_TRADE ?? 900),
   maxMarketsPerLoop: Number(process.env.MAX_MARKETS_PER_LOOP ?? 75),
 
+  // When true, every Gemini forecast call (entry-side, via
+  // geminiForecast.ts) grounds with google_search regardless of whether
+  // the question matches blend.ts's isTimeSensitive() pattern. When
+  // false, reverts to the original behavior: grounding only kicks in for
+  // questions that look news-driven. positionWatcher.ts's delta-check
+  // (geminiPositionCheck.ts) is unaffected either way — that one is
+  // always grounded by design, since it exists specifically to catch
+  // news.
+  geminiAlwaysGrounded: process.env.GEMINI_ALWAYS_GROUNDED !== "false",
+
+  // --- Position watcher (loss-prevention on already-open positions) ---
+  // Master switch — off means runPositionWatcherPass() is a no-op even if
+  // something calls it (dashboard button, main() timer).
+  positionWatcherEnabled: process.env.POSITION_WATCHER_ENABLED !== "false",
+
+  // Gemini's grounded delta-check only runs against markets whose
+  // question text matches blend.ts's isTimeSensitive() heuristic, same
+  // gate the entry forecaster uses — no point burning a search call on a
+  // slow-moving market. A position already mid-confirmation is always
+  // re-checked regardless of this gate (see positionWatcher.ts).
+  positionWatcherOnlyTimeSensitive:
+    process.env.POSITION_WATCHER_ONLY_TIME_SENSITIVE !== "false",
+
+  // Minimum time between checks for the SAME position, independent of
+  // however often the watcher pass itself is ticked. Gemini quota has
+  // held up fine so far even without this being aggressive — default is
+  // conservative anyway since this is new and unproven in production.
+  positionWatcherCooldownMs: Number(
+    process.env.POSITION_WATCHER_COOLDOWN_MS ?? 30 * 60 * 1000
+  ),
+
+  // Absolute implied-probability movement (0-1) required, ON TOP OF a
+  // "severe" Gemini read, before a check counts as qualifying. Same
+  // instinct as forecastCache.ts's forecastCachePriceMoveThreshold: if
+  // the book hasn't moved at all, be suspicious of the model's read.
+  positionWatcherPriceMoveThreshold: Number(
+    process.env.POSITION_WATCHER_PRICE_MOVE_THRESHOLD ?? 0.03
+  ),
+
+  // Confidence floor (0-1) for a "severe" read to count toward exit
+  // eligibility. Gemini's confidence is self-reported, not independently
+  // calibrated — set deliberately high (0.85 default, i.e. the 80-90%
+  // band) since this is what gates real capital moving.
+  positionWatcherMinConfidenceForExit: Number(
+    process.env.POSITION_WATCHER_MIN_CONFIDENCE ?? 0.85
+  ),
+
+  // Kill switch for the EXECUTION half specifically — leave detection/
+  // flagging on, but stop short of actually selling. When false, a
+  // confirmed severe+confident+price-moved position is logged as
+  // "confirmed-exit-disabled" and stays flagged for manual review
+  // instead of auto-selling.
+  positionWatcherAutoExitEnabled:
+    process.env.POSITION_WATCHER_AUTO_EXIT_ENABLED !== "false",
+
   // Server
   port: Number(process.env.PORT ?? 8787),
 
   // Gemini backup forecaster — enabled if either a single key or a pool is set.
   // The actual key(s) used at call time come from keyPool.ts, not this field.
-  geminiEnabled: Boolean(process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEYS),
+  geminiEnabled: Boolean(
+    process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEYS
+  ),
   geminiModel: process.env.GEMINI_MODEL || "gemini-flash-latest",
 
   // Agreement / disagreement rules for blending LLM + Gemini + Polymarket
   disagreementSoftThreshold: Number(process.env.DISAGREEMENT_SOFT ?? 0.15), // raise edge bar
-  disagreementHardThreshold: Number(process.env.DISAGREEMENT_HARD ?? 0.20), // skip entirely
+  disagreementHardThreshold: Number(process.env.DISAGREEMENT_HARD ?? 0.2), // skip entirely
   disagreementEdgeMultiplier: Number(process.env.DISAGREEMENT_EDGE_MULT ?? 1.5),
 
   // --- Bankroll-based position sizing ---
@@ -96,7 +160,9 @@ export const CONFIG = {
   // claim before conviction scaling. 0.05 = 5%. Kept deliberately small —
   // convictionScore below can multiply it up to ~3x for strong signals,
   // and maxTokensPerTrade is still a hard ceiling per trade.
-  bankrollFractionPerTrade: Number(process.env.BANKROLL_FRACTION_PER_TRADE ?? 0.20),
+  bankrollFractionPerTrade: Number(
+    process.env.BANKROLL_FRACTION_PER_TRADE ?? 0.2
+  ),
   // Upper multiplier on bankrollFractionPerTrade for a maximally-confident,
   // maximally-over-threshold signal (edge/minEdge capped at this value).
   maxConvictionMultiplier: Number(process.env.MAX_CONVICTION_MULTIPLIER ?? 4),
@@ -119,7 +185,7 @@ export const CONFIG = {
   // pattern as the spend-cap resize) before declining outright, so a
   // thin-but-real-edge market still gets a smaller bite instead of being
   // skipped entirely. Default 5% — override via MAX_PRICE_IMPACT_PCT.
-  maxPriceImpactPct: Number(process.env.MAX_PRICE_IMPACT_PCT ?? 0.10),
+  maxPriceImpactPct: Number(process.env.MAX_PRICE_IMPACT_PCT ?? 0.1),
 
   // A trade sized under this many TOKENS is skipped outright, before it
   // ever reaches a quote. This is separate from (and checked before)
@@ -172,7 +238,9 @@ export const CONFIG = {
   // call or attempting an on-chain quote that's going to revert anyway.
   // Default 10 min — comfortably longer than one loop tick so a market
   // doesn't slip through right before closing and revert mid-cycle.
-  resolutionSafetyBufferMs: Number(process.env.RESOLUTION_SAFETY_BUFFER_MS ?? 10 * 60 * 1000),
+  resolutionSafetyBufferMs: Number(
+    process.env.RESOLUTION_SAFETY_BUFFER_MS ?? 10 * 60 * 1000
+  ),
 
   // --- Forecast cache ---
   // How long an LLM/Gemini forecast for a given market stays valid before
@@ -181,11 +249,15 @@ export const CONFIG = {
   // Default 20 min — comfortably longer than the 5 min loopIntervalMs
   // default, so a market only gets re-forecast every ~4th cycle instead
   // of every single one, unless its price actually moves.
-  forecastCacheTtlMs: Number(process.env.FORECAST_CACHE_TTL_MS ?? 20 * 60 * 1000),
+  forecastCacheTtlMs: Number(
+    process.env.FORECAST_CACHE_TTL_MS ?? 20 * 60 * 1000
+  ),
   // Absolute implied-probability movement (0-1 scale) on any outcome that
   // forces a re-forecast even within the TTL — a real price move is new
   // information the cached forecast never saw.
-  forecastCachePriceMoveThreshold: Number(process.env.FORECAST_CACHE_PRICE_MOVE_THRESHOLD ?? 0.03),
+  forecastCachePriceMoveThreshold: Number(
+    process.env.FORECAST_CACHE_PRICE_MOVE_THRESHOLD ?? 0.03
+  ),
 
   // Optional manual override for the competition token's decimals. The
   // on-chain decimals() call (see chainRead.ts) silently falls back to 18
@@ -206,7 +278,9 @@ export const CONFIG = {
   // absolute liquidity unit, since Market doesn't expose a guaranteed
   // stable liquidity field to threshold against directly. 0.3 = bottom 30%
   // of whatever batch was fetched gets flagged.
-  thinLiquidityBottomFraction: Number(process.env.THIN_LIQUIDITY_BOTTOM_FRACTION ?? 0.3),
+  thinLiquidityBottomFraction: Number(
+    process.env.THIN_LIQUIDITY_BOTTOM_FRACTION ?? 0.3
+  ),
 
   // Fire scripts/checkpoint.sh (commit + push data/) once at the end of
   // any cycle that entered at least one trade (live or dry-run) — so a

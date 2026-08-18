@@ -20,6 +20,8 @@ import { runCheckpointScript } from "./checkpoint.js";
 import { withDelphiRetry } from "./delphiRetry.js";
 import { extractTradingFeePct, msUntilResolve } from "./marketFields.js";
 import { CONFIG, getDryRun, getCompetitionTokenAddress } from "./config.js";
+import { isLegClosed } from "./closedLegs.js";
+import { runPositionWatcherPass } from "./positionWatcher.js";
 
 const client = new DelphiClient();
 
@@ -276,7 +278,7 @@ async function decide(
     confidence = llmResult.confidence;
 
     if (CONFIG.geminiEnabled) {
-      const grounded = isTimeSensitive(question);
+      const grounded = CONFIG.geminiAlwaysGrounded || isTimeSensitive(question);
       geminiSignal = await getGeminiForecast(question, outcomes, { grounded });
     }
 
@@ -301,6 +303,7 @@ async function decide(
   let bestIdx = -1;
   let bestEdge = 0;
   for (let i = 0; i < blend.blendedProbs.length; i++) {
+    if (isLegClosed(market.id, i)) continue; 
     const edge = blend.blendedProbs[i] - (marketProbs[i] ?? 0.5);
     if (edge > bestEdge) {
       bestEdge = edge;
@@ -957,6 +960,15 @@ async function main() {
   setInterval(() => {
     runOnce().catch((err) => console.error("Loop error:", err));
   }, CONFIG.loopIntervalMs);
+
+  if (CONFIG.positionWatcherEnabled) {
+    const watcherTickMs = Math.min(CONFIG.positionWatcherCooldownMs, 10 * 60 * 1000);
+    setInterval(() => {
+      runPositionWatcherPass(client, getDryRun()).catch((err) =>
+        console.error("[watcher] pass error:", err)
+      );
+    }, watcherTickMs);
+  }
 }
 
 main();

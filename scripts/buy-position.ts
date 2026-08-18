@@ -7,7 +7,7 @@
  * in the dashboard's Open Positions panel and redeem.ts picks it up
  * normally once the market settles.
  *
- *   npx tsx scripts/buy-position.ts --market 0xb13bc65ea2c2600f74a4634abf55c65deb6d0edc --outcome yes --amount 750
+ *   npx tsx scripts/buy-position.ts --market 0xdcaabdc8f3e4eef25a4ffac567d118d8ab0a3081 --outcome no --amount 1390
  *   npx tsx scripts/buy-position.ts --market 0xabc... --outcome yes --amount 50 --buy
  *   npx tsx scripts/buy-position.ts --market 0xabc... --outcome yes --amount 50 --buy --dry-run
  *   npx tsx scripts/buy-position.ts --market 0xabc... --outcome yes --amount 50 --buy --slippage-bps 500

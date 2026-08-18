@@ -48,6 +48,10 @@ export interface Receipt {
     redeemedAmount?: string;
     resolved?: boolean; 
     won?: boolean;
+    exitReason?: "manual-sell" | "watcher-auto-exit";
+    /** Gemini's sourceSummary for a watcher-triggered exit, or a free-text
+     * note for a manual one — why this leg was closed. */
+    exitNote?: string;
     /** True for markets that settled "failed" (void/undecided) and were
      * liquidated rather than redeemed against a winning outcome — see
      * redeem.ts. These never resolved to an actual right-or-wrong
