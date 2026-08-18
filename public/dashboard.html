@@ -789,11 +789,34 @@
                 <th>FEE</th>
                 <th>RESOLVES</th>
                 <th>STATUS</th>
+                <th>HEALTH</th>
                 <th>ACTIONS</th>
               </tr>
             </thead>
 
             <tbody id="positionsBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Closed Legs // Re-buy Guard</h2>
+          <span class="panel-sub" id="closedLegsCount">0 CLOSED</span>
+        </div>
+        <div class="scroll-y">
+          <table>
+            <thead>
+              <tr>
+                <th>MARKET QUESTION</th>
+                <th>OUTCOME</th>
+                <th>REASON</th>
+                <th>CLOSED</th>
+                <th>NOTE</th>
+                <th>ACTIONS</th>
+              </tr>
+            </thead>
+            <tbody id="closedLegsBody"></tbody>
           </table>
         </div>
       </div>
@@ -1190,6 +1213,10 @@
                       p.marketId
                     )}" data-outcome="${p.outcomeIdx}" data-shares="${esc(
                       p.sharesRaw
+                    )}" data-question="${esc(
+                      p.question
+                    )}" data-outcome-label="${esc(
+                      p.outcomeLabel
                     )}">Sell</button>`
                   : '<span style="color:var(--text-muted)">—</span>';
 
@@ -1205,13 +1232,14 @@
           <td>${feeCell}</td>
           <td>${resolvesCell}</td>
           <td>
-            ${
-              p.isDryRun
-                ? '<span class="pill synth">DRY</span>'
-                : '<span class="pill trade">LIVE</span>'
-            }
-            ${statusCell}
+${
+  p.isDryRun
+    ? '<span class="pill synth">DRY</span>'
+    : '<span class="pill trade">LIVE</span>'
+}
+${statusCell}
           </td>
+          <td>${healthCellFor(p)}</td>
           <td>${actionsCell}</td>
         </tr>
       `;
@@ -1220,11 +1248,12 @@
         } catch (e) {
           $(
             "#positionsBody"
-          ).innerHTML = `<tr><td colspan="11"><div class="empty">positions unavailable &mdash; ${esc(
+          ).innerHTML = `<tr><td colspan="12"><div class="empty">positions unavailable &mdash; ${esc(
             e.message
           )}</div></td></tr>`;
         }
       }
+
       // ---- Summary ----
       async function loadSummary() {
         try {
@@ -1596,37 +1625,45 @@
         }
       }
 
-      async function handleSell(marketId, outcomeIdx, sharesIn) {
+      async function handleSell(
+        marketId,
+        outcomeIdx,
+        sharesIn,
+        question,
+        outcomeLabel
+      ) {
         try {
           const q = await j("/api/positions/quote-sell", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ marketId, outcomeIdx, sharesIn }),
           });
-
           if (
             !confirm(
               `Sell for ~${q.tokensOutHuman.toFixed(
                 4
               )} tokens (3% slippage buffer)?`
             )
-          ) {
+          )
             return;
-          }
-
           const r = await j("/api/positions/sell", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ marketId, outcomeIdx, sharesIn }),
+            body: JSON.stringify({
+              marketId,
+              outcomeIdx,
+              sharesIn,
+              question,
+              outcomeLabel,
+            }),
           });
-
           alert(`Sold. tx=${r.transactionHash}`);
           loadPositions();
+          loadClosedLegs();
         } catch (e) {
           alert("Sell failed: " + e.message);
         }
       }
-
       async function handleBuy(marketId, outcomeIdx, amountTokens) {
         try {
           const q = await j("/api/markets/quote-buy", {
@@ -1665,7 +1702,9 @@
           handleSell(
             sellBtn.dataset.market,
             Number(sellBtn.dataset.outcome),
-            sellBtn.dataset.shares
+            sellBtn.dataset.shares,
+            sellBtn.dataset.question,
+            sellBtn.dataset.outcomeLabel
           );
           return;
         }
@@ -1681,17 +1720,26 @@
 
           handleBuy(marketId, outcomeIdx, Number(buyBtn.dataset.amount));
         }
+
+        const reopenBtn = e.target.closest(".reopen-btn");
+        if (reopenBtn) {
+          handleReopen(
+            reopenBtn.dataset.market,
+            Number(reopenBtn.dataset.outcome)
+          );
+        }
       });
 
       // ---- Boot Lifecycle ----
       async function refreshAll() {
         loadStatus();
         loadBalance();
+        await loadWatcherState();
         loadPositions();
         loadSummary();
         loadReceipts();
         loadMarkets();
-        // loadBacktestHistory();
+        loadClosedLegs();
         loadNodes();
       }
 

@@ -464,14 +464,16 @@ async function main() {
             redeemedAmount:
               exitAmountHuman.toFixed(6),
             exitReason: "manual-sell",
-          }
+          },
+          pos.outcomeIdx
         );
   
         markLegClosed(
           pos.marketProxy,
           pos.outcomeIdx,
           "manual-sell",
-          "sold via scripts/sell-positions.ts"
+          "sold via scripts/sell-positions.ts",
+          { question: pos.question, outcomeLabel: pos.outcomeLabel }
         );
 
       console.log(

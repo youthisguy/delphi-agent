@@ -269,6 +269,8 @@ async function checkOnePosition(
         dryRun,
         closeReason: "watcher-auto-exit",
         closeNote: result.sourceSummary,
+        question: position.question,
+        outcomeLabel: position.outcomeLabel,
       });
 
       if (sellResult.sold) {

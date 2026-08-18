@@ -106,7 +106,7 @@ export const CONFIG = {
   // slow-moving market. A position already mid-confirmation is always
   // re-checked regardless of this gate (see positionWatcher.ts).
   positionWatcherOnlyTimeSensitive:
-    process.env.POSITION_WATCHER_ONLY_TIME_SENSITIVE !== "false",
+    process.env.POSITION_WATCHER_ONLY_TIME_SENSITIVE !== "true",
 
   // Minimum time between checks for the SAME position, independent of
   // however often the watcher pass itself is ticked. Gemini quota has
@@ -121,7 +121,7 @@ export const CONFIG = {
   // instinct as forecastCache.ts's forecastCachePriceMoveThreshold: if
   // the book hasn't moved at all, be suspicious of the model's read.
   positionWatcherPriceMoveThreshold: Number(
-    process.env.POSITION_WATCHER_PRICE_MOVE_THRESHOLD ?? 0.03
+    process.env.POSITION_WATCHER_PRICE_MOVE_THRESHOLD ?? 0.05
   ),
 
   // Confidence floor (0-1) for a "severe" read to count toward exit
@@ -226,7 +226,7 @@ export const CONFIG = {
   // conservative (2x the default per-trade cap) — raise it
   // deliberately, not by accident, since this is the knob that controls
   // how concentrated a single bad call can get.
-  maxExposurePerMarket: Number(process.env.MAX_EXPOSURE_PER_MARKET ?? 200),
+  maxExposurePerMarket: Number(process.env.MAX_EXPOSURE_PER_MARKET ?? 350),
 
   // Markets can still show status "open" via the listMarkets API after
   // their on-chain resolution window has actually passed — the market

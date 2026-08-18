@@ -25,7 +25,7 @@ import {
 } from "./marketFields.js";
 import { withDelphiRetry } from "./delphiRetry.js";
 import { runPositionWatcherPass, readWatcherLog, readWatcherState } from "./positionWatcher.js";
-import { getAllClosedLegs, reopenLeg, markLegClosed } from "./closedLegs.js";
+import { getAllClosedLegs, reopenLeg, markLegClosed, isLegClosed } from "./closedLegs.js";
 
 
 
@@ -248,7 +248,7 @@ app.post("/api/positions/quote-sell", async (req: any, res: any) => {
 
 app.post("/api/positions/sell", requireDashboardPassword, async (req: any, res: any) => {
   try {
-    const { marketId, outcomeIdx, sharesIn } = req.body ?? {};
+    const { marketId, outcomeIdx, sharesIn, question, outcomeLabel } = req.body ?? {};
     if (typeof marketId !== "string" || !/^0x[a-fA-F0-9]{40}$/.test(marketId)) {
       return res.status(400).json({ error: "marketId must be a 0x… address" });
     }
@@ -300,8 +300,9 @@ app.post("/api/positions/sell", requireDashboardPassword, async (req: any, res: 
         redeemedTxHash: result.transactionHash,
         redeemedAmount: (Number(quote.tokensOut) / 10 ** (CONFIG.competitionTokenDecimals ?? 6)).toFixed(6),
         exitReason: "manual-sell",
-      });
-      markLegClosed(marketId, outcomeIdx, "manual-sell", "sold via dashboard");
+      }, outcomeIdx
+    );
+      markLegClosed(marketId, outcomeIdx, "manual-sell", "sold via dashboard", { question, outcomeLabel });
   
       const decimals = CONFIG.competitionTokenDecimals ?? 6;
   
@@ -545,6 +546,12 @@ app.post("/api/markets/buy", requireDashboardPassword, async (req: any, res: any
     const { marketId, outcomeIdx, amountTokens } = req.body ?? {};
     if (typeof marketId !== "string" || !/^0x[a-fA-F0-9]{40}$/.test(marketId)) {
       return res.status(400).json({ error: "marketId must be a 0x… address" });
+    }
+    const closed = isLegClosed(marketId, outcomeIdx);
+    if (closed) {
+      return res.status(409).json({
+        error: `this leg was closed (${closed.reason}) at ${closed.closedAt}${closed.note ? " — " + closed.note : ""}. Reopen it first via POST /api/closed-legs/reopen if this was a mistake.`,
+      });
     }
     if (!Number.isInteger(outcomeIdx) || outcomeIdx < 0) {
       return res.status(400).json({ error: "outcomeIdx must be a non-negative integer" });

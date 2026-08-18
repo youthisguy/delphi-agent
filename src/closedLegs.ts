@@ -10,7 +10,15 @@ import { CONFIG } from "./config.js";
  * sold on purpose must never be silently re-bought back into on the next
  * qualifying signal, live or dry-run.
  *
- * Closures are permanent by design.
+ * Deliberately per-OUTCOME, not per-market: closing the "Yes" leg because
+ * its thesis broke says nothing about "No" — blocking the whole market
+ * would throw away a legitimately different (and now possibly BETTER)
+ * opportunity on the other side. See positionWatcher.ts's doc comment for
+ * the reasoning on why exit-only (never flip) keeps these independent.
+ *
+ * Closures are permanent by design — no TTL, no auto-expiry. reopenLeg()
+ * exists as a manual escape hatch for a confirmed false positive, but
+ * nothing in the codebase calls it automatically.
  */
 
 export type CloseReason = "manual-sell" | "watcher-auto-exit";
@@ -21,6 +29,15 @@ export interface ClosedLeg {
   reason: CloseReason;
   closedAt: string; // ISO
   note?: string;
+  /** Snapshot of the market question / outcome label AT THE TIME OF
+   * CLOSING, purely for display (the dashboard's Closed Legs panel).
+   * Optional and best-effort — callers that have this on hand already
+   * (positionWatcher.ts, the dashboard's sell request) should pass it so
+   * the panel doesn't need an extra getMarket() call just to render a
+   * label; callers that don't have it (a bare CLI invocation) can omit
+   * it and the panel falls back to showing the raw address. */
+  question?: string;
+  outcomeLabel?: string;
 }
 
 const CLOSED_LEGS_PATH = path.join(CONFIG.dataDir, "closed-legs.json");
@@ -54,7 +71,8 @@ export function markLegClosed(
   marketId: string,
   outcomeIdx: number,
   reason: CloseReason,
-  note?: string
+  note?: string,
+  display?: { question?: string; outcomeLabel?: string }
 ): void {
   const all = readAll();
   all[keyFor(marketId, outcomeIdx)] = {
@@ -63,6 +81,8 @@ export function markLegClosed(
     reason,
     closedAt: new Date().toISOString(),
     note,
+    question: display?.question,
+    outcomeLabel: display?.outcomeLabel,
   };
   writeAll(all);
 }

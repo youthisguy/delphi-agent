@@ -97,14 +97,15 @@ export function appendReceipt(r: Receipt) {
  * position is later redeemed). Trade receipts only. */
 export function patchReceiptExecution(
   marketId: string,
-  patch: Partial<NonNullable<Receipt["execution"]>>
+  patch: Partial<NonNullable<Receipt["execution"]>>,
+  outcomeIdx?: number
 ) {
   if (!fs.existsSync(CONFIG.journalPath)) return;
   const lines = fs.readFileSync(CONFIG.journalPath, "utf8").split("\n").filter(Boolean);
   let changed = false;
   const out = lines.map((line) => {
     const r: Receipt = JSON.parse(line);
-    if (r.marketId === marketId && r.decision === "trade") {
+    if (r.marketId === marketId && r.decision === "trade" && (outcomeIdx === undefined || r.outcomeIdx === outcomeIdx)) {
       r.execution = { ...(r.execution ?? {}), ...patch };
       changed = true;
     }

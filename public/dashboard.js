@@ -82,5 +82,87 @@ async function runNodeHealthCheck() {
   }
 }
 
+let watcherStateCache = {};
+
+async function loadWatcherState() {
+  try {
+    const r = await j("/api/watcher/state");
+    watcherStateCache = r.state || {};
+  } catch (e) {
+    watcherStateCache = {};
+  }
+}
+
+async function loadClosedLegs() {
+  try {
+    const r = await j("/api/closed-legs");
+    const legs = r.legs || [];
+    $("#closedLegsCount").textContent = legs.length + " CLOSED";
+
+    if (!legs.length) {
+      $("#closedLegsBody").innerHTML = `<tr><td colspan="6"><div class="empty">no closed legs</div></td></tr>`;
+      return;
+    }
+
+    // Most recently closed first.
+    legs.sort((a, b) => new Date(b.closedAt).getTime() - new Date(a.closedAt).getTime());
+
+    $("#closedLegsBody").innerHTML = legs.map((leg) => {
+      const reasonPill = leg.reason === "watcher-auto-exit"
+        ? '<span class="pill gone" title="Auto-exited by the position watcher">AUTO-EXIT</span>'
+        : '<span class="pill skip" title="Sold manually">MANUAL</span>';
+
+      return `
+        <tr>
+          <td class="q-cell" title="${esc(leg.question || leg.marketId)}">${esc(leg.question || leg.marketId)}</td>
+          <td>${esc(leg.outcomeLabel ?? ("#" + leg.outcomeIdx))}</td>
+          <td>${reasonPill}</td>
+          <td>${timeAgo(leg.closedAt)}</td>
+          <td style="color:var(--text-muted); font-size:9px; max-width:220px; white-space:normal;">${esc(leg.note || "—")}</td>
+          <td>
+            <button class="reopen-btn" data-market="${esc(leg.marketId)}" data-outcome="${leg.outcomeIdx}">Reopen</button>
+          </td>
+        </tr>
+      `;
+    }).join("");
+  } catch (e) {
+    $("#closedLegsBody").innerHTML = `<tr><td colspan="6"><div class="empty">closed-legs unavailable</div></td></tr>`;
+  }
+}
+
+async function handleReopen(marketId, outcomeIdx) {
+  if (!confirm("Reopen this leg? The bot will be able to buy it again on the next qualifying signal.")) return;
+  try {
+    const r = await j("/api/closed-legs/reopen", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ marketId, outcomeIdx }),
+    });
+    if (!r.reopened) {
+      alert("Nothing to reopen — it may have already been cleared.");
+    }
+    loadClosedLegs();
+  } catch (e) {
+    alert("Reopen failed: " + e.message);
+  }
+}
+
+function healthCellFor(p) {
+  const key = `${p.marketId.toLowerCase()}::${p.outcomeIdx}`;
+  const w = watcherStateCache[key];
+
+  if (!w) {
+    return `<span class="v" style="color:var(--text-muted); font-size:9px;" title="Not yet checked, or not time-sensitive enough to qualify for checks">—</span>`;
+  }
+
+  if (w.pendingConfirmation) {
+    const since = w.pendingSince ? timeAgo(w.pendingSince) : "";
+    return `<span class="pill stale" title="Severity=${esc(w.pendingSeverity || "")} conf=${fmtNum(w.pendingConfidence, 2)} — flagged ${since}, awaiting a second confirming check before auto-exit">FLAGGED</span>`;
+  }
+
+  const checkedAgo = timeAgo(w.lastCheckedAt);
+  return `<span class="v good" style="font-size:9px;" title="Last checked ${checkedAgo}, no concerning news found">OK <span style="color:var(--text-muted)">(${checkedAgo})</span></span>`;
+}
+
 // wire button once DOM ready
 document.getElementById("nodeHealthBtn")?.addEventListener("click", runNodeHealthCheck);

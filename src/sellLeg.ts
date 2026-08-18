@@ -37,6 +37,10 @@ export async function sellLeg(
     dryRun?: boolean;
     closeReason: CloseReason;
     closeNote?: string;
+    /** Passed straight through to closedLegs.ts's markLegClosed() for
+     * display — see that function's doc comment. */
+    question?: string;
+    outcomeLabel?: string;
   }
 ): Promise<SellLegResult> {
   const slippageBps = params.slippageBps ?? 300n;
@@ -54,18 +58,27 @@ export async function sellLeg(
     );
     quotedTokensOut = quote.tokensOut;
   } catch (err) {
-    return { sold: false, reason: `quoteSell failed: ${err instanceof Error ? err.message : err}` };
+    return {
+      sold: false,
+      reason: `quoteSell failed: ${err instanceof Error ? err.message : err}`,
+    };
   }
 
-  const tokensOutHuman = Number(quotedTokensOut) / 10 ** params.collateralDecimals;
+  const tokensOutHuman =
+    Number(quotedTokensOut) / 10 ** params.collateralDecimals;
 
   if (params.dryRun) {
     // Dry-run never touches closedLegs or the journal's execution block —
     // there's no real leg to close yet, only a simulated one.
-    return { sold: false, reason: "dry-run — no on-chain sell sent", tokensOutHuman };
+    return {
+      sold: false,
+      reason: "dry-run — no on-chain sell sent",
+      tokensOutHuman,
+    };
   }
 
-  const minTokensOut = quotedTokensOut - (quotedTokensOut * slippageBps) / 10_000n;
+  const minTokensOut =
+    quotedTokensOut - (quotedTokensOut * slippageBps) / 10_000n;
 
   try {
     const result = await withDelphiRetry(
@@ -79,20 +92,36 @@ export async function sellLeg(
       { label: `sellShares(${params.marketAddress})` }
     );
 
-    patchReceiptExecution(params.marketAddress, {
-      resolved: true,
-      redeemedTxHash: result.transactionHash,
-      redeemedAmount: tokensOutHuman.toFixed(6),
-      exitReason: params.closeReason,
-      exitNote: params.closeNote,
-    });
+    patchReceiptExecution(
+      params.marketAddress,
+      {
+        resolved: true,
+        redeemedTxHash: result.transactionHash,
+        redeemedAmount: tokensOutHuman.toFixed(6),
+        exitReason: params.closeReason,
+        exitNote: params.closeNote,
+      },
+      params.outcomeIdx
+    );
 
     // The permanent re-buy guard — see closedLegs.ts. Runs AFTER the sell
     // confirms, so a failed sell never blocks the leg for no reason.
-    markLegClosed(params.marketAddress, params.outcomeIdx, params.closeReason, params.closeNote);
+    markLegClosed(
+      params.marketAddress,
+      params.outcomeIdx,
+      params.closeReason,
+      params.closeNote,
+      {
+        question: params.question,
+        outcomeLabel: params.outcomeLabel,
+      }
+    );
 
     return { sold: true, txHash: result.transactionHash, tokensOutHuman };
   } catch (err) {
-    return { sold: false, reason: `sellShares failed: ${err instanceof Error ? err.message : err}` };
+    return {
+      sold: false,
+      reason: `sellShares failed: ${err instanceof Error ? err.message : err}`,
+    };
   }
 }
