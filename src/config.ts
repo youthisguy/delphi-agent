@@ -165,7 +165,7 @@ export const CONFIG = {
   ),
   // Upper multiplier on bankrollFractionPerTrade for a maximally-confident,
   // maximally-over-threshold signal (edge/minEdge capped at this value).
-  maxConvictionMultiplier: Number(process.env.MAX_CONVICTION_MULTIPLIER ?? 4),
+  maxConvictionMultiplier: Number(process.env.MAX_CONVICTION_MULTIPLIER ?? 3),
   // Tokens always left undeployed as a buffer (gas, slippage, redemption
   // timing) — never counted as available capital for sizing.
   bankrollReserveTokens: Number(process.env.BANKROLL_RESERVE_TOKENS ?? 1),
