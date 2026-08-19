@@ -1,16 +1,16 @@
 {
-  "updatedAt": "2026-08-19T12:10:41.259Z",
-  "totalReceipts": 1539,
-  "totalTrades": 200,
-  "totalSkips": 1339,
+  "updatedAt": "2026-08-19T22:06:53.254Z",
+  "totalReceipts": 1578,
+  "totalTrades": 226,
+  "totalSkips": 1352,
   "rollingAccuracy": {
-    "n": 175,
-    "hitRate": 0.44
+    "n": 176,
+    "hitRate": 0.4431818181818182
   },
   "calibrationByConfidenceBucket": {
     "low(<0.4)": {
-      "n": 73,
-      "hitRate": 0.3424657534246575
+      "n": 74,
+      "hitRate": 0.35135135135135137
     },
     "mid(0.4-0.6)": {
       "n": 55,
@@ -27,9 +27,24 @@
   },
   "perCategory": {
     "uncategorized": {
-      "n": 51,
-      "hitRate": 0.13725490196078433,
-      "trades": 65
+      "n": 52,
+      "hitRate": 0.15384615384615385,
+      "trades": 88
+    },
+    "economics": {
+      "n": 34,
+      "hitRate": 1,
+      "trades": 36
+    },
+    "miscellaneous": {
+      "n": 65,
+      "hitRate": 0.35384615384615387,
+      "trades": 71
+    },
+    "finance": {
+      "n": 1,
+      "hitRate": 0,
+      "trades": 3
     },
     "tech": {
       "n": 4,
@@ -40,21 +55,6 @@
       "n": 7,
       "hitRate": 0.2857142857142857,
       "trades": 9
-    },
-    "economics": {
-      "n": 34,
-      "hitRate": 1,
-      "trades": 35
-    },
-    "miscellaneous": {
-      "n": 65,
-      "hitRate": 0.35384615384615387,
-      "trades": 70
-    },
-    "finance": {
-      "n": 1,
-      "hitRate": 0,
-      "trades": 2
     },
     "politics": {
       "n": 10,
@@ -72,25 +72,25 @@
       "trades": 1
     }
   },
-  "openExposureTokens": 2552.2040328671155,
+  "openExposureTokens": 4197.766187627308,
   "tradePerformance": {
-    "settled": 133,
-    "wins": 77,
+    "settled": 134,
+    "wins": 78,
     "losses": 56,
-    "winRate": 0.5789473684210527,
+    "winRate": 0.582089552238806,
     "voidTrades": 4,
     "totalPnl": -570.1171,
-    "openTrades": 21
+    "openTrades": 46
   },
   "skipCalibration": {
-    "settled": 1316,
-    "wouldHaveWon": 919,
-    "wouldHaveWonRate": 0.6983282674772037,
+    "settled": 1325,
+    "wouldHaveWon": 928,
+    "wouldHaveWonRate": 0.700377358490566,
     "voidSkips": 5
   },
   "lastNDecisions": [
     {
-      "ts": "2026-08-19T12:10:41.199Z",
+      "ts": "2026-08-19T22:06:52.524Z",
       "marketId": "0x2258cfca1af0eac76dcc6d0b1a134f274bdf2d3e",
       "question": "Will AARO or ODNI publicly release previously unreleased UAP records between Aug 10 00:00 and Aug 21 14:00 UTC 2026?",
       "category": "politics",
@@ -99,8 +99,8 @@
         "No"
       ],
       "rawPrice": [
-        0.16980324701199997,
-        0.830196752988
+        0.13284806189243076,
+        0.8671519381075693
       ],
       "syntheticPrice": false,
       "signals": {
@@ -121,468 +121,15 @@
       ],
       "confidence": 0.46,
       "decision": "skip",
-      "outcomeIdx": 0,
-      "edge": 0.11019675298800005,
-      "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "bestEdge=0.110 < minEdge=0.13"
-    },
-    {
-      "ts": "2026-08-19T10:30:48.777Z",
-      "marketId": "0xc598c6fac139b5b76a88ac08bf3e4663f1336acc",
-      "question": "Will the US Treasury 10-year constant maturity yield for 2026-08-20 be above 4.68%?",
-      "category": "economics",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.7576387862995926,
-        0.24236121370040745
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.57,
-            0.43
-          ],
-          "confidence": 0.52
-        },
-        "gemini": {
-          "probs": [
-            0.45,
-            0.55
-          ],
-          "confidence": 0.4,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.12000000000000005,
-      "blendedProbs": [
-        0.5357142857142857,
-        0.46428571428571436
-      ],
-      "confidence": 0.52,
-      "decision": "skip",
       "outcomeIdx": null,
-      "edge": 0.2219245005853069,
+      "edge": 0.14715193810756927,
       "thresholdUsed": 0.125,
       "size": null,
       "execution": null,
-      "skipReason": "live execution declined: price impact still 23.3% after resize, exceeds 10% cap"
+      "skipReason": "live execution declined: price impact still 38.1% after resize, exceeds 10% cap"
     },
     {
-      "ts": "2026-08-19T09:54:54.917Z",
-      "marketId": "0x701f91b48fdf8eaac09de1317f34d3d901b74216",
-      "question": "Will Botafogo and CS Cienciano combine for 4 or more goals in their Copa Sudamericana match on Aug 20, 2026?",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.532765157496887,
-        0.5
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": null,
-        "gemini": null,
-        "polymarket": null
-      },
-      "disagreement": null,
-      "blendedProbs": [
-        1,
-        0
-      ],
-      "confidence": 0,
-      "decision": "trade",
-      "outcomeIdx": 0,
-      "edge": 0,
-      "thresholdUsed": 0,
-      "size": 48.9812,
-      "execution": {
-        "txHash": "0x0d1badb7894b286dc6d2c92485e38ec415565619189b7e71f0331d6d3018390b",
-        "quotedTokensIn": 48.9812,
-        "sharesOut": "90521876045591756800",
-        "priceImpactPct": 0.015640616076081592
-      },
-      "skipReason": "manual buy via dashboard"
-    },
-    {
-      "ts": "2026-08-19T09:27:20.236Z",
-      "marketId": "0x360274d153c58566943cb21088dd95e45638bda3",
-      "question": "Will water level at The Battery, New York exceed 5.18 ft MLLW between 18:00 and 23:54 UTC on 2026-08-20?",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.5,
-        0.3996690089375217
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": null,
-        "gemini": null,
-        "polymarket": null
-      },
-      "disagreement": null,
-      "blendedProbs": [
-        0,
-        1
-      ],
-      "confidence": 0,
-      "decision": "trade",
-      "outcomeIdx": 1,
-      "edge": 0,
-      "thresholdUsed": 0,
-      "size": 97.658228,
-      "execution": {
-        "txHash": "0x69c7c4a95c4d180c2e42f65c5e1fb29b24bc55e355a1e79b93cc5ffe43703dd3",
-        "quotedTokensIn": 97.658228,
-        "sharesOut": "232231711470284767232",
-        "priceImpactPct": 0.05217224971845192
-      },
-      "skipReason": "manual buy via dashboard"
-    },
-    {
-      "ts": "2026-08-19T09:25:44.724Z",
-      "marketId": "0x360274d153c58566943cb21088dd95e45638bda3",
-      "question": "Will water level at The Battery, New York exceed 5.18 ft MLLW between 18:00 and 23:54 UTC on 2026-08-20?",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.5,
-        0.35860480591703897
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": null,
-        "gemini": null,
-        "polymarket": null
-      },
-      "disagreement": null,
-      "blendedProbs": [
-        0,
-        1
-      ],
-      "confidence": 0,
-      "decision": "trade",
-      "outcomeIdx": 1,
-      "edge": 0,
-      "thresholdUsed": 0,
-      "size": 97.54241,
-      "execution": {
-        "txHash": "0x87e23f1c3b9bba912ae1ef3a7782375373cfb1e6497da5169d4f69a7a5896e6a",
-        "quotedTokensIn": 97.54241,
-        "sharesOut": "256379375683558899712",
-        "priceImpactPct": 0.06094846891681433
-      },
-      "skipReason": "manual buy via dashboard"
-    },
-    {
-      "ts": "2026-08-19T09:22:56.804Z",
-      "marketId": "0x701f91b48fdf8eaac09de1317f34d3d901b74216",
-      "question": "Will Botafogo and CS Cienciano combine for 4 or more goals in their Copa Sudamericana match on Aug 20, 2026?",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.5326814987417399,
-        0.5
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": null,
-        "gemini": null,
-        "polymarket": null
-      },
-      "disagreement": null,
-      "blendedProbs": [
-        1,
-        0
-      ],
-      "confidence": 0,
-      "decision": "trade",
-      "outcomeIdx": 0,
-      "edge": 0,
-      "thresholdUsed": 0,
-      "size": 48.981192,
-      "execution": {
-        "txHash": "0xe5625dff8092aa5c0de15a3706bc1a66384d6b6f7f2cab15c45a974644d380b1",
-        "quotedTokensIn": 48.981192,
-        "sharesOut": "90535761218260631552",
-        "priceImpactPct": 0.01564416876568817
-      },
-      "skipReason": "manual buy via dashboard"
-    },
-    {
-      "ts": "2026-08-19T09:21:26.555Z",
-      "marketId": "0x360274d153c58566943cb21088dd95e45638bda3",
-      "question": "Will water level at The Battery, New York exceed 5.18 ft MLLW between 18:00 and 23:54 UTC on 2026-08-20?",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.5,
-        0.4956335058621925
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": null,
-        "gemini": null,
-        "polymarket": null
-      },
-      "disagreement": null,
-      "blendedProbs": [
-        0,
-        1
-      ],
-      "confidence": 0,
-      "decision": "trade",
-      "outcomeIdx": 1,
-      "edge": 0,
-      "thresholdUsed": 0,
-      "size": 97.817371,
-      "execution": {
-        "txHash": "0x2a46b1977959632aa4cf05b1c543a44d2d6fab488acc404eea188180acb4dd72",
-        "quotedTokensIn": 97.817371,
-        "sharesOut": "190285825552237133824",
-        "priceImpactPct": 0.037167476245108175
-      },
-      "skipReason": "manual buy via dashboard"
-    },
-    {
-      "ts": "2026-08-19T09:21:08.631Z",
-      "marketId": "0x360274d153c58566943cb21088dd95e45638bda3",
-      "question": "Will water level at The Battery, New York exceed 5.18 ft MLLW between 18:00 and 23:54 UTC on 2026-08-20?",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.5,
-        0.46183792052159867
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": null,
-        "gemini": null,
-        "polymarket": null
-      },
-      "disagreement": null,
-      "blendedProbs": [
-        0,
-        1
-      ],
-      "confidence": 0,
-      "decision": "trade",
-      "outcomeIdx": 1,
-      "edge": 0,
-      "thresholdUsed": 0,
-      "size": 97.773774,
-      "execution": {
-        "txHash": "0x0c300b84025846111b5c3b1df75726c2d91271287eb2ecf6e55ce553156af578",
-        "quotedTokensIn": 97.773774,
-        "sharesOut": "203219023542360637440",
-        "priceImpactPct": 0.041761803060028524
-      },
-      "skipReason": "manual buy via dashboard"
-    },
-    {
-      "ts": "2026-08-19T09:20:30.990Z",
-      "marketId": "0x360274d153c58566943cb21088dd95e45638bda3",
-      "question": "Will water level at The Battery, New York exceed 5.18 ft MLLW between 18:00 and 23:54 UTC on 2026-08-20?",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.5,
-        0.4258007187952173
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": null,
-        "gemini": null,
-        "polymarket": null
-      },
-      "disagreement": null,
-      "blendedProbs": [
-        0,
-        1
-      ],
-      "confidence": 0,
-      "decision": "trade",
-      "outcomeIdx": 1,
-      "edge": 0,
-      "thresholdUsed": 0,
-      "size": 97.713677,
-      "execution": {
-        "txHash": "0x41f4f22179e3092fdcbd53edb3b836d5995735824cc4f6730db08bd49798a8ff",
-        "quotedTokensIn": 97.713677,
-        "sharesOut": "219088958532234444800",
-        "priceImpactPct": 0.047438360564371736
-      },
-      "skipReason": "manual buy via dashboard"
-    },
-    {
-      "ts": "2026-08-19T09:18:59.621Z",
-      "marketId": "0x701f91b48fdf8eaac09de1317f34d3d901b74216",
-      "question": "Will Botafogo and CS Cienciano combine for 4 or more goals in their Copa Sudamericana match on Aug 20, 2026?",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.5681533384986188,
-        0.5
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": null,
-        "gemini": null,
-        "polymarket": null
-      },
-      "disagreement": null,
-      "blendedProbs": [
-        1,
-        0
-      ],
-      "confidence": 0,
-      "decision": "trade",
-      "outcomeIdx": 0,
-      "edge": 0,
-      "thresholdUsed": 0,
-      "size": 48.984358,
-      "execution": {
-        "txHash": "0x6621fe739b7d9f37f3a06ba048ab3ddf5db253878e5c3698ee538e83cdbd60b2",
-        "quotedTokensIn": 48.984358,
-        "sharesOut": "85007114091581505536",
-        "priceImpactPct": 0.014230309459519036
-      },
-      "skipReason": "manual buy via dashboard"
-    },
-    {
-      "ts": "2026-08-19T08:57:32.844Z",
-      "marketId": "0x701f91b48fdf8eaac09de1317f34d3d901b74216",
-      "question": "Will Botafogo and CS Cienciano combine for 4 or more goals in their Copa Sudamericana match on Aug 20, 2026?",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.6785717894579337,
-        0.5
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": null,
-        "gemini": null,
-        "polymarket": null
-      },
-      "disagreement": null,
-      "blendedProbs": [
-        1,
-        0
-      ],
-      "confidence": 0,
-      "decision": "trade",
-      "outcomeIdx": 0,
-      "edge": 0,
-      "thresholdUsed": 0,
-      "size": 97.959195,
-      "execution": {
-        "txHash": "0x4fa65ddc058fc261dccb9df97e4ad0b6af493670889554a5edb794a4d8d3a4f3",
-        "quotedTokensIn": 97.959195,
-        "sharesOut": "142031898449211375616",
-        "priceImpactPct": 0.0163973286829434
-      },
-      "skipReason": "manual buy via dashboard"
-    },
-    {
-      "ts": "2026-08-19T08:57:02.395Z",
-      "marketId": "0x701f91b48fdf8eaac09de1317f34d3d901b74216",
-      "question": "Will Botafogo and CS Cienciano combine for 4 or more goals in their Copa Sudamericana match on Aug 20, 2026?",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.6729738351006491,
-        0.5
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": null,
-        "gemini": null,
-        "polymarket": null
-      },
-      "disagreement": null,
-      "blendedProbs": [
-        1,
-        0
-      ],
-      "confidence": 0,
-      "decision": "trade",
-      "outcomeIdx": 0,
-      "edge": 0,
-      "thresholdUsed": 0,
-      "size": 97.957798,
-      "execution": {
-        "txHash": "0x19055bc68a3c883a29f285a82bdab9b1c4daf6c476f2bf34e159f6b3897a6a1d",
-        "quotedTokensIn": 97.957798,
-        "sharesOut": "143170034090191896576",
-        "priceImpactPct": 0.01669036131152301
-      },
-      "skipReason": "manual buy via dashboard"
-    },
-    {
-      "ts": "2026-08-19T08:56:30.320Z",
-      "marketId": "0x701f91b48fdf8eaac09de1317f34d3d901b74216",
-      "question": "Will Botafogo and CS Cienciano combine for 4 or more goals in their Copa Sudamericana match on Aug 20, 2026?",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.6566425473652436,
-        0.5
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": null,
-        "gemini": null,
-        "polymarket": null
-      },
-      "disagreement": null,
-      "blendedProbs": [
-        1,
-        0
-      ],
-      "confidence": 0,
-      "decision": "trade",
-      "outcomeIdx": 0,
-      "edge": 0,
-      "thresholdUsed": 0,
-      "size": 97.953484,
-      "execution": {
-        "txHash": "0x09c6e37fda8f5b0886029325b7b2ebc0eb7cca1babca19e99e82814c8e25dd41",
-        "quotedTokensIn": 97.953484,
-        "sharesOut": "146597012387919183872",
-        "priceImpactPct": 0.017573406304070623
-      },
-      "skipReason": "manual buy via dashboard"
-    },
-    {
-      "ts": "2026-08-19T08:54:50.444Z",
+      "ts": "2026-08-19T22:06:38.369Z",
       "marketId": "0x701f91b48fdf8eaac09de1317f34d3d901b74216",
       "question": "Will Botafogo and CS Cienciano combine for 4 or more goals in their Copa Sudamericana match on Aug 20, 2026?",
       "category": "sports",
@@ -591,8 +138,8 @@
         "No"
       ],
       "rawPrice": [
-        0.6091361013207652,
-        0.3908638986792348
+        0.5986586294405791,
+        0.4013413705594209
       ],
       "syntheticPrice": false,
       "signals": {
@@ -605,30 +152,661 @@
         },
         "gemini": {
           "probs": [
-            0.42,
-            0.58
+            0.38,
+            0.62
           ],
           "confidence": 0.4,
           "grounded": false
         },
         "polymarket": null
       },
-      "disagreement": 0.14,
+      "disagreement": 0.09999999999999998,
       "blendedProbs": [
-        0.32000000000000006,
-        0.68
+        0.3085714285714286,
+        0.6914285714285715
       ],
       "confidence": 0.58,
       "decision": "skip",
-      "outcomeIdx": 1,
-      "edge": 0.2891361013207652,
+      "outcomeIdx": null,
+      "edge": 0,
       "thresholdUsed": 0.125,
       "size": null,
       "execution": null,
-      "skipReason": "models disagree sharply (spread=0.14 >= hard threshold 0.13)"
+      "skipReason": "bestEdge=0.000 < minEdge=0.13"
     },
     {
-      "ts": "2026-08-19T08:54:47.067Z",
+      "ts": "2026-08-19T20:27:35.538Z",
+      "marketId": "0xbf1ce7c9d751b92bfac4acefe0e87d82b1d30163",
+      "question": "Will Sporting Kansas City win their MLS match against St. Louis City SC scheduled for Aug 19, 2026?",
+      "category": "sports",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.33987727927828676,
+        0.6601227207217133
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.39,
+            0.61
+          ],
+          "confidence": 0.58
+        },
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [
+        0.39,
+        0.61
+      ],
+      "confidence": 0.58,
+      "decision": "skip",
+      "outcomeIdx": 0,
+      "edge": 0.050122720721713254,
+      "thresholdUsed": 0.125,
+      "size": null,
+      "execution": null,
+      "skipReason": "bestEdge=0.050 < minEdge=0.13"
+    },
+    {
+      "ts": "2026-08-19T19:25:16.808Z",
+      "marketId": "0x2e58244d21a2bf56e68aef7b674c1630da1694fe",
+      "question": "Will an additional 50% Section 338 duty apply to covered Canadian goods entered Aug 19, 2026 (04:00Z–Aug 20 04:00Z)?",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.17275635585502547,
+        0.5
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": null,
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [
+        1,
+        0
+      ],
+      "confidence": 0,
+      "decision": "trade",
+      "outcomeIdx": 0,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": 34.438071,
+      "execution": {
+        "txHash": "0x9cea74a7fe42fff9986e36d31c6799523db7d69cd890b10c23b494b719e01e08",
+        "quotedTokensIn": 34.438071,
+        "sharesOut": "181976800446643929088",
+        "priceImpactPct": 0.09544041014871649
+      },
+      "skipReason": "manual buy via dashboard"
+    },
+    {
+      "ts": "2026-08-19T19:20:20.712Z",
+      "marketId": "0x2e58244d21a2bf56e68aef7b674c1630da1694fe",
+      "question": "Will an additional 50% Section 338 duty apply to covered Canadian goods entered Aug 19, 2026 (04:00Z–Aug 20 04:00Z)?",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.27001222605405745,
+        0.5
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": null,
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [
+        1,
+        0
+      ],
+      "confidence": 0,
+      "decision": "trade",
+      "outcomeIdx": 0,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": 63.55516,
+      "execution": {
+        "txHash": "0xb80c9d444d4317367fbaa600d74cca521deeadb70889053dfe618a32a9f6c263",
+        "quotedTokensIn": 63.55516,
+        "sharesOut": "214338942160083681280",
+        "priceImpactPct": 0.0981617281508138
+      },
+      "skipReason": "manual buy via dashboard"
+    },
+    {
+      "ts": "2026-08-19T19:17:48.529Z",
+      "marketId": "0x2e58244d21a2bf56e68aef7b674c1630da1694fe",
+      "question": "Will an additional 50% Section 338 duty apply to covered Canadian goods entered Aug 19, 2026 (04:00Z–Aug 20 04:00Z)?",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.5084987619408331,
+        0.5
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": null,
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [
+        1,
+        0
+      ],
+      "confidence": 0,
+      "decision": "trade",
+      "outcomeIdx": 0,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": 97.614443,
+      "execution": {
+        "txHash": "0x3b92b4cb867ed24d6d0d918df2e5b27ec2c02edc9cbc4f6567e8cd354a74669e",
+        "quotedTokensIn": 97.614443,
+        "sharesOut": "181755448614696910848",
+        "priceImpactPct": 0.05617708744168463
+      },
+      "skipReason": "manual buy via dashboard"
+    },
+    {
+      "ts": "2026-08-19T19:17:14.457Z",
+      "marketId": "0x2e58244d21a2bf56e68aef7b674c1630da1694fe",
+      "question": "Will an additional 50% Section 338 duty apply to covered Canadian goods entered Aug 19, 2026 (04:00Z–Aug 20 04:00Z)?",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.47253535187170514,
+        0.5
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": null,
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [
+        1,
+        0
+      ],
+      "confidence": 0,
+      "decision": "trade",
+      "outcomeIdx": 0,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": 97.50866,
+      "execution": {
+        "txHash": "0xac6b7ab7c85c5b40299d94f8e265c645d67c8571466da5bdfd617421c38307b8",
+        "quotedTokensIn": 97.50866,
+        "sharesOut": "193958512185752190976",
+        "priceImpactPct": 0.06389811436938579
+      },
+      "skipReason": "manual buy via dashboard"
+    },
+    {
+      "ts": "2026-08-19T19:16:52.617Z",
+      "marketId": "0x2e58244d21a2bf56e68aef7b674c1630da1694fe",
+      "question": "Will an additional 50% Section 338 duty apply to covered Canadian goods entered Aug 19, 2026 (04:00Z–Aug 20 04:00Z)?",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.4108610300485896,
+        0.5
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": null,
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [
+        1,
+        0
+      ],
+      "confidence": 0,
+      "decision": "trade",
+      "outcomeIdx": 0,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": 97.243942,
+      "execution": {
+        "txHash": "0xa3937a4dcc00088ff23e4b5f9e8c2ea1652ae97f9f501314f75dda64a1024f40",
+        "quotedTokensIn": 97.243942,
+        "sharesOut": "219133061587072974848",
+        "priceImpactPct": 0.08008938661916387
+      },
+      "skipReason": "manual buy via dashboard"
+    },
+    {
+      "ts": "2026-08-19T19:15:00.982Z",
+      "marketId": "0x2e58244d21a2bf56e68aef7b674c1630da1694fe",
+      "question": "Will an additional 50% Section 338 duty apply to covered Canadian goods entered Aug 19, 2026 (04:00Z–Aug 20 04:00Z)?",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.34602143365718296,
+        0.5
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": null,
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [
+        1,
+        0
+      ],
+      "confidence": 0,
+      "decision": "trade",
+      "outcomeIdx": 0,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": 91.820021,
+      "execution": {
+        "txHash": "0xde143e02e2ea853a6ef374a03939f96f9bc310f6a146fd5f5e06c04bed6a63cb",
+        "quotedTokensIn": 91.820021,
+        "sharesOut": "241645941705753427968",
+        "priceImpactPct": 0.09813284325074288
+      },
+      "skipReason": "manual buy via dashboard"
+    },
+    {
+      "ts": "2026-08-19T19:14:33.730Z",
+      "marketId": "0x2e58244d21a2bf56e68aef7b674c1630da1694fe",
+      "question": "Will an additional 50% Section 338 duty apply to covered Canadian goods entered Aug 19, 2026 (04:00Z–Aug 20 04:00Z)?",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.291136681950777,
+        0.5
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": null,
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [
+        1,
+        0
+      ],
+      "confidence": 0,
+      "decision": "trade",
+      "outcomeIdx": 0,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": 70.868976,
+      "execution": {
+        "txHash": "0x4d991889624cea14005dec36a5a9ef0ca73476b12c0d6a13c18e7d747e61dc73",
+        "quotedTokensIn": 70.868976,
+        "sharesOut": "221634012855696392192",
+        "priceImpactPct": 0.09830464347069019
+      },
+      "skipReason": "manual buy via dashboard"
+    },
+    {
+      "ts": "2026-08-19T19:14:06.735Z",
+      "marketId": "0x2e58244d21a2bf56e68aef7b674c1630da1694fe",
+      "question": "Will an additional 50% Section 338 duty apply to covered Canadian goods entered Aug 19, 2026 (04:00Z–Aug 20 04:00Z)?",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.24504768586479378,
+        0.5
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": null,
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [
+        1,
+        0
+      ],
+      "confidence": 0,
+      "decision": "trade",
+      "outcomeIdx": 0,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": 55.394853,
+      "execution": {
+        "txHash": "0xead58d231a91471ad91e5a0f0ceddfd02b3130144fa222cd51d3b1bc5d3eee1e",
+        "quotedTokensIn": 55.394853,
+        "sharesOut": "205915401185414676480",
+        "priceImpactPct": 0.09781706738482861
+      },
+      "skipReason": "manual buy via dashboard"
+    },
+    {
+      "ts": "2026-08-19T19:11:34.756Z",
+      "marketId": "0x2e58244d21a2bf56e68aef7b674c1630da1694fe",
+      "question": "Will an additional 50% Section 338 duty apply to covered Canadian goods entered Aug 19, 2026 (04:00Z–Aug 20 04:00Z)?",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.2692966125749385,
+        0.5
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": null,
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [
+        1,
+        0
+      ],
+      "confidence": 0,
+      "decision": "trade",
+      "outcomeIdx": 0,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": 63.314113,
+      "execution": {
+        "txHash": "0x9be2e57b0cf628b83d4485ea0e2789c3f4f4986ca924abe6af6084de78484f07",
+        "quotedTokensIn": 63.314113,
+        "sharesOut": "214094812890718502912",
+        "priceImpactPct": 0.09815461529918919
+      },
+      "skipReason": "manual buy via dashboard"
+    },
+    {
+      "ts": "2026-08-19T19:11:08.420Z",
+      "marketId": "0x2e58244d21a2bf56e68aef7b674c1630da1694fe",
+      "question": "Will an additional 50% Section 338 duty apply to covered Canadian goods entered Aug 19, 2026 (04:00Z–Aug 20 04:00Z)?",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.22677945540388508,
+        0.5
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": null,
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [
+        1,
+        0
+      ],
+      "confidence": 0,
+      "decision": "trade",
+      "outcomeIdx": 0,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": 49.735795,
+      "execution": {
+        "txHash": "0x1f524e03a4bb5bb72bc5562586d41fb8186ed8ba3fb42255328aea5cee70192d",
+        "quotedTokensIn": 49.735795,
+        "sharesOut": "199843123548149088256",
+        "priceImpactPct": 0.09742827918086536
+      },
+      "skipReason": "manual buy via dashboard"
+    },
+    {
+      "ts": "2026-08-19T19:10:46.132Z",
+      "marketId": "0x2e58244d21a2bf56e68aef7b674c1630da1694fe",
+      "question": "Will an additional 50% Section 338 duty apply to covered Canadian goods entered Aug 19, 2026 (04:00Z–Aug 20 04:00Z)?",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.19129892413329205,
+        0.5
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": null,
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [
+        1,
+        0
+      ],
+      "confidence": 0,
+      "decision": "trade",
+      "outcomeIdx": 0,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": 39.454175,
+      "execution": {
+        "txHash": "0xc990a4dfb94ad19d255869f2e78caa5926ca5f201f5fc6eea4e14afe6efa5fc0",
+        "quotedTokensIn": 39.454175,
+        "sharesOut": "188130042864611098624",
+        "priceImpactPct": 0.09628200286838613
+      },
+      "skipReason": "manual buy via dashboard"
+    },
+    {
+      "ts": "2026-08-19T19:09:50.170Z",
+      "marketId": "0x2e58244d21a2bf56e68aef7b674c1630da1694fe",
+      "question": "Will an additional 50% Section 338 duty apply to covered Canadian goods entered Aug 19, 2026 (04:00Z–Aug 20 04:00Z)?",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.3006286432923925,
+        0.5
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": null,
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [
+        1,
+        0
+      ],
+      "confidence": 0,
+      "decision": "trade",
+      "outcomeIdx": 0,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": 74.284325,
+      "execution": {
+        "txHash": "0xa8a290c6b8068ee4b326d4c1d67d0b3bb6955dbe3baf4d1d5bd61a60f9c8b349",
+        "quotedTokensIn": 74.284325,
+        "sharesOut": "224975150776130863104",
+        "priceImpactPct": 0.09832855027898058
+      },
+      "skipReason": "manual buy via dashboard"
+    },
+    {
+      "ts": "2026-08-19T19:09:06.313Z",
+      "marketId": "0x2e58244d21a2bf56e68aef7b674c1630da1694fe",
+      "question": "Will an additional 50% Section 338 duty apply to covered Canadian goods entered Aug 19, 2026 (04:00Z–Aug 20 04:00Z)?",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.2529987073347351,
+        0.5
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": null,
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [
+        1,
+        0
+      ],
+      "confidence": 0,
+      "decision": "trade",
+      "outcomeIdx": 0,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": 57.939112,
+      "execution": {
+        "txHash": "0x20fbde9d8adabeb152dd8652ff7eb72091d3a76aff85f42d5a4a5ac2f5751579",
+        "quotedTokensIn": 57.939112,
+        "sharesOut": "208579373091114123264",
+        "priceImpactPct": 0.09794901826447898
+      },
+      "skipReason": "manual buy via dashboard"
+    },
+    {
+      "ts": "2026-08-19T19:07:47.566Z",
+      "marketId": "0x2e58244d21a2bf56e68aef7b674c1630da1694fe",
+      "question": "Will an additional 50% Section 338 duty apply to covered Canadian goods entered Aug 19, 2026 (04:00Z–Aug 20 04:00Z)?",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.21316776907361779,
+        0.5
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": null,
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [
+        1,
+        0
+      ],
+      "confidence": 0,
+      "decision": "trade",
+      "outcomeIdx": 0,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": 45.683034,
+      "execution": {
+        "txHash": "0x0e0c9d56375fe5ad9449fc8ae8ba5e446c0bebc9cd8d4ef1f0dc7d3c30bf2f56",
+        "quotedTokensIn": 45.683034,
+        "sharesOut": "195346383835499593728",
+        "priceImpactPct": 0.0970540454346615
+      },
+      "skipReason": "manual buy via dashboard"
+    },
+    {
+      "ts": "2026-08-19T19:06:50.785Z",
+      "marketId": "0x2e58244d21a2bf56e68aef7b674c1630da1694fe",
+      "question": "Will an additional 50% Section 338 duty apply to covered Canadian goods entered Aug 19, 2026 (04:00Z–Aug 20 04:00Z)?",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.3998657582785158,
+        0.5
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": null,
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [
+        1,
+        0
+      ],
+      "confidence": 0,
+      "decision": "trade",
+      "outcomeIdx": 0,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": 97.181262,
+      "execution": {
+        "txHash": "0xa23d14cd1f4e8f27e8a9a81a3e2faf1fbd2357d272ed2fbc8900d6e8d6b44624",
+        "quotedTokensIn": 97.181262,
+        "sharesOut": "224312400582833405952",
+        "priceImpactPct": 0.08346537180289199
+      },
+      "skipReason": "manual buy via dashboard"
+    },
+    {
+      "ts": "2026-08-19T19:06:23.754Z",
+      "marketId": "0x2e58244d21a2bf56e68aef7b674c1630da1694fe",
+      "question": "Will an additional 50% Section 338 duty apply to covered Canadian goods entered Aug 19, 2026 (04:00Z–Aug 20 04:00Z)?",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.33667490431163666,
+        0.5
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": null,
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [
+        1,
+        0
+      ],
+      "confidence": 0,
+      "decision": "trade",
+      "outcomeIdx": 0,
+      "edge": 0,
+      "thresholdUsed": 0,
+      "size": 88.038055,
+      "execution": {
+        "txHash": "0xf1617aa54020c7d097cf0e58c896c6b0b1a71ceb6a231121c345f56b0c0341bb",
+        "quotedTokensIn": 88.038055,
+        "sharesOut": "238107573703963213824",
+        "priceImpactPct": 0.09821275706762
+      },
+      "skipReason": "manual buy via dashboard"
+    },
+    {
+      "ts": "2026-08-19T17:12:12.309Z",
       "marketId": "0x26c97689a636c28040e979f1d242fd996730a8bc",
       "question": "Will the LaLiga match Rayo Vallecano vs Deportivo Alavés on Aug 20, 2026 end in a draw after 90 minutes?",
       "category": "sports",
@@ -638,9 +816,9 @@
         "Match not played"
       ],
       "rawPrice": [
-        0.28389825015919906,
-        0.6840572175571595,
-        0.03204453228364142
+        0.36022118055161195,
+        0.6152742479615401,
+        0.02450457148684797
       ],
       "syntheticPrice": false,
       "signals": {
@@ -658,67 +836,82 @@
             0.7,
             0.01
           ],
-          "confidence": 0.4,
+          "confidence": 0.3,
           "grounded": false
         },
         "polymarket": null
       },
       "disagreement": 0.36666666666666664,
       "blendedProbs": [
-        0.320952380952381,
-        0.43809523809523815,
-        0.24095238095238097
+        0.3233333333333333,
+        0.41794871794871796,
+        0.2587179487179487
       ],
       "confidence": 0.25,
       "decision": "skip",
       "outcomeIdx": 2,
-      "edge": 0.20890784866873954,
+      "edge": 0.2342133772311007,
       "thresholdUsed": 0.125,
       "size": null,
       "execution": null,
       "skipReason": "models disagree sharply (spread=0.37 >= hard threshold 0.13)"
     },
     {
-      "ts": "2026-08-19T08:54:40.819Z",
-      "marketId": "0xbf1ce7c9d751b92bfac4acefe0e87d82b1d30163",
-      "question": "Will Sporting Kansas City win their MLS match against St. Louis City SC scheduled for Aug 19, 2026?",
-      "category": "sports",
+      "ts": "2026-08-19T17:12:03.611Z",
+      "marketId": "0xc598c6fac139b5b76a88ac08bf3e4663f1336acc",
+      "question": "Will the US Treasury 10-year constant maturity yield for 2026-08-20 be above 4.68%?",
+      "category": "economics",
       "outcomes": [
         "Yes",
         "No"
       ],
       "rawPrice": [
-        0.27899627483400746,
-        0.7210037251659925
+        0.23883564352679246,
+        0.7611643564732076
       ],
       "syntheticPrice": false,
       "signals": {
         "llm": {
           "probs": [
-            0.36,
-            0.64
+            0.56,
+            0.44
           ],
-          "confidence": 0.57
+          "confidence": 0.56
         },
-        "gemini": null,
+        "gemini": {
+          "probs": [
+            0.45,
+            0.55
+          ],
+          "confidence": 0.4,
+          "grounded": false
+        },
         "polymarket": null
       },
-      "disagreement": null,
+      "disagreement": 0.11000000000000004,
       "blendedProbs": [
-        0.36,
-        0.64
+        0.5285714285714286,
+        0.47142857142857136
       ],
-      "confidence": 0.57,
-      "decision": "skip",
+      "confidence": 0.56,
+      "decision": "trade",
       "outcomeIdx": 0,
-      "edge": 0.08100372516599252,
+      "edge": 0.28973578504463615,
       "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "bestEdge=0.081 < minEdge=0.13"
+      "size": 120.76797674200726,
+      "execution": {
+        "txHash": "0x953134fcdc0b5d59d8989110bfec47f870513a41e20043e2f16e94dcc08bebd8",
+        "quotedTokensIn": 117856099,
+        "sharesOut": "466757604338573312000",
+        "priceImpactPct": 0.0572,
+        "resolved": true,
+        "redeemedTxHash": "0x9cf4fc1651c4c01aa3a419cea5702a57bca29c50a18ebbb8c8b3ff03a9b8af82",
+        "redeemedAmount": "116.680482",
+        "exitReason": "manual-sell"
+      }
     },
     {
-      "ts": "2026-08-19T08:54:37.482Z",
+      "ts": "2026-08-19T17:11:54.815Z",
       "marketId": "0x360274d153c58566943cb21088dd95e45638bda3",
       "question": "Will water level at The Battery, New York exceed 5.18 ft MLLW between 18:00 and 23:54 UTC on 2026-08-20?",
       "category": "miscellaneous",
@@ -727,44 +920,41 @@
         "No"
       ],
       "rawPrice": [
-        0.5215206572313389,
-        0.47847934276866105
+        0.5290748975553559,
+        0.4709251024446441
       ],
       "syntheticPrice": false,
       "signals": {
         "llm": {
           "probs": [
-            0.22,
-            0.78
+            0.18,
+            0.82
           ],
           "confidence": 0.58
         },
-        "gemini": {
-          "probs": [
-            0.03,
-            0.97
-          ],
-          "confidence": 0.85,
-          "grounded": false
-        },
+        "gemini": null,
         "polymarket": null
       },
-      "disagreement": 0.19,
+      "disagreement": null,
       "blendedProbs": [
-        0.1327027027027027,
-        0.8672972972972973
+        0.18,
+        0.82
       ],
       "confidence": 0.58,
-      "decision": "skip",
+      "decision": "trade",
       "outcomeIdx": 1,
-      "edge": 0.38881795452863627,
+      "edge": 0.34907489755535587,
       "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "models disagree sharply (spread=0.19 >= hard threshold 0.13)"
+      "size": 50.125031000000035,
+      "execution": {
+        "txHash": "0xafcc0951251f71a9296bb0919d5eaa12ae47d67d5b89dd1e05e30aed2c435dc4",
+        "quotedTokensIn": 49083632,
+        "sharesOut": "101874581883988131840",
+        "priceImpactPct": 0.0231
+      }
     },
     {
-      "ts": "2026-08-19T08:54:26.436Z",
+      "ts": "2026-08-19T17:11:52.199Z",
       "marketId": "0x2e0d3ee960783033bb70e5b5577a04a1d19f7dcf",
       "question": "Will Google release a model called Gemini 3.5 Pro or later by 03:59 UTC on Aug 21, 2026?",
       "category": "tech",
@@ -773,45 +963,37 @@
         "No"
       ],
       "rawPrice": [
-        0.1087020552863871,
-        0.8912979447136129
+        0.136699642318883,
+        0.863300357681117
       ],
       "syntheticPrice": false,
       "signals": {
         "llm": {
           "probs": [
-            0.28,
-            0.72
+            0.72,
+            0.28
           ],
-          "confidence": 0.46
+          "confidence": 0.58
         },
         "gemini": null,
         "polymarket": null
       },
       "disagreement": null,
       "blendedProbs": [
-        0.28,
-        0.72
+        0.72,
+        0.28
       ],
-      "confidence": 0.46,
-      "decision": "trade",
-      "outcomeIdx": 0,
-      "edge": 0.17129794471361293,
+      "confidence": 0.58,
+      "decision": "skip",
+      "outcomeIdx": null,
+      "edge": 0,
       "thresholdUsed": 0.125,
-      "size": 157.08798727102533,
-      "execution": {
-        "txHash": "0xa957d0d319fef59a120f6aac00291c963c69311d7bfe429ab9cc0dd20e09b209",
-        "quotedTokensIn": 105394732,
-        "sharesOut": "883384268456236023808",
-        "priceImpactPct": 0.0976,
-        "resolved": true,
-        "redeemedTxHash": "0xd75437a70f84162c441f566a5a9605e2ec22a6600bb08144d8491e6aae049b5b",
-        "redeemedAmount": "104.343418",
-        "exitReason": "manual-sell"
-      }
+      "size": null,
+      "execution": null,
+      "skipReason": "bestEdge=0.000 < minEdge=0.13"
     },
     {
-      "ts": "2026-08-19T08:54:23.796Z",
+      "ts": "2026-08-19T17:11:45.210Z",
       "marketId": "0x77985bbb52a7744a8eeab5a82d02c8c079fa7a55",
       "question": "Will WTI front-month crude futures settle below $65.00 on Aug 21, 2026?",
       "category": "finance",
@@ -820,44 +1002,52 @@
         "No"
       ],
       "rawPrice": [
-        0.06939408954794328,
-        0.9306059104520567
+        0.06847444772204411,
+        0.9315255522779559
       ],
       "syntheticPrice": false,
       "signals": {
         "llm": {
           "probs": [
-            0.47,
-            0.53
+            0.42,
+            0.58
           ],
-          "confidence": 0.42
+          "confidence": 0.56
         },
         "gemini": {
           "probs": [
-            0.22,
-            0.78
+            0.35,
+            0.65
           ],
           "confidence": 0.4,
           "grounded": false
         },
         "polymarket": null
       },
-      "disagreement": 0.25,
+      "disagreement": 0.07000000000000006,
       "blendedProbs": [
-        0.3985714285714286,
-        0.6014285714285715
+        0.39999999999999997,
+        0.6
       ],
-      "confidence": 0.42,
-      "decision": "skip",
+      "confidence": 0.56,
+      "decision": "trade",
       "outcomeIdx": 0,
-      "edge": 0.3291773390234853,
+      "edge": 0.3315255522779559,
       "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "models disagree sharply (spread=0.25 >= hard threshold 0.13)"
+      "size": 192.1655890181852,
+      "execution": {
+        "txHash": "0x20ac08cbcbcd43a4ac028ee660971ec1994106c6b3f94fee35304594d99662fb",
+        "quotedTokensIn": 67903990,
+        "sharesOut": "906110995178553737216",
+        "priceImpactPct": 0.0944,
+        "resolved": true,
+        "redeemedTxHash": "0x93eceb7cf503db619ae1bba50ad796227c63bf288039fa7bc04e97b4e28a0f7a",
+        "redeemedAmount": "67.226646",
+        "exitReason": "manual-sell"
+      }
     },
     {
-      "ts": "2026-08-19T05:31:38.505Z",
+      "ts": "2026-08-19T17:06:55.585Z",
       "marketId": "0x2258cfca1af0eac76dcc6d0b1a134f274bdf2d3e",
       "question": "Will AARO or ODNI publicly release previously unreleased UAP records between Aug 10 00:00 and Aug 21 14:00 UTC 2026?",
       "category": "politics",
@@ -866,8 +1056,8 @@
         "No"
       ],
       "rawPrice": [
-        0.11300052868987145,
-        0.8869994713101285
+        0.13429086893714767,
+        0.8657091310628523
       ],
       "syntheticPrice": false,
       "signals": {
@@ -889,222 +1079,11 @@
       "confidence": 0.46,
       "decision": "skip",
       "outcomeIdx": 0,
-      "edge": 0.06699947131012854,
+      "edge": 0.04570913106285232,
       "thresholdUsed": 0.125,
       "size": null,
       "execution": null,
-      "skipReason": "bestEdge=0.067 < minEdge=0.13"
-    },
-    {
-      "ts": "2026-08-19T03:51:38.369Z",
-      "marketId": "0x701f91b48fdf8eaac09de1317f34d3d901b74216",
-      "question": "Will Botafogo and CS Cienciano combine for 4 or more goals in their Copa Sudamericana match on Aug 20, 2026?",
-      "category": "sports",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.6187807087570335,
-        0.38121929124296644
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.28,
-            0.72
-          ],
-          "confidence": 0.56
-        },
-        "gemini": null,
-        "polymarket": null
-      },
-      "disagreement": null,
-      "blendedProbs": [
-        0.28,
-        0.72
-      ],
-      "confidence": 0.56,
-      "decision": "trade",
-      "outcomeIdx": 1,
-      "edge": 0.33878070875703353,
-      "thresholdUsed": 0.125,
-      "size": 170.56788285201293,
-      "execution": {
-        "txHash": "0xff5eefaead611fa5389566d6856ab1ccc49402fc5ec6eb4c1b2b8b242b9a53bd",
-        "quotedTokensIn": 166207656,
-        "sharesOut": "409370900303674408960",
-        "priceImpactPct": 0.065,
-        "resolved": true,
-        "redeemedTxHash": "0xbc3c913c359f471e69792cd66fa2e0f881e63f7c5ff7837cabd416397065fe29",
-        "redeemedAmount": "149.445171",
-        "exitReason": "manual-sell"
-      }
-    },
-    {
-      "ts": "2026-08-19T02:12:36.722Z",
-      "marketId": "0xbf1ce7c9d751b92bfac4acefe0e87d82b1d30163",
-      "question": "Will Sporting Kansas City win their MLS match against St. Louis City SC scheduled for Aug 19, 2026?",
-      "category": "sports",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.3641559424571131,
-        0.6358440575428869
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.38,
-            0.62
-          ],
-          "confidence": 0.56
-        },
-        "gemini": null,
-        "polymarket": null
-      },
-      "disagreement": null,
-      "blendedProbs": [
-        0.38,
-        0.62
-      ],
-      "confidence": 0.56,
-      "decision": "skip",
-      "outcomeIdx": 0,
-      "edge": 0.015844057542886925,
-      "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "bestEdge=0.016 < minEdge=0.13"
-    },
-    {
-      "ts": "2026-08-19T01:37:32.128Z",
-      "marketId": "0x360274d153c58566943cb21088dd95e45638bda3",
-      "question": "Will water level at The Battery, New York exceed 5.18 ft MLLW between 18:00 and 23:54 UTC on 2026-08-20?",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.5,
-        0.49483309342780546
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": null,
-        "gemini": null,
-        "polymarket": null
-      },
-      "disagreement": null,
-      "blendedProbs": [
-        0,
-        1
-      ],
-      "confidence": 0,
-      "decision": "trade",
-      "outcomeIdx": 1,
-      "edge": 0,
-      "thresholdUsed": 0,
-      "size": 2.939923,
-      "execution": {
-        "txHash": "0xda95d1d25e4e36f442fa9522230a90682193f505c28806d8fa8fce2c00b39daf",
-        "quotedTokensIn": 2.939923,
-        "sharesOut": "5905660171156236288",
-        "priceImpactPct": 0.006024984369841436,
-        "resolved": true,
-        "redeemedTxHash": "0xe692bdeb2a3aa2bf10eba6182ed7f6d6a5329a0df4139fe1f1cb18402329b384",
-        "redeemedAmount": "139.023075",
-        "exitReason": "manual-sell"
-      },
-      "skipReason": "manual buy via dashboard"
-    },
-    {
-      "ts": "2026-08-19T01:33:16.130Z",
-      "marketId": "0x2e0d3ee960783033bb70e5b5577a04a1d19f7dcf",
-      "question": "Will Google release a model called Gemini 3.5 Pro or later by 03:59 UTC on Aug 21, 2026?",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.5,
-        0.8936380231790558
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": null,
-        "gemini": null,
-        "polymarket": null
-      },
-      "disagreement": null,
-      "blendedProbs": [
-        0,
-        1
-      ],
-      "confidence": 0,
-      "decision": "trade",
-      "outcomeIdx": 1,
-      "edge": 0,
-      "thresholdUsed": 0,
-      "size": 2.939998,
-      "execution": {
-        "txHash": "0x14ba5562d181ff252c245764d76db074209cedb862fd1fe6147406fb501a2bda",
-        "quotedTokensIn": 2.939998,
-        "sharesOut": "3273343196522578432",
-        "priceImpactPct": 0.005064316282312948
-      },
-      "skipReason": "manual buy via dashboard"
-    },
-    {
-      "ts": "2026-08-19T00:34:49.529Z",
-      "marketId": "0x26c97689a636c28040e979f1d242fd996730a8bc",
-      "question": "Will the LaLiga match Rayo Vallecano vs Deportivo Alavés on Aug 20, 2026 end in a draw after 90 minutes?",
-      "category": "sports",
-      "outcomes": [
-        "Yes",
-        "No",
-        "Match not played"
-      ],
-      "rawPrice": [
-        0.323401262926662,
-        0.6455563466575049,
-        0.031042390415833156
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.3333333333333333,
-            0.3333333333333333,
-            0.3333333333333333
-          ],
-          "confidence": 0.25
-        },
-        "gemini": null,
-        "polymarket": null
-      },
-      "disagreement": null,
-      "blendedProbs": [
-        0.3333333333333333,
-        0.3333333333333333,
-        0.3333333333333333
-      ],
-      "confidence": 0.25,
-      "decision": "trade",
-      "outcomeIdx": 2,
-      "edge": 0.30229094291750014,
-      "thresholdUsed": 0.125,
-      "size": 74.72095924943561,
-      "execution": {
-        "txHash": "0xe57b8ecb7396814c62bda72f512b44d47c46f69afefc0c0602c2531f6a81b7f3",
-        "quotedTokensIn": 10946976,
-        "sharesOut": "324101636959801049088",
-        "priceImpactPct": 0.0881
-      }
+      "skipReason": "bestEdge=0.046 < minEdge=0.13"
     }
   ]
 }
