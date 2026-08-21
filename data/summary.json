@@ -1,8 +1,8 @@
 {
-  "updatedAt": "2026-08-21T09:32:36.356Z",
-  "totalReceipts": 1721,
-  "totalTrades": 240,
-  "totalSkips": 1481,
+  "updatedAt": "2026-08-21T09:37:12.954Z",
+  "totalReceipts": 1723,
+  "totalTrades": 241,
+  "totalSkips": 1482,
   "rollingAccuracy": {
     "n": 230,
     "hitRate": 0.3391304347826087
@@ -29,7 +29,7 @@
     "politics": {
       "n": 10,
       "hitRate": 0.7,
-      "trades": 11
+      "trades": 12
     },
     "uncategorized": {
       "n": 96,
@@ -72,7 +72,7 @@
       "trades": 1
     }
   },
-  "openExposureTokens": 1463.7948787076043,
+  "openExposureTokens": 1675.322291827172,
   "tradePerformance": {
     "settled": 137,
     "wins": 78,
@@ -80,7 +80,7 @@
     "winRate": 0.5693430656934306,
     "voidTrades": 4,
     "totalPnl": -570.1171,
-    "openTrades": 6
+    "openTrades": 7
   },
   "skipCalibration": {
     "settled": 1379,
@@ -89,6 +89,95 @@
     "voidSkips": 5
   },
   "lastNDecisions": [
+    {
+      "ts": "2026-08-21T09:37:08.055Z",
+      "marketId": "0x2258cfca1af0eac76dcc6d0b1a134f274bdf2d3e",
+      "question": "Will AARO or ODNI publicly release previously unreleased UAP records between Aug 10 00:00 and Aug 21 14:00 UTC 2026?",
+      "category": "politics",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.1071751826620198,
+        0.8928248173379801
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.28,
+            0.72
+          ],
+          "confidence": 0.46
+        },
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [
+        0.28,
+        0.72
+      ],
+      "confidence": 0.46,
+      "decision": "trade",
+      "outcomeIdx": 0,
+      "edge": 0.17282481733798022,
+      "thresholdUsed": 0.125,
+      "size": 211.5274131195676,
+      "execution": {
+        "txHash": "0xd3871f1dbcf223838656be626ed32171a2205e05c40779760e9af737ed00288c",
+        "quotedTokensIn": 31434145,
+        "sharesOut": "269221420956901179392",
+        "priceImpactPct": 0.0894
+      }
+    },
+    {
+      "ts": "2026-08-21T09:37:07.958Z",
+      "marketId": "0x77985bbb52a7744a8eeab5a82d02c8c079fa7a55",
+      "question": "Will WTI front-month crude futures settle below $65.00 on Aug 21, 2026?",
+      "category": "finance",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.07847952778411149,
+        0.9215204722158885
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.46,
+            0.54
+          ],
+          "confidence": 0.56
+        },
+        "gemini": {
+          "probs": [
+            0.35,
+            0.65
+          ],
+          "confidence": 0.4,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.11000000000000004,
+      "blendedProbs": [
+        0.4285714285714286,
+        0.5714285714285715
+      ],
+      "confidence": 0.56,
+      "decision": "skip",
+      "outcomeIdx": null,
+      "edge": 0,
+      "thresholdUsed": 0.125,
+      "size": null,
+      "execution": null,
+      "skipReason": "bestEdge=0.000 < minEdge=0.13"
+    },
     {
       "ts": "2026-08-21T09:32:28.554Z",
       "marketId": "0x2258cfca1af0eac76dcc6d0b1a134f274bdf2d3e",
@@ -1066,91 +1155,6 @@
       "size": null,
       "execution": null,
       "skipReason": "sized trade too small (0.787 tokens < 1 token floor; of 7.36 remaining) — price impact isn't worth it at this size"
-    },
-    {
-      "ts": "2026-08-21T04:22:14.799Z",
-      "marketId": "0x77985bbb52a7744a8eeab5a82d02c8c079fa7a55",
-      "question": "Will WTI front-month crude futures settle below $65.00 on Aug 21, 2026?",
-      "category": "finance",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.07755606098051585,
-        0.9224439390194842
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.46,
-            0.54
-          ],
-          "confidence": 0.56
-        },
-        "gemini": {
-          "probs": [
-            0.22,
-            0.78
-          ],
-          "confidence": 0.45,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.24000000000000002,
-      "blendedProbs": [
-        0.38551724137931037,
-        0.6144827586206897
-      ],
-      "confidence": 0.56,
-      "decision": "skip",
-      "outcomeIdx": null,
-      "edge": 0,
-      "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "models disagree sharply (spread=0.24 >= hard threshold 0.13)"
-    },
-    {
-      "ts": "2026-08-21T04:18:48.248Z",
-      "marketId": "0x2258cfca1af0eac76dcc6d0b1a134f274bdf2d3e",
-      "question": "Will AARO or ODNI publicly release previously unreleased UAP records between Aug 10 00:00 and Aug 21 14:00 UTC 2026?",
-      "category": "politics",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.1062585124176388,
-        0.8937414875823613
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.28,
-            0.72
-          ],
-          "confidence": 0.46
-        },
-        "gemini": null,
-        "polymarket": null
-      },
-      "disagreement": null,
-      "blendedProbs": [
-        0.28,
-        0.72
-      ],
-      "confidence": 0.46,
-      "decision": "skip",
-      "outcomeIdx": 0,
-      "edge": 0.17374148758236124,
-      "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "sized trade too small (0.706 tokens < 1 token floor; of 7.36 remaining) — price impact isn't worth it at this size"
     }
   ]
 }
