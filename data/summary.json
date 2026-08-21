@@ -1,24 +1,24 @@
 {
-  "updatedAt": "2026-08-20T08:41:52.852Z",
-  "totalReceipts": 1602,
-  "totalTrades": 230,
-  "totalSkips": 1372,
+  "updatedAt": "2026-08-21T09:32:36.356Z",
+  "totalReceipts": 1721,
+  "totalTrades": 240,
+  "totalSkips": 1481,
   "rollingAccuracy": {
-    "n": 176,
-    "hitRate": 0.4431818181818182
+    "n": 230,
+    "hitRate": 0.3391304347826087
   },
   "calibrationByConfidenceBucket": {
     "mid(0.4-0.6)": {
-      "n": 55,
-      "hitRate": 0.4
-    },
-    "high(0.6-0.8)": {
-      "n": 36,
-      "hitRate": 0.5277777777777778
+      "n": 63,
+      "hitRate": 0.3492063492063492
     },
     "low(<0.4)": {
-      "n": 74,
-      "hitRate": 0.35135135135135137
+      "n": 119,
+      "hitRate": 0.2184873949579832
+    },
+    "high(0.6-0.8)": {
+      "n": 37,
+      "hitRate": 0.5135135135135135
     },
     "veryhigh(0.8+)": {
       "n": 11,
@@ -26,29 +26,34 @@
     }
   },
   "perCategory": {
+    "politics": {
+      "n": 10,
+      "hitRate": 0.7,
+      "trades": 11
+    },
+    "uncategorized": {
+      "n": 96,
+      "hitRate": 0.08333333333333333,
+      "trades": 97
+    },
     "crypto": {
-      "n": 2,
+      "n": 4,
       "hitRate": 0,
       "trades": 4
     },
     "economics": {
-      "n": 34,
-      "hitRate": 1,
+      "n": 37,
+      "hitRate": 0.918918918918919,
       "trades": 37
     },
     "finance": {
-      "n": 1,
+      "n": 2,
       "hitRate": 0,
       "trades": 4
     },
-    "uncategorized": {
-      "n": 52,
-      "hitRate": 0.15384615384615385,
-      "trades": 88
-    },
     "miscellaneous": {
-      "n": 65,
-      "hitRate": 0.35384615384615387,
+      "n": 67,
+      "hitRate": 0.34328358208955223,
       "trades": 71
     },
     "tech": {
@@ -57,14 +62,9 @@
       "trades": 6
     },
     "sports": {
-      "n": 7,
-      "hitRate": 0.2857142857142857,
+      "n": 9,
+      "hitRate": 0.2222222222222222,
       "trades": 9
-    },
-    "politics": {
-      "n": 10,
-      "hitRate": 0.7,
-      "trades": 10
     },
     "culture": {
       "n": 1,
@@ -72,201 +72,102 @@
       "trades": 1
     }
   },
-  "openExposureTokens": 4273.9806354293505,
+  "openExposureTokens": 1463.7948787076043,
   "tradePerformance": {
-    "settled": 134,
+    "settled": 137,
     "wins": 78,
-    "losses": 56,
-    "winRate": 0.582089552238806,
+    "losses": 59,
+    "winRate": 0.5693430656934306,
     "voidTrades": 4,
     "totalPnl": -570.1171,
-    "openTrades": 50
+    "openTrades": 6
   },
   "skipCalibration": {
-    "settled": 1325,
-    "wouldHaveWon": 928,
-    "wouldHaveWonRate": 0.700377358490566,
+    "settled": 1379,
+    "wouldHaveWon": 933,
+    "wouldHaveWonRate": 0.6765772298767223,
     "voidSkips": 5
   },
   "lastNDecisions": [
     {
-      "ts": "2026-08-20T08:41:52.356Z",
-      "marketId": "0x0098f1f9d997ea02cb5f7309bf9d3b09d72bfd76",
-      "question": "Will Rangers (Glasgow) beat FK Jablonec by 2+ in regulation in their Conference League play-off first leg Aug 20, 2026?",
-      "category": "sports",
+      "ts": "2026-08-21T09:32:28.554Z",
+      "marketId": "0x2258cfca1af0eac76dcc6d0b1a134f274bdf2d3e",
+      "question": "Will AARO or ODNI publicly release previously unreleased UAP records between Aug 10 00:00 and Aug 21 14:00 UTC 2026?",
+      "category": "politics",
       "outcomes": [
         "Yes",
         "No"
       ],
       "rawPrice": [
-        0.4787605423915518,
-        0.5212394576084481
+        0.10012016202104963,
+        0.8998798379789504
       ],
       "syntheticPrice": false,
       "signals": {
         "llm": {
           "probs": [
-            0.5,
-            0.5
-          ],
-          "confidence": 0.25
-        },
-        "gemini": {
-          "probs": [
-            0.35,
-            0.65
-          ],
-          "confidence": 0.3,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.15000000000000002,
-      "blendedProbs": [
-        0.46538461538461534,
-        0.5346153846153846
-      ],
-      "confidence": 0.25,
-      "decision": "skip",
-      "outcomeIdx": 1,
-      "edge": 0.013375927006936461,
-      "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "models disagree sharply (spread=0.15 >= hard threshold 0.13)"
-    },
-    {
-      "ts": "2026-08-20T08:41:45.820Z",
-      "marketId": "0xc01afc5152ebbafb979e0947365aea9fb4bfde88",
-      "question": "Will the Secured Overnight Financing Rate for Aug 19, 2026 be above 3.65%?",
-      "category": "economics",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.1765077726636341,
-        0.8234922273363658
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.58,
-            0.42
-          ],
-          "confidence": 0.55
-        },
-        "gemini": {
-          "probs": [
-            0.55,
-            0.45
-          ],
-          "confidence": 0.4,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.030000000000000027,
-      "blendedProbs": [
-        0.5714285714285715,
-        0.4285714285714286
-      ],
-      "confidence": 0.55,
-      "decision": "skip",
-      "outcomeIdx": null,
-      "edge": 0.3949207987649374,
-      "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "live execution declined: price impact still 75.6% after resize, exceeds 10% cap"
-    },
-    {
-      "ts": "2026-08-20T08:41:36.812Z",
-      "marketId": "0xaebc7755d23a804efac1d5ed445d44d111e635f3",
-      "question": "Will the Binance BTC/USDT 1-minute close at 16:00 UTC on Aug 20, 2026 be above $68,000?",
-      "category": "crypto",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.8094548014483449,
-        0.19054519855165508
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.58,
-            0.42
+            0.28,
+            0.72
           ],
           "confidence": 0.46
         },
-        "gemini": {
-          "probs": [
-            0.5,
-            0.5
-          ],
-          "confidence": 0.3,
-          "grounded": false
-        },
+        "gemini": null,
         "polymarket": null
       },
-      "disagreement": 0.08000000000000002,
+      "disagreement": null,
       "blendedProbs": [
-        0.5615384615384615,
-        0.4384615384615384
+        0.28,
+        0.72
       ],
       "confidence": 0.46,
       "decision": "trade",
-      "outcomeIdx": 1,
-      "edge": 0.24791633990988332,
+      "outcomeIdx": 0,
+      "edge": 0.1798798379789504,
       "thresholdUsed": 0.125,
-      "size": 50.11565671164881,
+      "size": 223.02298054552543,
       "execution": {
-        "txHash": "0xf449d51b4806e1910dad12f7e738985ba4b8c7040084a16653bab9b45d907909",
-        "quotedTokensIn": 20421354,
-        "sharesOut": "263011910520867323904",
-        "priceImpactPct": -0.5925
+        "txHash": "0xbb609f966ed719ec61afc643b25aed4bf7da4e4d8ffde424bbc0c9799f6faa93",
+        "quotedTokensIn": 28809863,
+        "sharesOut": "264344061902377877504",
+        "priceImpactPct": 0.0886
       }
     },
     {
-      "ts": "2026-08-20T08:41:33.098Z",
-      "marketId": "0x97171bc2b4c6871ced995a9021354800c1f15280",
-      "question": "Will the ECB euro foreign exchange reference rate for USD on 2026-08-20 be above 1.1610?",
+      "ts": "2026-08-21T09:32:28.451Z",
+      "marketId": "0x77985bbb52a7744a8eeab5a82d02c8c079fa7a55",
+      "question": "Will WTI front-month crude futures settle below $65.00 on Aug 21, 2026?",
       "category": "finance",
       "outcomes": [
         "Yes",
         "No"
       ],
       "rawPrice": [
-        0.7686485778302699,
-        0.23135142216973018
+        0.054862726530291395,
+        0.9451372734697085
       ],
       "syntheticPrice": false,
       "signals": {
         "llm": {
           "probs": [
-            0.58,
-            0.42
+            0.46,
+            0.54
           ],
           "confidence": 0.56
         },
         "gemini": {
           "probs": [
-            0.48,
-            0.52
+            0.35,
+            0.65
           ],
-          "confidence": 0.35,
+          "confidence": 0.4,
           "grounded": false
         },
         "polymarket": null
       },
-      "disagreement": 0.10000000000000003,
+      "disagreement": 0.11000000000000004,
       "blendedProbs": [
-        0.554074074074074,
-        0.4459259259259259
+        0.4285714285714286,
+        0.5714285714285715
       ],
       "confidence": 0.56,
       "decision": "skip",
@@ -278,7 +179,7 @@
       "skipReason": "bestEdge=0.000 < minEdge=0.13"
     },
     {
-      "ts": "2026-08-20T08:41:28.741Z",
+      "ts": "2026-08-21T09:28:56.254Z",
       "marketId": "0x2258cfca1af0eac76dcc6d0b1a134f274bdf2d3e",
       "question": "Will AARO or ODNI publicly release previously unreleased UAP records between Aug 10 00:00 and Aug 21 14:00 UTC 2026?",
       "category": "politics",
@@ -287,8 +188,8 @@
         "No"
       ],
       "rawPrice": [
-        0.09075971674221682,
-        0.9092402832577832
+        0.08658326294433458,
+        0.9134167370556654
       ],
       "syntheticPrice": false,
       "signals": {
@@ -309,168 +210,71 @@
       ],
       "confidence": 0.46,
       "decision": "skip",
-      "outcomeIdx": null,
-      "edge": 0.1892402832577832,
+      "outcomeIdx": 0,
+      "edge": 0.19341673705566545,
       "thresholdUsed": 0.125,
       "size": null,
       "execution": null,
-      "skipReason": "live execution declined: price impact still 11.8% after resize, exceeds 10% cap"
+      "skipReason": "sized trade too small (0.786 tokens < 1 token floor; of 7.36 remaining) — price impact isn't worth it at this size"
     },
     {
-      "ts": "2026-08-20T08:41:25.876Z",
-      "marketId": "0x701f91b48fdf8eaac09de1317f34d3d901b74216",
-      "question": "Will Botafogo and CS Cienciano combine for 4 or more goals in their Copa Sudamericana match on Aug 20, 2026?",
-      "category": "sports",
+      "ts": "2026-08-21T06:46:48.070Z",
+      "marketId": "0x77985bbb52a7744a8eeab5a82d02c8c079fa7a55",
+      "question": "Will WTI front-month crude futures settle below $65.00 on Aug 21, 2026?",
+      "category": "finance",
       "outcomes": [
         "Yes",
         "No"
       ],
       "rawPrice": [
-        0.6133376778721674,
-        0.3866623221278326
+        0.0776419538541802,
+        0.9223580461458197
       ],
       "syntheticPrice": false,
       "signals": {
         "llm": {
           "probs": [
-            0.34,
-            0.66
+            0.58,
+            0.42
           ],
-          "confidence": 0.58
+          "confidence": 0.56
         },
         "gemini": {
           "probs": [
-            0.42,
-            0.58
+            0.35,
+            0.65
           ],
           "confidence": 0.4,
           "grounded": false
         },
         "polymarket": null
       },
-      "disagreement": 0.08000000000000007,
+      "disagreement": 0.23000000000000004,
       "blendedProbs": [
-        0.3628571428571429,
-        0.6371428571428572
+        0.5142857142857143,
+        0.4857142857142857
       ],
-      "confidence": 0.58,
+      "confidence": 0.56,
       "decision": "skip",
       "outcomeIdx": null,
       "edge": 0,
       "thresholdUsed": 0.125,
       "size": null,
       "execution": null,
-      "skipReason": "bestEdge=0.000 < minEdge=0.13"
+      "skipReason": "models disagree sharply (spread=0.23 >= hard threshold 0.13)"
     },
     {
-      "ts": "2026-08-20T07:02:26.259Z",
-      "marketId": "0x26c97689a636c28040e979f1d242fd996730a8bc",
-      "question": "Will the LaLiga match Rayo Vallecano vs Deportivo Alavés on Aug 20, 2026 end in a draw after 90 minutes?",
-      "category": "sports",
-      "outcomes": [
-        "Yes",
-        "No",
-        "Match not played"
-      ],
-      "rawPrice": [
-        0.389000570289715,
-        0.5849203504531797,
-        0.026079079257105335
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.29000000000000004,
-            0.6100000000000001,
-            0.10000000000000002
-          ],
-          "confidence": 0.58
-        },
-        "gemini": {
-          "probs": [
-            0.29,
-            0.7,
-            0.01
-          ],
-          "confidence": 0.35,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.09000000000000002,
-      "blendedProbs": [
-        0.29,
-        0.6333333333333334,
-        0.07666666666666667
-      ],
-      "confidence": 0.58,
-      "decision": "skip",
-      "outcomeIdx": 1,
-      "edge": 0.04841298288015372,
-      "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "bestEdge=0.048 < minEdge=0.13"
-    },
-    {
-      "ts": "2026-08-20T07:02:22.467Z",
-      "marketId": "0xc598c6fac139b5b76a88ac08bf3e4663f1336acc",
-      "question": "Will the US Treasury 10-year constant maturity yield for 2026-08-20 be above 4.68%?",
-      "category": "economics",
+      "ts": "2026-08-21T05:07:05.753Z",
+      "marketId": "0x2258cfca1af0eac76dcc6d0b1a134f274bdf2d3e",
+      "question": "Will AARO or ODNI publicly release previously unreleased UAP records between Aug 10 00:00 and Aug 21 14:00 UTC 2026?",
+      "category": "politics",
       "outcomes": [
         "Yes",
         "No"
       ],
       "rawPrice": [
-        0.16778025640231692,
-        0.832219743597683
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.46,
-            0.54
-          ],
-          "confidence": 0.58
-        },
-        "gemini": {
-          "probs": [
-            0.44,
-            0.56
-          ],
-          "confidence": 0.35,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.020000000000000018,
-      "blendedProbs": [
-        0.45481481481481484,
-        0.5451851851851852
-      ],
-      "confidence": 0.58,
-      "decision": "skip",
-      "outcomeIdx": null,
-      "edge": 0,
-      "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "bestEdge=0.000 < minEdge=0.13"
-    },
-    {
-      "ts": "2026-08-20T05:31:59.021Z",
-      "marketId": "0x2e0d3ee960783033bb70e5b5577a04a1d19f7dcf",
-      "question": "Will Google release a model called Gemini 3.5 Pro or later by 03:59 UTC on Aug 21, 2026?",
-      "category": "tech",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.1477801407174808,
-        0.8522198592825192
+        0.08658326294433458,
+        0.9134167370556654
       ],
       "syntheticPrice": false,
       "signals": {
@@ -491,42 +295,15 @@
       ],
       "confidence": 0.25,
       "decision": "skip",
-      "outcomeIdx": null,
-      "edge": 0,
+      "outcomeIdx": 0,
+      "edge": 0.4134167370556654,
       "thresholdUsed": 0.125,
       "size": null,
       "execution": null,
-      "skipReason": "bestEdge=0.000 < minEdge=0.13"
+      "skipReason": "sized trade too small (0.913 tokens < 1 token floor; of 7.36 remaining) — price impact isn't worth it at this size"
     },
     {
-      "ts": "2026-08-20T05:31:52.553Z",
-      "marketId": "0x360274d153c58566943cb21088dd95e45638bda3",
-      "question": "Will water level at The Battery, New York exceed 5.18 ft MLLW between 18:00 and 23:54 UTC on 2026-08-20?",
-      "category": "miscellaneous",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": null,
-      "syntheticPrice": false,
-      "signals": {
-        "llm": null,
-        "gemini": null,
-        "polymarket": null
-      },
-      "disagreement": null,
-      "blendedProbs": [],
-      "confidence": 0,
-      "decision": "skip",
-      "outcomeIdx": null,
-      "edge": 0,
-      "thresholdUsed": 0,
-      "size": null,
-      "execution": null,
-      "skipReason": "already at max exposure for this market (700.00/700 tokens)"
-    },
-    {
-      "ts": "2026-08-20T05:31:52.553Z",
+      "ts": "2026-08-21T05:07:05.312Z",
       "marketId": "0x77985bbb52a7744a8eeab5a82d02c8c079fa7a55",
       "question": "Will WTI front-month crude futures settle below $65.00 on Aug 21, 2026?",
       "category": "finance",
@@ -535,15 +312,15 @@
         "No"
       ],
       "rawPrice": [
-        0.07871829934649283,
-        0.9212817006535072
+        0.0776419538541802,
+        0.9223580461458197
       ],
       "syntheticPrice": false,
       "signals": {
         "llm": {
           "probs": [
-            0.46,
-            0.54
+            0.44,
+            0.56
           ],
           "confidence": 0.58
         },
@@ -552,15 +329,15 @@
             0.22,
             0.78
           ],
-          "confidence": 0.55,
+          "confidence": 0.45,
           "grounded": false
         },
         "polymarket": null
       },
-      "disagreement": 0.24000000000000002,
+      "disagreement": 0.22,
       "blendedProbs": [
-        0.3748387096774194,
-        0.6251612903225807
+        0.37172413793103454,
+        0.6282758620689656
       ],
       "confidence": 0.58,
       "decision": "skip",
@@ -569,210 +346,95 @@
       "thresholdUsed": 0.125,
       "size": null,
       "execution": null,
-      "skipReason": "models disagree sharply (spread=0.24 >= hard threshold 0.13)"
+      "skipReason": "models disagree sharply (spread=0.22 >= hard threshold 0.13)"
     },
     {
-      "ts": "2026-08-20T05:26:44.420Z",
-      "marketId": "0x0098f1f9d997ea02cb5f7309bf9d3b09d72bfd76",
-      "question": "Will Rangers (Glasgow) beat FK Jablonec by 2+ in regulation in their Conference League play-off first leg Aug 20, 2026?",
-      "category": "sports",
+      "ts": "2026-08-21T05:02:42.361Z",
+      "marketId": "0x2258cfca1af0eac76dcc6d0b1a134f274bdf2d3e",
+      "question": "Will AARO or ODNI publicly release previously unreleased UAP records between Aug 10 00:00 and Aug 21 14:00 UTC 2026?",
+      "category": "politics",
       "outcomes": [
         "Yes",
         "No"
       ],
       "rawPrice": [
-        0.42342598237378,
-        0.5765740176262201
+        0.08658326294433458,
+        0.9134167370556654
       ],
       "syntheticPrice": false,
       "signals": {
         "llm": {
-          "probs": [
-            0.62,
-            0.38
-          ],
-          "confidence": 0.56
-        },
-        "gemini": {
-          "probs": [
-            0.35,
-            0.65
-          ],
-          "confidence": 0.3,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.27,
-      "blendedProbs": [
-        0.5576923076923077,
-        0.44230769230769224
-      ],
-      "confidence": 0.56,
-      "decision": "skip",
-      "outcomeIdx": 0,
-      "edge": 0.13426632531852772,
-      "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "models disagree sharply (spread=0.27 >= hard threshold 0.13)"
-    },
-    {
-      "ts": "2026-08-20T05:26:33.949Z",
-      "marketId": "0xaebc7755d23a804efac1d5ed445d44d111e635f3",
-      "question": "Will the Binance BTC/USDT 1-minute close at 16:00 UTC on Aug 20, 2026 be above $68,000?",
-      "category": "crypto",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.7703330382787817,
-        0.22966696172121823
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.58,
-            0.42
-          ],
-          "confidence": 0.42
-        },
-        "gemini": {
           "probs": [
             0.5,
             0.5
           ],
-          "confidence": 0.3,
-          "grounded": false
+          "confidence": 0.25
         },
+        "gemini": null,
         "polymarket": null
       },
-      "disagreement": 0.08000000000000002,
+      "disagreement": null,
       "blendedProbs": [
-        0.5615384615384615,
-        0.4384615384615384
+        0.5,
+        0.5
       ],
-      "confidence": 0.42,
-      "decision": "trade",
-      "outcomeIdx": 1,
-      "edge": 0.20879457674032018,
-      "thresholdUsed": 0.125,
-      "size": 5.141952488480105,
-      "execution": {
-        "txHash": "0x26a8c329b52c130756c508c2f6b583c543ca15343b396ff1879e0a56f7aa2599",
-        "quotedTokensIn": 4210520,
-        "sharesOut": "22388733886424969216",
-        "priceImpactPct": -0.1811
-      }
-    },
-    {
-      "ts": "2026-08-20T05:26:23.858Z",
-      "marketId": "0xc01afc5152ebbafb979e0947365aea9fb4bfde88",
-      "question": "Will the Secured Overnight Financing Rate for Aug 19, 2026 be above 3.65%?",
-      "category": "economics",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.29780474913471666,
-        0.7021952508652833
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.58,
-            0.42
-          ],
-          "confidence": 0.62
-        },
-        "gemini": {
-          "probs": [
-            0.62,
-            0.38
-          ],
-          "confidence": 0.35,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.040000000000000036,
-      "blendedProbs": [
-        0.5903703703703704,
-        0.4096296296296296
-      ],
-      "confidence": 0.62,
-      "decision": "trade",
+      "confidence": 0.25,
+      "decision": "skip",
       "outcomeIdx": 0,
-      "edge": 0.29256562123565377,
+      "edge": 0.4134167370556654,
       "thresholdUsed": 0.125,
-      "size": 13.595146691671237,
-      "execution": {
-        "txHash": "0x080cb3815380e81f7a7a6062695c607e4d2c61d8688427af52c8b7a52e78d18b",
-        "quotedTokensIn": 7897980,
-        "sharesOut": "45651208488690884608",
-        "priceImpactPct": -0.4191
-      }
+      "size": null,
+      "execution": null,
+      "skipReason": "sized trade too small (0.913 tokens < 1 token floor; of 7.36 remaining) — price impact isn't worth it at this size"
     },
     {
-      "ts": "2026-08-20T03:51:08.954Z",
-      "marketId": "0x97171bc2b4c6871ced995a9021354800c1f15280",
-      "question": "Will the ECB euro foreign exchange reference rate for USD on 2026-08-20 be above 1.1610?",
+      "ts": "2026-08-21T05:02:36.351Z",
+      "marketId": "0x77985bbb52a7744a8eeab5a82d02c8c079fa7a55",
+      "question": "Will WTI front-month crude futures settle below $65.00 on Aug 21, 2026?",
       "category": "finance",
       "outcomes": [
         "Yes",
         "No"
       ],
       "rawPrice": [
-        0.758463042366194,
-        0.241536957633806
+        0.0776419538541802,
+        0.9223580461458197
       ],
       "syntheticPrice": false,
       "signals": {
         "llm": {
           "probs": [
-            0.57,
-            0.43
+            0.44,
+            0.56
           ],
-          "confidence": 0.42
+          "confidence": 0.58
         },
         "gemini": {
           "probs": [
-            0.49,
-            0.51
+            0.22,
+            0.78
           ],
-          "confidence": 0.35,
+          "confidence": 0.45,
           "grounded": false
         },
         "polymarket": null
       },
-      "disagreement": 0.08000000000000002,
+      "disagreement": 0.22,
       "blendedProbs": [
-        0.5492592592592592,
-        0.4507407407407407
+        0.37172413793103454,
+        0.6282758620689656
       ],
-      "confidence": 0.42,
-      "decision": "trade",
-      "outcomeIdx": 1,
-      "edge": 0.20920378310693472,
+      "confidence": 0.58,
+      "decision": "skip",
+      "outcomeIdx": null,
+      "edge": 0,
       "thresholdUsed": 0.125,
-      "size": 7.3616919102425475,
-      "execution": {
-        "txHash": "0xc8f8fd6dafb0390eb8555f176efce08a579766a3ade4cf8090b2da37eaecead5",
-        "quotedTokensIn": 2508880,
-        "sharesOut": "30478532073769029632",
-        "priceImpactPct": -0.6592,
-        "resolved": true,
-        "redeemedTxHash": "0xbb7080d000f6df57f060685d63f74ae39b789594d6bd165eda6e3c09512ac5ef",
-        "redeemedAmount": "5.507419",
-        "exitReason": "manual-sell"
-      }
+      "size": null,
+      "execution": null,
+      "skipReason": "models disagree sharply (spread=0.22 >= hard threshold 0.13)"
     },
     {
-      "ts": "2026-08-20T01:15:30.963Z",
+      "ts": "2026-08-21T04:57:07.158Z",
       "marketId": "0x2258cfca1af0eac76dcc6d0b1a134f274bdf2d3e",
       "question": "Will AARO or ODNI publicly release previously unreleased UAP records between Aug 10 00:00 and Aug 21 14:00 UTC 2026?",
       "category": "politics",
@@ -781,8 +443,8 @@
         "No"
       ],
       "rawPrice": [
-        0.18037799967188495,
-        0.819622000328115
+        0.08658326294433458,
+        0.9134167370556654
       ],
       "syntheticPrice": false,
       "signals": {
@@ -804,289 +466,14 @@
       "confidence": 0.46,
       "decision": "skip",
       "outcomeIdx": 0,
-      "edge": 0.09962200032811508,
+      "edge": 0.19341673705566545,
       "thresholdUsed": 0.125,
       "size": null,
       "execution": null,
-      "skipReason": "bestEdge=0.100 < minEdge=0.13"
+      "skipReason": "sized trade too small (0.786 tokens < 1 token floor; of 7.36 remaining) — price impact isn't worth it at this size"
     },
     {
-      "ts": "2026-08-19T22:30:23.148Z",
-      "marketId": "0x2e58244d21a2bf56e68aef7b674c1630da1694fe",
-      "question": "Will an additional 50% Section 338 duty apply to covered Canadian goods entered Aug 19, 2026 (04:00Z–Aug 20 04:00Z)?",
-      "category": "politics",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": null,
-      "syntheticPrice": false,
-      "signals": {
-        "llm": null,
-        "gemini": null,
-        "polymarket": null
-      },
-      "disagreement": null,
-      "blendedProbs": [],
-      "confidence": 0,
-      "decision": "skip",
-      "outcomeIdx": null,
-      "edge": 0,
-      "thresholdUsed": 0,
-      "size": null,
-      "execution": null,
-      "skipReason": "already at max exposure for this market (1124.07/700 tokens)"
-    },
-    {
-      "ts": "2026-08-19T22:30:23.148Z",
-      "marketId": "0x701f91b48fdf8eaac09de1317f34d3d901b74216",
-      "question": "Will Botafogo and CS Cienciano combine for 4 or more goals in their Copa Sudamericana match on Aug 20, 2026?",
-      "category": "sports",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.5827778244751884,
-        0.4172221755248115
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.34,
-            0.66
-          ],
-          "confidence": 0.58
-        },
-        "gemini": {
-          "probs": [
-            0.38,
-            0.62
-          ],
-          "confidence": 0.4,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.040000000000000036,
-      "blendedProbs": [
-        0.3514285714285714,
-        0.6485714285714286
-      ],
-      "confidence": 0.58,
-      "decision": "skip",
-      "outcomeIdx": null,
-      "edge": 0,
-      "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "bestEdge=0.000 < minEdge=0.13"
-    },
-    {
-      "ts": "2026-08-19T22:30:19.976Z",
-      "marketId": "0x26c97689a636c28040e979f1d242fd996730a8bc",
-      "question": "Will the LaLiga match Rayo Vallecano vs Deportivo Alavés on Aug 20, 2026 end in a draw after 90 minutes?",
-      "category": "sports",
-      "outcomes": [
-        "Yes",
-        "No",
-        "Match not played"
-      ],
-      "rawPrice": [
-        0.366641658021048,
-        0.6003639237331424,
-        0.03299441824580961
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.3333333333333333,
-            0.3333333333333333,
-            0.3333333333333333
-          ],
-          "confidence": 0.25
-        },
-        "gemini": {
-          "probs": [
-            0.29,
-            0.71,
-            0
-          ],
-          "confidence": 0.4,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.37666666666666665,
-      "blendedProbs": [
-        0.32095238095238093,
-        0.44095238095238093,
-        0.2380952380952381
-      ],
-      "confidence": 0.25,
-      "decision": "skip",
-      "outcomeIdx": 2,
-      "edge": 0.2051008198494285,
-      "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "models disagree sharply (spread=0.38 >= hard threshold 0.13)"
-    },
-    {
-      "ts": "2026-08-19T22:30:13.191Z",
-      "marketId": "0xbf1ce7c9d751b92bfac4acefe0e87d82b1d30163",
-      "question": "Will Sporting Kansas City win their MLS match against St. Louis City SC scheduled for Aug 19, 2026?",
-      "category": "sports",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.2917789486279754,
-        0.7082210513720247
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.39,
-            0.61
-          ],
-          "confidence": 0.58
-        },
-        "gemini": null,
-        "polymarket": null
-      },
-      "disagreement": null,
-      "blendedProbs": [
-        0.39,
-        0.61
-      ],
-      "confidence": 0.58,
-      "decision": "skip",
-      "outcomeIdx": 0,
-      "edge": 0.09822105137202464,
-      "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "bestEdge=0.098 < minEdge=0.13"
-    },
-    {
-      "ts": "2026-08-19T22:30:10.167Z",
-      "marketId": "0x360274d153c58566943cb21088dd95e45638bda3",
-      "question": "Will water level at The Battery, New York exceed 5.18 ft MLLW between 18:00 and 23:54 UTC on 2026-08-20?",
-      "category": "miscellaneous",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": null,
-      "syntheticPrice": false,
-      "signals": {
-        "llm": null,
-        "gemini": null,
-        "polymarket": null
-      },
-      "disagreement": null,
-      "blendedProbs": [],
-      "confidence": 0,
-      "decision": "skip",
-      "outcomeIdx": null,
-      "edge": 0,
-      "thresholdUsed": 0,
-      "size": null,
-      "execution": null,
-      "skipReason": "already at max exposure for this market (700.00/700 tokens)"
-    },
-    {
-      "ts": "2026-08-19T22:30:10.167Z",
-      "marketId": "0xc598c6fac139b5b76a88ac08bf3e4663f1336acc",
-      "question": "Will the US Treasury 10-year constant maturity yield for 2026-08-20 be above 4.68%?",
-      "category": "economics",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.2065124893431271,
-        0.793487510656873
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.58,
-            0.42
-          ],
-          "confidence": 0.56
-        },
-        "gemini": {
-          "probs": [
-            0.45,
-            0.55
-          ],
-          "confidence": 0.4,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.13000000000000006,
-      "blendedProbs": [
-        0.5428571428571429,
-        0.4571428571428572
-      ],
-      "confidence": 0.56,
-      "decision": "skip",
-      "outcomeIdx": null,
-      "edge": 0,
-      "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "models disagree sharply (spread=0.13 >= hard threshold 0.13)"
-    },
-    {
-      "ts": "2026-08-19T22:30:06.482Z",
-      "marketId": "0x2e0d3ee960783033bb70e5b5577a04a1d19f7dcf",
-      "question": "Will Google release a model called Gemini 3.5 Pro or later by 03:59 UTC on Aug 21, 2026?",
-      "category": "tech",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.13349128471674687,
-        0.8665087152832531
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.42,
-            0.58
-          ],
-          "confidence": 0.46
-        },
-        "gemini": null,
-        "polymarket": null
-      },
-      "disagreement": null,
-      "blendedProbs": [
-        0.42,
-        0.58
-      ],
-      "confidence": 0.46,
-      "decision": "skip",
-      "outcomeIdx": null,
-      "edge": 0,
-      "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "bestEdge=0.000 < minEdge=0.13"
-    },
-    {
-      "ts": "2026-08-19T22:30:03.749Z",
+      "ts": "2026-08-21T04:57:07.092Z",
       "marketId": "0x77985bbb52a7744a8eeab5a82d02c8c079fa7a55",
       "question": "Will WTI front-month crude futures settle below $65.00 on Aug 21, 2026?",
       "category": "finance",
@@ -1095,8 +482,263 @@
         "No"
       ],
       "rawPrice": [
-        0.07241549654470926,
-        0.9275845034552908
+        0.0776419538541802,
+        0.9223580461458197
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.44,
+            0.56
+          ],
+          "confidence": 0.58
+        },
+        "gemini": {
+          "probs": [
+            0.22,
+            0.78
+          ],
+          "confidence": 0.45,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.22,
+      "blendedProbs": [
+        0.37172413793103454,
+        0.6282758620689656
+      ],
+      "confidence": 0.58,
+      "decision": "skip",
+      "outcomeIdx": null,
+      "edge": 0,
+      "thresholdUsed": 0.125,
+      "size": null,
+      "execution": null,
+      "skipReason": "models disagree sharply (spread=0.22 >= hard threshold 0.13)"
+    },
+    {
+      "ts": "2026-08-21T04:52:01.455Z",
+      "marketId": "0x2258cfca1af0eac76dcc6d0b1a134f274bdf2d3e",
+      "question": "Will AARO or ODNI publicly release previously unreleased UAP records between Aug 10 00:00 and Aug 21 14:00 UTC 2026?",
+      "category": "politics",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.08658326294433458,
+        0.9134167370556654
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.28,
+            0.72
+          ],
+          "confidence": 0.46
+        },
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [
+        0.28,
+        0.72
+      ],
+      "confidence": 0.46,
+      "decision": "skip",
+      "outcomeIdx": 0,
+      "edge": 0.19341673705566545,
+      "thresholdUsed": 0.125,
+      "size": null,
+      "execution": null,
+      "skipReason": "sized trade too small (0.786 tokens < 1 token floor; of 7.36 remaining) — price impact isn't worth it at this size"
+    },
+    {
+      "ts": "2026-08-21T04:52:01.358Z",
+      "marketId": "0x77985bbb52a7744a8eeab5a82d02c8c079fa7a55",
+      "question": "Will WTI front-month crude futures settle below $65.00 on Aug 21, 2026?",
+      "category": "finance",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.0776419538541802,
+        0.9223580461458197
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.44,
+            0.56
+          ],
+          "confidence": 0.58
+        },
+        "gemini": {
+          "probs": [
+            0.22,
+            0.78
+          ],
+          "confidence": 0.45,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.22,
+      "blendedProbs": [
+        0.37172413793103454,
+        0.6282758620689656
+      ],
+      "confidence": 0.58,
+      "decision": "skip",
+      "outcomeIdx": null,
+      "edge": 0,
+      "thresholdUsed": 0.125,
+      "size": null,
+      "execution": null,
+      "skipReason": "models disagree sharply (spread=0.22 >= hard threshold 0.13)"
+    },
+    {
+      "ts": "2026-08-21T04:47:09.551Z",
+      "marketId": "0x2258cfca1af0eac76dcc6d0b1a134f274bdf2d3e",
+      "question": "Will AARO or ODNI publicly release previously unreleased UAP records between Aug 10 00:00 and Aug 21 14:00 UTC 2026?",
+      "category": "politics",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.08626743922658728,
+        0.9137325607734127
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.28,
+            0.72
+          ],
+          "confidence": 0.46
+        },
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [
+        0.28,
+        0.72
+      ],
+      "confidence": 0.46,
+      "decision": "skip",
+      "outcomeIdx": 0,
+      "edge": 0.19373256077341275,
+      "thresholdUsed": 0.125,
+      "size": null,
+      "execution": null,
+      "skipReason": "sized trade too small (0.787 tokens < 1 token floor; of 7.36 remaining) — price impact isn't worth it at this size"
+    },
+    {
+      "ts": "2026-08-21T04:47:09.434Z",
+      "marketId": "0x77985bbb52a7744a8eeab5a82d02c8c079fa7a55",
+      "question": "Will WTI front-month crude futures settle below $65.00 on Aug 21, 2026?",
+      "category": "finance",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.07755606098051585,
+        0.9224439390194842
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.44,
+            0.56
+          ],
+          "confidence": 0.58
+        },
+        "gemini": {
+          "probs": [
+            0.22,
+            0.78
+          ],
+          "confidence": 0.45,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.22,
+      "blendedProbs": [
+        0.37172413793103454,
+        0.6282758620689656
+      ],
+      "confidence": 0.58,
+      "decision": "skip",
+      "outcomeIdx": null,
+      "edge": 0,
+      "thresholdUsed": 0.125,
+      "size": null,
+      "execution": null,
+      "skipReason": "models disagree sharply (spread=0.22 >= hard threshold 0.13)"
+    },
+    {
+      "ts": "2026-08-21T04:42:08.662Z",
+      "marketId": "0x2258cfca1af0eac76dcc6d0b1a134f274bdf2d3e",
+      "question": "Will AARO or ODNI publicly release previously unreleased UAP records between Aug 10 00:00 and Aug 21 14:00 UTC 2026?",
+      "category": "politics",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.08626743922658728,
+        0.9137325607734127
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.28,
+            0.72
+          ],
+          "confidence": 0.46
+        },
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [
+        0.28,
+        0.72
+      ],
+      "confidence": 0.46,
+      "decision": "skip",
+      "outcomeIdx": 0,
+      "edge": 0.19373256077341275,
+      "thresholdUsed": 0.125,
+      "size": null,
+      "execution": null,
+      "skipReason": "sized trade too small (0.787 tokens < 1 token floor; of 7.36 remaining) — price impact isn't worth it at this size"
+    },
+    {
+      "ts": "2026-08-21T04:42:04.992Z",
+      "marketId": "0x77985bbb52a7744a8eeab5a82d02c8c079fa7a55",
+      "question": "Will WTI front-month crude futures settle below $65.00 on Aug 21, 2026?",
+      "category": "finance",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.07755606098051585,
+        0.9224439390194842
       ],
       "syntheticPrice": false,
       "signals": {
@@ -1105,24 +747,24 @@
             0.46,
             0.54
           ],
-          "confidence": 0.52
+          "confidence": 0.56
         },
         "gemini": {
           "probs": [
             0.22,
             0.78
           ],
-          "confidence": 0.5,
+          "confidence": 0.45,
           "grounded": false
         },
         "polymarket": null
       },
       "disagreement": 0.24000000000000002,
       "blendedProbs": [
-        0.38000000000000006,
-        0.62
+        0.38551724137931037,
+        0.6144827586206897
       ],
-      "confidence": 0.52,
+      "confidence": 0.56,
       "decision": "skip",
       "outcomeIdx": null,
       "edge": 0,
@@ -1132,7 +774,7 @@
       "skipReason": "models disagree sharply (spread=0.24 >= hard threshold 0.13)"
     },
     {
-      "ts": "2026-08-19T22:06:52.524Z",
+      "ts": "2026-08-21T04:37:05.383Z",
       "marketId": "0x2258cfca1af0eac76dcc6d0b1a134f274bdf2d3e",
       "question": "Will AARO or ODNI publicly release previously unreleased UAP records between Aug 10 00:00 and Aug 21 14:00 UTC 2026?",
       "category": "politics",
@@ -1141,8 +783,8 @@
         "No"
       ],
       "rawPrice": [
-        0.13284806189243076,
-        0.8671519381075693
+        0.08626743922658728,
+        0.9137325607734127
       ],
       "syntheticPrice": false,
       "signals": {
@@ -1163,12 +805,352 @@
       ],
       "confidence": 0.46,
       "decision": "skip",
-      "outcomeIdx": null,
-      "edge": 0.14715193810756927,
+      "outcomeIdx": 0,
+      "edge": 0.19373256077341275,
       "thresholdUsed": 0.125,
       "size": null,
       "execution": null,
-      "skipReason": "live execution declined: price impact still 38.1% after resize, exceeds 10% cap"
+      "skipReason": "sized trade too small (0.787 tokens < 1 token floor; of 7.36 remaining) — price impact isn't worth it at this size"
+    },
+    {
+      "ts": "2026-08-21T04:37:05.352Z",
+      "marketId": "0x77985bbb52a7744a8eeab5a82d02c8c079fa7a55",
+      "question": "Will WTI front-month crude futures settle below $65.00 on Aug 21, 2026?",
+      "category": "finance",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.07755606098051585,
+        0.9224439390194842
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.46,
+            0.54
+          ],
+          "confidence": 0.56
+        },
+        "gemini": {
+          "probs": [
+            0.22,
+            0.78
+          ],
+          "confidence": 0.45,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.24000000000000002,
+      "blendedProbs": [
+        0.38551724137931037,
+        0.6144827586206897
+      ],
+      "confidence": 0.56,
+      "decision": "skip",
+      "outcomeIdx": null,
+      "edge": 0,
+      "thresholdUsed": 0.125,
+      "size": null,
+      "execution": null,
+      "skipReason": "models disagree sharply (spread=0.24 >= hard threshold 0.13)"
+    },
+    {
+      "ts": "2026-08-21T04:32:03.259Z",
+      "marketId": "0x2258cfca1af0eac76dcc6d0b1a134f274bdf2d3e",
+      "question": "Will AARO or ODNI publicly release previously unreleased UAP records between Aug 10 00:00 and Aug 21 14:00 UTC 2026?",
+      "category": "politics",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.08626743922658728,
+        0.9137325607734127
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.28,
+            0.72
+          ],
+          "confidence": 0.46
+        },
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [
+        0.28,
+        0.72
+      ],
+      "confidence": 0.46,
+      "decision": "skip",
+      "outcomeIdx": 0,
+      "edge": 0.19373256077341275,
+      "thresholdUsed": 0.125,
+      "size": null,
+      "execution": null,
+      "skipReason": "sized trade too small (0.787 tokens < 1 token floor; of 7.36 remaining) — price impact isn't worth it at this size"
+    },
+    {
+      "ts": "2026-08-21T04:32:02.849Z",
+      "marketId": "0x77985bbb52a7744a8eeab5a82d02c8c079fa7a55",
+      "question": "Will WTI front-month crude futures settle below $65.00 on Aug 21, 2026?",
+      "category": "finance",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.07755606098051585,
+        0.9224439390194842
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.46,
+            0.54
+          ],
+          "confidence": 0.56
+        },
+        "gemini": {
+          "probs": [
+            0.22,
+            0.78
+          ],
+          "confidence": 0.45,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.24000000000000002,
+      "blendedProbs": [
+        0.38551724137931037,
+        0.6144827586206897
+      ],
+      "confidence": 0.56,
+      "decision": "skip",
+      "outcomeIdx": null,
+      "edge": 0,
+      "thresholdUsed": 0.125,
+      "size": null,
+      "execution": null,
+      "skipReason": "models disagree sharply (spread=0.24 >= hard threshold 0.13)"
+    },
+    {
+      "ts": "2026-08-21T04:27:03.856Z",
+      "marketId": "0x2258cfca1af0eac76dcc6d0b1a134f274bdf2d3e",
+      "question": "Will AARO or ODNI publicly release previously unreleased UAP records between Aug 10 00:00 and Aug 21 14:00 UTC 2026?",
+      "category": "politics",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.08626743922658728,
+        0.9137325607734127
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.28,
+            0.72
+          ],
+          "confidence": 0.46
+        },
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [
+        0.28,
+        0.72
+      ],
+      "confidence": 0.46,
+      "decision": "skip",
+      "outcomeIdx": 0,
+      "edge": 0.19373256077341275,
+      "thresholdUsed": 0.125,
+      "size": null,
+      "execution": null,
+      "skipReason": "sized trade too small (0.787 tokens < 1 token floor; of 7.36 remaining) — price impact isn't worth it at this size"
+    },
+    {
+      "ts": "2026-08-21T04:27:03.777Z",
+      "marketId": "0x77985bbb52a7744a8eeab5a82d02c8c079fa7a55",
+      "question": "Will WTI front-month crude futures settle below $65.00 on Aug 21, 2026?",
+      "category": "finance",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.07755606098051585,
+        0.9224439390194842
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.46,
+            0.54
+          ],
+          "confidence": 0.56
+        },
+        "gemini": {
+          "probs": [
+            0.22,
+            0.78
+          ],
+          "confidence": 0.45,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.24000000000000002,
+      "blendedProbs": [
+        0.38551724137931037,
+        0.6144827586206897
+      ],
+      "confidence": 0.56,
+      "decision": "skip",
+      "outcomeIdx": null,
+      "edge": 0,
+      "thresholdUsed": 0.125,
+      "size": null,
+      "execution": null,
+      "skipReason": "models disagree sharply (spread=0.24 >= hard threshold 0.13)"
+    },
+    {
+      "ts": "2026-08-21T04:22:14.829Z",
+      "marketId": "0x2258cfca1af0eac76dcc6d0b1a134f274bdf2d3e",
+      "question": "Will AARO or ODNI publicly release previously unreleased UAP records between Aug 10 00:00 and Aug 21 14:00 UTC 2026?",
+      "category": "politics",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.08626743922658728,
+        0.9137325607734127
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.28,
+            0.72
+          ],
+          "confidence": 0.46
+        },
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [
+        0.28,
+        0.72
+      ],
+      "confidence": 0.46,
+      "decision": "skip",
+      "outcomeIdx": 0,
+      "edge": 0.19373256077341275,
+      "thresholdUsed": 0.125,
+      "size": null,
+      "execution": null,
+      "skipReason": "sized trade too small (0.787 tokens < 1 token floor; of 7.36 remaining) — price impact isn't worth it at this size"
+    },
+    {
+      "ts": "2026-08-21T04:22:14.799Z",
+      "marketId": "0x77985bbb52a7744a8eeab5a82d02c8c079fa7a55",
+      "question": "Will WTI front-month crude futures settle below $65.00 on Aug 21, 2026?",
+      "category": "finance",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.07755606098051585,
+        0.9224439390194842
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.46,
+            0.54
+          ],
+          "confidence": 0.56
+        },
+        "gemini": {
+          "probs": [
+            0.22,
+            0.78
+          ],
+          "confidence": 0.45,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.24000000000000002,
+      "blendedProbs": [
+        0.38551724137931037,
+        0.6144827586206897
+      ],
+      "confidence": 0.56,
+      "decision": "skip",
+      "outcomeIdx": null,
+      "edge": 0,
+      "thresholdUsed": 0.125,
+      "size": null,
+      "execution": null,
+      "skipReason": "models disagree sharply (spread=0.24 >= hard threshold 0.13)"
+    },
+    {
+      "ts": "2026-08-21T04:18:48.248Z",
+      "marketId": "0x2258cfca1af0eac76dcc6d0b1a134f274bdf2d3e",
+      "question": "Will AARO or ODNI publicly release previously unreleased UAP records between Aug 10 00:00 and Aug 21 14:00 UTC 2026?",
+      "category": "politics",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.1062585124176388,
+        0.8937414875823613
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.28,
+            0.72
+          ],
+          "confidence": 0.46
+        },
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [
+        0.28,
+        0.72
+      ],
+      "confidence": 0.46,
+      "decision": "skip",
+      "outcomeIdx": 0,
+      "edge": 0.17374148758236124,
+      "thresholdUsed": 0.125,
+      "size": null,
+      "execution": null,
+      "skipReason": "sized trade too small (0.706 tokens < 1 token floor; of 7.36 remaining) — price impact isn't worth it at this size"
     }
   ]
 }
