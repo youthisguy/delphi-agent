@@ -1,24 +1,24 @@
 {
-  "updatedAt": "2026-08-21T09:37:12.954Z",
-  "totalReceipts": 1723,
-  "totalTrades": 241,
-  "totalSkips": 1482,
+  "updatedAt": "2026-08-22T17:46:12.656Z",
+  "totalReceipts": 1870,
+  "totalTrades": 250,
+  "totalSkips": 1620,
   "rollingAccuracy": {
-    "n": 230,
-    "hitRate": 0.3391304347826087
+    "n": 241,
+    "hitRate": 0.35684647302904565
   },
   "calibrationByConfidenceBucket": {
-    "mid(0.4-0.6)": {
-      "n": 63,
-      "hitRate": 0.3492063492063492
-    },
-    "low(<0.4)": {
-      "n": 119,
-      "hitRate": 0.2184873949579832
-    },
     "high(0.6-0.8)": {
       "n": 37,
       "hitRate": 0.5135135135135135
+    },
+    "low(<0.4)": {
+      "n": 124,
+      "hitRate": 0.24193548387096775
+    },
+    "mid(0.4-0.6)": {
+      "n": 69,
+      "hitRate": 0.37681159420289856
     },
     "veryhigh(0.8+)": {
       "n": 11,
@@ -26,15 +26,20 @@
     }
   },
   "perCategory": {
-    "politics": {
-      "n": 10,
-      "hitRate": 0.7,
-      "trades": 12
+    "sports": {
+      "n": 9,
+      "hitRate": 0.2222222222222222,
+      "trades": 10
     },
     "uncategorized": {
-      "n": 96,
-      "hitRate": 0.08333333333333333,
-      "trades": 97
+      "n": 101,
+      "hitRate": 0.1188118811881188,
+      "trades": 105
+    },
+    "politics": {
+      "n": 12,
+      "hitRate": 0.75,
+      "trades": 12
     },
     "crypto": {
       "n": 4,
@@ -47,8 +52,8 @@
       "trades": 37
     },
     "finance": {
-      "n": 2,
-      "hitRate": 0,
+      "n": 4,
+      "hitRate": 0.5,
       "trades": 4
     },
     "miscellaneous": {
@@ -57,14 +62,9 @@
       "trades": 71
     },
     "tech": {
-      "n": 4,
-      "hitRate": 1,
+      "n": 6,
+      "hitRate": 0.6666666666666666,
       "trades": 6
-    },
-    "sports": {
-      "n": 9,
-      "hitRate": 0.2222222222222222,
-      "trades": 9
     },
     "culture": {
       "n": 1,
@@ -72,213 +72,187 @@
       "trades": 1
     }
   },
-  "openExposureTokens": 1675.322291827172,
+  "openExposureTokens": 354.02736326577144,
   "tradePerformance": {
-    "settled": 137,
-    "wins": 78,
-    "losses": 59,
-    "winRate": 0.5693430656934306,
+    "settled": 148,
+    "wins": 86,
+    "losses": 62,
+    "winRate": 0.581081081081081,
     "voidTrades": 4,
     "totalPnl": -570.1171,
-    "openTrades": 7
+    "openTrades": 5
   },
   "skipCalibration": {
-    "settled": 1379,
-    "wouldHaveWon": 933,
-    "wouldHaveWonRate": 0.6765772298767223,
+    "settled": 1534,
+    "wouldHaveWon": 1064,
+    "wouldHaveWonRate": 0.6936114732724902,
     "voidSkips": 5
   },
   "lastNDecisions": [
     {
-      "ts": "2026-08-21T09:37:08.055Z",
-      "marketId": "0x2258cfca1af0eac76dcc6d0b1a134f274bdf2d3e",
-      "question": "Will AARO or ODNI publicly release previously unreleased UAP records between Aug 10 00:00 and Aug 21 14:00 UTC 2026?",
-      "category": "politics",
+      "ts": "2026-08-22T17:46:09.241Z",
+      "marketId": "0x36387895d67e697749eb57ef5679c56782e7d13e",
+      "question": "Will LAFC vs Portland Timbers produce 4 or more combined goals (MLS, kickoff 02:30 UTC Aug 23, 2026)?",
+      "category": "sports",
       "outcomes": [
         "Yes",
-        "No"
+        "No",
+        "Match not completed"
       ],
       "rawPrice": [
-        0.1071751826620198,
-        0.8928248173379801
+        0.301089,
+        0.5,
+        0.5
       ],
-      "syntheticPrice": false,
+      "syntheticPrice": true,
       "signals": {
         "llm": {
           "probs": [
-            0.28,
-            0.72
+            0.54,
+            0.41,
+            0.05
           ],
-          "confidence": 0.46
-        },
-        "gemini": null,
-        "polymarket": null
-      },
-      "disagreement": null,
-      "blendedProbs": [
-        0.28,
-        0.72
-      ],
-      "confidence": 0.46,
-      "decision": "trade",
-      "outcomeIdx": 0,
-      "edge": 0.17282481733798022,
-      "thresholdUsed": 0.125,
-      "size": 211.5274131195676,
-      "execution": {
-        "txHash": "0xd3871f1dbcf223838656be626ed32171a2205e05c40779760e9af737ed00288c",
-        "quotedTokensIn": 31434145,
-        "sharesOut": "269221420956901179392",
-        "priceImpactPct": 0.0894
-      }
-    },
-    {
-      "ts": "2026-08-21T09:37:07.958Z",
-      "marketId": "0x77985bbb52a7744a8eeab5a82d02c8c079fa7a55",
-      "question": "Will WTI front-month crude futures settle below $65.00 on Aug 21, 2026?",
-      "category": "finance",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.07847952778411149,
-        0.9215204722158885
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.46,
-            0.54
-          ],
-          "confidence": 0.56
+          "confidence": 0.62
         },
         "gemini": {
           "probs": [
-            0.35,
-            0.65
+            0.46,
+            0.52,
+            0.02
           ],
-          "confidence": 0.4,
+          "confidence": 0.5,
           "grounded": false
         },
         "polymarket": null
       },
       "disagreement": 0.11000000000000004,
       "blendedProbs": [
-        0.4285714285714286,
-        0.5714285714285715
+        0.5133333333333333,
+        0.4466666666666666,
+        0.04
       ],
-      "confidence": 0.56,
-      "decision": "skip",
-      "outcomeIdx": null,
-      "edge": 0,
-      "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "bestEdge=0.000 < minEdge=0.13"
+      "confidence": 0.62,
+      "decision": "trade",
+      "outcomeIdx": 0,
+      "edge": 0.2122443333333333,
+      "thresholdUsed": 0.20500000000000002,
+      "size": 136.6171602657714,
+      "execution": {
+        "txHash": "0x0fda35e742440aff3c8cd4410d6ff98c15b78c5b283feb5495ef9a0fb1b8cdc9",
+        "quotedTokensIn": 132492642,
+        "sharesOut": "403869463200812892160",
+        "priceImpactPct": 0.0896
+      }
     },
     {
-      "ts": "2026-08-21T09:32:28.554Z",
-      "marketId": "0x2258cfca1af0eac76dcc6d0b1a134f274bdf2d3e",
-      "question": "Will AARO or ODNI publicly release previously unreleased UAP records between Aug 10 00:00 and Aug 21 14:00 UTC 2026?",
+      "ts": "2026-08-22T17:38:18.491Z",
+      "marketId": "0xb47d059e2e134564c7298f6cacd2f4bfd27f09c2",
+      "question": "Will the US and Canada conclude a final trade agreement before 03:59 UTC on Aug 24, 2026?",
       "category": "politics",
       "outcomes": [
         "Yes",
         "No"
       ],
       "rawPrice": [
-        0.10012016202104963,
-        0.8998798379789504
+        0.1295252687598795,
+        0.8704747312401204
       ],
       "syntheticPrice": false,
       "signals": {
         "llm": {
           "probs": [
-            0.28,
-            0.72
+            0.5,
+            0.5
           ],
-          "confidence": 0.46
-        },
-        "gemini": null,
-        "polymarket": null
-      },
-      "disagreement": null,
-      "blendedProbs": [
-        0.28,
-        0.72
-      ],
-      "confidence": 0.46,
-      "decision": "trade",
-      "outcomeIdx": 0,
-      "edge": 0.1798798379789504,
-      "thresholdUsed": 0.125,
-      "size": 223.02298054552543,
-      "execution": {
-        "txHash": "0xbb609f966ed719ec61afc643b25aed4bf7da4e4d8ffde424bbc0c9799f6faa93",
-        "quotedTokensIn": 28809863,
-        "sharesOut": "264344061902377877504",
-        "priceImpactPct": 0.0886
-      }
-    },
-    {
-      "ts": "2026-08-21T09:32:28.451Z",
-      "marketId": "0x77985bbb52a7744a8eeab5a82d02c8c079fa7a55",
-      "question": "Will WTI front-month crude futures settle below $65.00 on Aug 21, 2026?",
-      "category": "finance",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.054862726530291395,
-        0.9451372734697085
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.46,
-            0.54
-          ],
-          "confidence": 0.56
+          "confidence": 0.25
         },
         "gemini": {
           "probs": [
-            0.35,
-            0.65
+            0.05,
+            0.95
           ],
-          "confidence": 0.4,
+          "confidence": 0.8,
           "grounded": false
         },
         "polymarket": null
       },
-      "disagreement": 0.11000000000000004,
+      "disagreement": 0.45,
       "blendedProbs": [
-        0.4285714285714286,
-        0.5714285714285715
+        0.3,
+        0.7
       ],
-      "confidence": 0.56,
+      "confidence": 0.25,
       "decision": "skip",
       "outcomeIdx": null,
       "edge": 0,
       "thresholdUsed": 0.125,
       "size": null,
       "execution": null,
-      "skipReason": "bestEdge=0.000 < minEdge=0.13"
+      "skipReason": "models disagree sharply (spread=0.45 >= hard threshold 0.13)"
     },
     {
-      "ts": "2026-08-21T09:28:56.254Z",
-      "marketId": "0x2258cfca1af0eac76dcc6d0b1a134f274bdf2d3e",
-      "question": "Will AARO or ODNI publicly release previously unreleased UAP records between Aug 10 00:00 and Aug 21 14:00 UTC 2026?",
+      "ts": "2026-08-22T17:33:10.654Z",
+      "marketId": "0x36387895d67e697749eb57ef5679c56782e7d13e",
+      "question": "Will LAFC vs Portland Timbers produce 4 or more combined goals (MLS, kickoff 02:30 UTC Aug 23, 2026)?",
+      "category": "sports",
+      "outcomes": [
+        "Yes",
+        "No",
+        "Match not completed"
+      ],
+      "rawPrice": [
+        0.301089,
+        0.5,
+        0.5
+      ],
+      "syntheticPrice": true,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.56,
+            0.38,
+            0.06
+          ],
+          "confidence": 0.58
+        },
+        "gemini": {
+          "probs": [
+            0.44,
+            0.54,
+            0.02
+          ],
+          "confidence": 0.55,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.16000000000000003,
+      "blendedProbs": [
+        0.5174193548387097,
+        0.4367741935483871,
+        0.04580645161290322
+      ],
+      "confidence": 0.58,
+      "decision": "skip",
+      "outcomeIdx": 0,
+      "edge": 0.21633035483870972,
+      "thresholdUsed": 0.20500000000000002,
+      "size": null,
+      "execution": null,
+      "skipReason": "models disagree sharply (spread=0.16 >= hard threshold 0.13)"
+    },
+    {
+      "ts": "2026-08-22T17:33:10.355Z",
+      "marketId": "0xb47d059e2e134564c7298f6cacd2f4bfd27f09c2",
+      "question": "Will the US and Canada conclude a final trade agreement before 03:59 UTC on Aug 24, 2026?",
       "category": "politics",
       "outcomes": [
         "Yes",
         "No"
       ],
       "rawPrice": [
-        0.08658326294433458,
-        0.9134167370556654
+        0.1295252687598795,
+        0.8704747312401204
       ],
       "syntheticPrice": false,
       "signals": {
@@ -289,61 +263,22 @@
           ],
           "confidence": 0.46
         },
-        "gemini": null,
-        "polymarket": null
-      },
-      "disagreement": null,
-      "blendedProbs": [
-        0.28,
-        0.72
-      ],
-      "confidence": 0.46,
-      "decision": "skip",
-      "outcomeIdx": 0,
-      "edge": 0.19341673705566545,
-      "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "sized trade too small (0.786 tokens < 1 token floor; of 7.36 remaining) — price impact isn't worth it at this size"
-    },
-    {
-      "ts": "2026-08-21T06:46:48.070Z",
-      "marketId": "0x77985bbb52a7744a8eeab5a82d02c8c079fa7a55",
-      "question": "Will WTI front-month crude futures settle below $65.00 on Aug 21, 2026?",
-      "category": "finance",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.0776419538541802,
-        0.9223580461458197
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.58,
-            0.42
-          ],
-          "confidence": 0.56
-        },
         "gemini": {
           "probs": [
-            0.35,
-            0.65
+            0.05,
+            0.95
           ],
-          "confidence": 0.4,
+          "confidence": 0.8,
           "grounded": false
         },
         "polymarket": null
       },
       "disagreement": 0.23000000000000004,
       "blendedProbs": [
-        0.5142857142857143,
-        0.4857142857142857
+        0.1777777777777778,
+        0.8222222222222222
       ],
-      "confidence": 0.56,
+      "confidence": 0.46,
       "decision": "skip",
       "outcomeIdx": null,
       "edge": 0,
@@ -353,187 +288,165 @@
       "skipReason": "models disagree sharply (spread=0.23 >= hard threshold 0.13)"
     },
     {
-      "ts": "2026-08-21T05:07:05.753Z",
-      "marketId": "0x2258cfca1af0eac76dcc6d0b1a134f274bdf2d3e",
-      "question": "Will AARO or ODNI publicly release previously unreleased UAP records between Aug 10 00:00 and Aug 21 14:00 UTC 2026?",
-      "category": "politics",
+      "ts": "2026-08-22T17:28:09.641Z",
+      "marketId": "0x36387895d67e697749eb57ef5679c56782e7d13e",
+      "question": "Will LAFC vs Portland Timbers produce 4 or more combined goals (MLS, kickoff 02:30 UTC Aug 23, 2026)?",
+      "category": "sports",
       "outcomes": [
         "Yes",
-        "No"
+        "No",
+        "Match not completed"
       ],
       "rawPrice": [
-        0.08658326294433458,
-        0.9134167370556654
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.5,
-            0.5
-          ],
-          "confidence": 0.25
-        },
-        "gemini": null,
-        "polymarket": null
-      },
-      "disagreement": null,
-      "blendedProbs": [
+        0.301089,
         0.5,
         0.5
       ],
-      "confidence": 0.25,
-      "decision": "skip",
-      "outcomeIdx": 0,
-      "edge": 0.4134167370556654,
-      "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "sized trade too small (0.913 tokens < 1 token floor; of 7.36 remaining) — price impact isn't worth it at this size"
-    },
-    {
-      "ts": "2026-08-21T05:07:05.312Z",
-      "marketId": "0x77985bbb52a7744a8eeab5a82d02c8c079fa7a55",
-      "question": "Will WTI front-month crude futures settle below $65.00 on Aug 21, 2026?",
-      "category": "finance",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.0776419538541802,
-        0.9223580461458197
-      ],
-      "syntheticPrice": false,
+      "syntheticPrice": true,
       "signals": {
         "llm": {
           "probs": [
-            0.44,
-            0.56
+            0.56,
+            0.38,
+            0.06
           ],
           "confidence": 0.58
         },
         "gemini": {
           "probs": [
-            0.22,
-            0.78
+            0.44,
+            0.54,
+            0.02
           ],
-          "confidence": 0.45,
+          "confidence": 0.55,
           "grounded": false
         },
         "polymarket": null
       },
-      "disagreement": 0.22,
+      "disagreement": 0.16000000000000003,
       "blendedProbs": [
-        0.37172413793103454,
-        0.6282758620689656
+        0.5174193548387097,
+        0.4367741935483871,
+        0.04580645161290322
       ],
       "confidence": 0.58,
       "decision": "skip",
-      "outcomeIdx": null,
-      "edge": 0,
-      "thresholdUsed": 0.125,
+      "outcomeIdx": 0,
+      "edge": 0.21633035483870972,
+      "thresholdUsed": 0.20500000000000002,
       "size": null,
       "execution": null,
-      "skipReason": "models disagree sharply (spread=0.22 >= hard threshold 0.13)"
+      "skipReason": "models disagree sharply (spread=0.16 >= hard threshold 0.13)"
     },
     {
-      "ts": "2026-08-21T05:02:42.361Z",
-      "marketId": "0x2258cfca1af0eac76dcc6d0b1a134f274bdf2d3e",
-      "question": "Will AARO or ODNI publicly release previously unreleased UAP records between Aug 10 00:00 and Aug 21 14:00 UTC 2026?",
+      "ts": "2026-08-22T17:28:09.450Z",
+      "marketId": "0xb47d059e2e134564c7298f6cacd2f4bfd27f09c2",
+      "question": "Will the US and Canada conclude a final trade agreement before 03:59 UTC on Aug 24, 2026?",
       "category": "politics",
       "outcomes": [
         "Yes",
         "No"
       ],
       "rawPrice": [
-        0.08658326294433458,
-        0.9134167370556654
+        0.1295252687598795,
+        0.8704747312401204
       ],
       "syntheticPrice": false,
       "signals": {
         "llm": {
           "probs": [
-            0.5,
-            0.5
+            0.28,
+            0.72
           ],
-          "confidence": 0.25
+          "confidence": 0.46
         },
-        "gemini": null,
+        "gemini": {
+          "probs": [
+            0.05,
+            0.95
+          ],
+          "confidence": 0.8,
+          "grounded": false
+        },
         "polymarket": null
       },
-      "disagreement": null,
+      "disagreement": 0.23000000000000004,
       "blendedProbs": [
+        0.1777777777777778,
+        0.8222222222222222
+      ],
+      "confidence": 0.46,
+      "decision": "skip",
+      "outcomeIdx": null,
+      "edge": 0,
+      "thresholdUsed": 0.125,
+      "size": null,
+      "execution": null,
+      "skipReason": "models disagree sharply (spread=0.23 >= hard threshold 0.13)"
+    },
+    {
+      "ts": "2026-08-22T17:23:08.337Z",
+      "marketId": "0x36387895d67e697749eb57ef5679c56782e7d13e",
+      "question": "Will LAFC vs Portland Timbers produce 4 or more combined goals (MLS, kickoff 02:30 UTC Aug 23, 2026)?",
+      "category": "sports",
+      "outcomes": [
+        "Yes",
+        "No",
+        "Match not completed"
+      ],
+      "rawPrice": [
+        0.301089,
         0.5,
         0.5
       ],
-      "confidence": 0.25,
-      "decision": "skip",
-      "outcomeIdx": 0,
-      "edge": 0.4134167370556654,
-      "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "sized trade too small (0.913 tokens < 1 token floor; of 7.36 remaining) — price impact isn't worth it at this size"
-    },
-    {
-      "ts": "2026-08-21T05:02:36.351Z",
-      "marketId": "0x77985bbb52a7744a8eeab5a82d02c8c079fa7a55",
-      "question": "Will WTI front-month crude futures settle below $65.00 on Aug 21, 2026?",
-      "category": "finance",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.0776419538541802,
-        0.9223580461458197
-      ],
-      "syntheticPrice": false,
+      "syntheticPrice": true,
       "signals": {
         "llm": {
           "probs": [
-            0.44,
-            0.56
+            0.56,
+            0.38,
+            0.06
           ],
           "confidence": 0.58
         },
         "gemini": {
           "probs": [
-            0.22,
-            0.78
+            0.44,
+            0.54,
+            0.02
           ],
-          "confidence": 0.45,
+          "confidence": 0.55,
           "grounded": false
         },
         "polymarket": null
       },
-      "disagreement": 0.22,
+      "disagreement": 0.16000000000000003,
       "blendedProbs": [
-        0.37172413793103454,
-        0.6282758620689656
+        0.5174193548387097,
+        0.4367741935483871,
+        0.04580645161290322
       ],
       "confidence": 0.58,
       "decision": "skip",
-      "outcomeIdx": null,
-      "edge": 0,
-      "thresholdUsed": 0.125,
+      "outcomeIdx": 0,
+      "edge": 0.21633035483870972,
+      "thresholdUsed": 0.20500000000000002,
       "size": null,
       "execution": null,
-      "skipReason": "models disagree sharply (spread=0.22 >= hard threshold 0.13)"
+      "skipReason": "models disagree sharply (spread=0.16 >= hard threshold 0.13)"
     },
     {
-      "ts": "2026-08-21T04:57:07.158Z",
-      "marketId": "0x2258cfca1af0eac76dcc6d0b1a134f274bdf2d3e",
-      "question": "Will AARO or ODNI publicly release previously unreleased UAP records between Aug 10 00:00 and Aug 21 14:00 UTC 2026?",
+      "ts": "2026-08-22T17:23:07.950Z",
+      "marketId": "0xb47d059e2e134564c7298f6cacd2f4bfd27f09c2",
+      "question": "Will the US and Canada conclude a final trade agreement before 03:59 UTC on Aug 24, 2026?",
       "category": "politics",
       "outcomes": [
         "Yes",
         "No"
       ],
       "rawPrice": [
-        0.08658326294433458,
-        0.9134167370556654
+        0.1295252687598795,
+        0.8704747312401204
       ],
       "syntheticPrice": false,
       "signals": {
@@ -544,81 +457,93 @@
           ],
           "confidence": 0.46
         },
-        "gemini": null,
+        "gemini": {
+          "probs": [
+            0.05,
+            0.95
+          ],
+          "confidence": 0.8,
+          "grounded": false
+        },
         "polymarket": null
       },
-      "disagreement": null,
+      "disagreement": 0.23000000000000004,
       "blendedProbs": [
-        0.28,
-        0.72
+        0.1777777777777778,
+        0.8222222222222222
       ],
       "confidence": 0.46,
       "decision": "skip",
-      "outcomeIdx": 0,
-      "edge": 0.19341673705566545,
+      "outcomeIdx": null,
+      "edge": 0,
       "thresholdUsed": 0.125,
       "size": null,
       "execution": null,
-      "skipReason": "sized trade too small (0.786 tokens < 1 token floor; of 7.36 remaining) — price impact isn't worth it at this size"
+      "skipReason": "models disagree sharply (spread=0.23 >= hard threshold 0.13)"
     },
     {
-      "ts": "2026-08-21T04:57:07.092Z",
-      "marketId": "0x77985bbb52a7744a8eeab5a82d02c8c079fa7a55",
-      "question": "Will WTI front-month crude futures settle below $65.00 on Aug 21, 2026?",
-      "category": "finance",
+      "ts": "2026-08-22T17:18:12.641Z",
+      "marketId": "0x36387895d67e697749eb57ef5679c56782e7d13e",
+      "question": "Will LAFC vs Portland Timbers produce 4 or more combined goals (MLS, kickoff 02:30 UTC Aug 23, 2026)?",
+      "category": "sports",
       "outcomes": [
         "Yes",
-        "No"
+        "No",
+        "Match not completed"
       ],
       "rawPrice": [
-        0.0776419538541802,
-        0.9223580461458197
+        0.301089,
+        0.5,
+        0.5
       ],
-      "syntheticPrice": false,
+      "syntheticPrice": true,
       "signals": {
         "llm": {
           "probs": [
-            0.44,
-            0.56
+            0.56,
+            0.38,
+            0.06
           ],
           "confidence": 0.58
         },
         "gemini": {
           "probs": [
-            0.22,
-            0.78
+            0.44,
+            0.54,
+            0.02
           ],
-          "confidence": 0.45,
+          "confidence": 0.55,
           "grounded": false
         },
         "polymarket": null
       },
-      "disagreement": 0.22,
+      "disagreement": 0.16000000000000003,
       "blendedProbs": [
-        0.37172413793103454,
-        0.6282758620689656
+        0.5174193548387097,
+        0.4367741935483871,
+        0.04580645161290322
       ],
       "confidence": 0.58,
       "decision": "skip",
-      "outcomeIdx": null,
-      "edge": 0,
-      "thresholdUsed": 0.125,
+      "outcomeIdx": 0,
+      "edge": 0.21633035483870972,
+      "thresholdUsed": 0.20500000000000002,
       "size": null,
       "execution": null,
-      "skipReason": "models disagree sharply (spread=0.22 >= hard threshold 0.13)"
+      "skipReason": "models disagree sharply (spread=0.16 >= hard threshold 0.13)"
     },
     {
-      "ts": "2026-08-21T04:52:01.455Z",
-      "marketId": "0x2258cfca1af0eac76dcc6d0b1a134f274bdf2d3e",
-      "question": "Will AARO or ODNI publicly release previously unreleased UAP records between Aug 10 00:00 and Aug 21 14:00 UTC 2026?",
+      "ts": "2026-08-22T17:18:12.459Z",
+      "marketId": "0xb47d059e2e134564c7298f6cacd2f4bfd27f09c2",
+      "question": "Will the US and Canada conclude a final trade agreement before 03:59 UTC on Aug 24, 2026?",
       "category": "politics",
       "outcomes": [
         "Yes",
         "No"
       ],
       "rawPrice": [
-        0.08658326294433458,
-        0.9134167370556654
+        0.1295252687598795,
+        0.8704747312401204
       ],
       "syntheticPrice": false,
       "signals": {
@@ -629,81 +554,93 @@
           ],
           "confidence": 0.46
         },
-        "gemini": null,
+        "gemini": {
+          "probs": [
+            0.05,
+            0.95
+          ],
+          "confidence": 0.8,
+          "grounded": false
+        },
         "polymarket": null
       },
-      "disagreement": null,
+      "disagreement": 0.23000000000000004,
       "blendedProbs": [
-        0.28,
-        0.72
+        0.1777777777777778,
+        0.8222222222222222
       ],
       "confidence": 0.46,
       "decision": "skip",
-      "outcomeIdx": 0,
-      "edge": 0.19341673705566545,
+      "outcomeIdx": null,
+      "edge": 0,
       "thresholdUsed": 0.125,
       "size": null,
       "execution": null,
-      "skipReason": "sized trade too small (0.786 tokens < 1 token floor; of 7.36 remaining) — price impact isn't worth it at this size"
+      "skipReason": "models disagree sharply (spread=0.23 >= hard threshold 0.13)"
     },
     {
-      "ts": "2026-08-21T04:52:01.358Z",
-      "marketId": "0x77985bbb52a7744a8eeab5a82d02c8c079fa7a55",
-      "question": "Will WTI front-month crude futures settle below $65.00 on Aug 21, 2026?",
-      "category": "finance",
+      "ts": "2026-08-22T17:13:18.907Z",
+      "marketId": "0x36387895d67e697749eb57ef5679c56782e7d13e",
+      "question": "Will LAFC vs Portland Timbers produce 4 or more combined goals (MLS, kickoff 02:30 UTC Aug 23, 2026)?",
+      "category": "sports",
       "outcomes": [
         "Yes",
-        "No"
+        "No",
+        "Match not completed"
       ],
       "rawPrice": [
-        0.0776419538541802,
-        0.9223580461458197
+        0.301089,
+        0.5,
+        0.5
       ],
-      "syntheticPrice": false,
+      "syntheticPrice": true,
       "signals": {
         "llm": {
           "probs": [
-            0.44,
-            0.56
+            0.56,
+            0.38,
+            0.06
           ],
           "confidence": 0.58
         },
         "gemini": {
           "probs": [
-            0.22,
-            0.78
+            0.44,
+            0.54,
+            0.02
           ],
-          "confidence": 0.45,
+          "confidence": 0.55,
           "grounded": false
         },
         "polymarket": null
       },
-      "disagreement": 0.22,
+      "disagreement": 0.16000000000000003,
       "blendedProbs": [
-        0.37172413793103454,
-        0.6282758620689656
+        0.5174193548387097,
+        0.4367741935483871,
+        0.04580645161290322
       ],
       "confidence": 0.58,
       "decision": "skip",
-      "outcomeIdx": null,
-      "edge": 0,
-      "thresholdUsed": 0.125,
+      "outcomeIdx": 0,
+      "edge": 0.21633035483870972,
+      "thresholdUsed": 0.20500000000000002,
       "size": null,
       "execution": null,
-      "skipReason": "models disagree sharply (spread=0.22 >= hard threshold 0.13)"
+      "skipReason": "models disagree sharply (spread=0.16 >= hard threshold 0.13)"
     },
     {
-      "ts": "2026-08-21T04:47:09.551Z",
-      "marketId": "0x2258cfca1af0eac76dcc6d0b1a134f274bdf2d3e",
-      "question": "Will AARO or ODNI publicly release previously unreleased UAP records between Aug 10 00:00 and Aug 21 14:00 UTC 2026?",
+      "ts": "2026-08-22T17:13:14.682Z",
+      "marketId": "0xb47d059e2e134564c7298f6cacd2f4bfd27f09c2",
+      "question": "Will the US and Canada conclude a final trade agreement before 03:59 UTC on Aug 24, 2026?",
       "category": "politics",
       "outcomes": [
         "Yes",
         "No"
       ],
       "rawPrice": [
-        0.08626743922658728,
-        0.9137325607734127
+        0.1295252687598795,
+        0.8704747312401204
       ],
       "syntheticPrice": false,
       "signals": {
@@ -714,81 +651,605 @@
           ],
           "confidence": 0.46
         },
-        "gemini": null,
+        "gemini": {
+          "probs": [
+            0.05,
+            0.95
+          ],
+          "confidence": 0.8,
+          "grounded": false
+        },
         "polymarket": null
       },
-      "disagreement": null,
+      "disagreement": 0.23000000000000004,
       "blendedProbs": [
-        0.28,
-        0.72
+        0.1777777777777778,
+        0.8222222222222222
       ],
       "confidence": 0.46,
       "decision": "skip",
-      "outcomeIdx": 0,
-      "edge": 0.19373256077341275,
+      "outcomeIdx": null,
+      "edge": 0,
       "thresholdUsed": 0.125,
       "size": null,
       "execution": null,
-      "skipReason": "sized trade too small (0.787 tokens < 1 token floor; of 7.36 remaining) — price impact isn't worth it at this size"
+      "skipReason": "models disagree sharply (spread=0.23 >= hard threshold 0.13)"
     },
     {
-      "ts": "2026-08-21T04:47:09.434Z",
-      "marketId": "0x77985bbb52a7744a8eeab5a82d02c8c079fa7a55",
-      "question": "Will WTI front-month crude futures settle below $65.00 on Aug 21, 2026?",
-      "category": "finance",
+      "ts": "2026-08-22T17:08:09.774Z",
+      "marketId": "0x36387895d67e697749eb57ef5679c56782e7d13e",
+      "question": "Will LAFC vs Portland Timbers produce 4 or more combined goals (MLS, kickoff 02:30 UTC Aug 23, 2026)?",
+      "category": "sports",
+      "outcomes": [
+        "Yes",
+        "No",
+        "Match not completed"
+      ],
+      "rawPrice": [
+        0.301089,
+        0.5,
+        0.5
+      ],
+      "syntheticPrice": true,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.56,
+            0.39,
+            0.05
+          ],
+          "confidence": 0.62
+        },
+        "gemini": {
+          "probs": [
+            0.42,
+            0.56,
+            0.02
+          ],
+          "confidence": 0.55,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.17000000000000004,
+      "blendedProbs": [
+        0.5103225806451613,
+        0.45032258064516134,
+        0.039354838709677424
+      ],
+      "confidence": 0.62,
+      "decision": "skip",
+      "outcomeIdx": 0,
+      "edge": 0.20923358064516134,
+      "thresholdUsed": 0.20500000000000002,
+      "size": null,
+      "execution": null,
+      "skipReason": "models disagree sharply (spread=0.17 >= hard threshold 0.13)"
+    },
+    {
+      "ts": "2026-08-22T17:08:09.251Z",
+      "marketId": "0xb47d059e2e134564c7298f6cacd2f4bfd27f09c2",
+      "question": "Will the US and Canada conclude a final trade agreement before 03:59 UTC on Aug 24, 2026?",
+      "category": "politics",
       "outcomes": [
         "Yes",
         "No"
       ],
       "rawPrice": [
-        0.07755606098051585,
-        0.9224439390194842
+        0.1295252687598795,
+        0.8704747312401204
       ],
       "syntheticPrice": false,
       "signals": {
         "llm": {
+          "probs": [
+            0.28,
+            0.72
+          ],
+          "confidence": 0.55
+        },
+        "gemini": {
+          "probs": [
+            0.05,
+            0.95
+          ],
+          "confidence": 0.8,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.23000000000000004,
+      "blendedProbs": [
+        0.1777777777777778,
+        0.8222222222222222
+      ],
+      "confidence": 0.55,
+      "decision": "skip",
+      "outcomeIdx": null,
+      "edge": 0,
+      "thresholdUsed": 0.125,
+      "size": null,
+      "execution": null,
+      "skipReason": "models disagree sharply (spread=0.23 >= hard threshold 0.13)"
+    },
+    {
+      "ts": "2026-08-22T17:03:11.647Z",
+      "marketId": "0x36387895d67e697749eb57ef5679c56782e7d13e",
+      "question": "Will LAFC vs Portland Timbers produce 4 or more combined goals (MLS, kickoff 02:30 UTC Aug 23, 2026)?",
+      "category": "sports",
+      "outcomes": [
+        "Yes",
+        "No",
+        "Match not completed"
+      ],
+      "rawPrice": [
+        0.301089,
+        0.5,
+        0.5
+      ],
+      "syntheticPrice": true,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.56,
+            0.39,
+            0.05
+          ],
+          "confidence": 0.62
+        },
+        "gemini": {
+          "probs": [
+            0.42,
+            0.56,
+            0.02
+          ],
+          "confidence": 0.55,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.17000000000000004,
+      "blendedProbs": [
+        0.5103225806451613,
+        0.45032258064516134,
+        0.039354838709677424
+      ],
+      "confidence": 0.62,
+      "decision": "skip",
+      "outcomeIdx": 0,
+      "edge": 0.20923358064516134,
+      "thresholdUsed": 0.20500000000000002,
+      "size": null,
+      "execution": null,
+      "skipReason": "models disagree sharply (spread=0.17 >= hard threshold 0.13)"
+    },
+    {
+      "ts": "2026-08-22T17:03:11.251Z",
+      "marketId": "0xb47d059e2e134564c7298f6cacd2f4bfd27f09c2",
+      "question": "Will the US and Canada conclude a final trade agreement before 03:59 UTC on Aug 24, 2026?",
+      "category": "politics",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.1295252687598795,
+        0.8704747312401204
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.28,
+            0.72
+          ],
+          "confidence": 0.55
+        },
+        "gemini": {
+          "probs": [
+            0.05,
+            0.95
+          ],
+          "confidence": 0.8,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.23000000000000004,
+      "blendedProbs": [
+        0.1777777777777778,
+        0.8222222222222222
+      ],
+      "confidence": 0.55,
+      "decision": "skip",
+      "outcomeIdx": null,
+      "edge": 0,
+      "thresholdUsed": 0.125,
+      "size": null,
+      "execution": null,
+      "skipReason": "models disagree sharply (spread=0.23 >= hard threshold 0.13)"
+    },
+    {
+      "ts": "2026-08-22T16:58:38.640Z",
+      "marketId": "0x36387895d67e697749eb57ef5679c56782e7d13e",
+      "question": "Will LAFC vs Portland Timbers produce 4 or more combined goals (MLS, kickoff 02:30 UTC Aug 23, 2026)?",
+      "category": "sports",
+      "outcomes": [
+        "Yes",
+        "No",
+        "Match not completed"
+      ],
+      "rawPrice": [
+        0.301089,
+        0.5,
+        0.5
+      ],
+      "syntheticPrice": true,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.56,
+            0.39,
+            0.05
+          ],
+          "confidence": 0.62
+        },
+        "gemini": {
+          "probs": [
+            0.42,
+            0.56,
+            0.02
+          ],
+          "confidence": 0.55,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.17000000000000004,
+      "blendedProbs": [
+        0.5103225806451613,
+        0.45032258064516134,
+        0.039354838709677424
+      ],
+      "confidence": 0.62,
+      "decision": "skip",
+      "outcomeIdx": 0,
+      "edge": 0.20923358064516134,
+      "thresholdUsed": 0.20500000000000002,
+      "size": null,
+      "execution": null,
+      "skipReason": "models disagree sharply (spread=0.17 >= hard threshold 0.13)"
+    },
+    {
+      "ts": "2026-08-22T16:58:38.459Z",
+      "marketId": "0xb47d059e2e134564c7298f6cacd2f4bfd27f09c2",
+      "question": "Will the US and Canada conclude a final trade agreement before 03:59 UTC on Aug 24, 2026?",
+      "category": "politics",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.1295252687598795,
+        0.8704747312401204
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.28,
+            0.72
+          ],
+          "confidence": 0.55
+        },
+        "gemini": {
+          "probs": [
+            0.05,
+            0.95
+          ],
+          "confidence": 0.8,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.23000000000000004,
+      "blendedProbs": [
+        0.1777777777777778,
+        0.8222222222222222
+      ],
+      "confidence": 0.55,
+      "decision": "skip",
+      "outcomeIdx": null,
+      "edge": 0,
+      "thresholdUsed": 0.125,
+      "size": null,
+      "execution": null,
+      "skipReason": "models disagree sharply (spread=0.23 >= hard threshold 0.13)"
+    },
+    {
+      "ts": "2026-08-22T16:53:08.444Z",
+      "marketId": "0x36387895d67e697749eb57ef5679c56782e7d13e",
+      "question": "Will LAFC vs Portland Timbers produce 4 or more combined goals (MLS, kickoff 02:30 UTC Aug 23, 2026)?",
+      "category": "sports",
+      "outcomes": [
+        "Yes",
+        "No",
+        "Match not completed"
+      ],
+      "rawPrice": [
+        0.301089,
+        0.5,
+        0.5
+      ],
+      "syntheticPrice": true,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.56,
+            0.39,
+            0.05
+          ],
+          "confidence": 0.62
+        },
+        "gemini": {
+          "probs": [
+            0.42,
+            0.56,
+            0.02
+          ],
+          "confidence": 0.55,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.17000000000000004,
+      "blendedProbs": [
+        0.5103225806451613,
+        0.45032258064516134,
+        0.039354838709677424
+      ],
+      "confidence": 0.62,
+      "decision": "skip",
+      "outcomeIdx": 0,
+      "edge": 0.20923358064516134,
+      "thresholdUsed": 0.20500000000000002,
+      "size": null,
+      "execution": null,
+      "skipReason": "models disagree sharply (spread=0.17 >= hard threshold 0.13)"
+    },
+    {
+      "ts": "2026-08-22T16:53:08.054Z",
+      "marketId": "0xb47d059e2e134564c7298f6cacd2f4bfd27f09c2",
+      "question": "Will the US and Canada conclude a final trade agreement before 03:59 UTC on Aug 24, 2026?",
+      "category": "politics",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.1295252687598795,
+        0.8704747312401204
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.28,
+            0.72
+          ],
+          "confidence": 0.55
+        },
+        "gemini": {
+          "probs": [
+            0.05,
+            0.95
+          ],
+          "confidence": 0.8,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.23000000000000004,
+      "blendedProbs": [
+        0.1777777777777778,
+        0.8222222222222222
+      ],
+      "confidence": 0.55,
+      "decision": "skip",
+      "outcomeIdx": null,
+      "edge": 0,
+      "thresholdUsed": 0.125,
+      "size": null,
+      "execution": null,
+      "skipReason": "models disagree sharply (spread=0.23 >= hard threshold 0.13)"
+    },
+    {
+      "ts": "2026-08-22T16:50:44.816Z",
+      "marketId": "0x36387895d67e697749eb57ef5679c56782e7d13e",
+      "question": "Will LAFC vs Portland Timbers produce 4 or more combined goals (MLS, kickoff 02:30 UTC Aug 23, 2026)?",
+      "category": "sports",
+      "outcomes": [
+        "Yes",
+        "No",
+        "Match not completed"
+      ],
+      "rawPrice": [
+        0.301089,
+        0.5,
+        0.5
+      ],
+      "syntheticPrice": true,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.56,
+            0.39,
+            0.05
+          ],
+          "confidence": 0.62
+        },
+        "gemini": {
+          "probs": [
+            0.42,
+            0.56,
+            0.02
+          ],
+          "confidence": 0.55,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.17000000000000004,
+      "blendedProbs": [
+        0.5103225806451613,
+        0.45032258064516134,
+        0.039354838709677424
+      ],
+      "confidence": 0.62,
+      "decision": "skip",
+      "outcomeIdx": 0,
+      "edge": 0.20923358064516134,
+      "thresholdUsed": 0.20500000000000002,
+      "size": null,
+      "execution": null,
+      "skipReason": "models disagree sharply (spread=0.17 >= hard threshold 0.13)"
+    },
+    {
+      "ts": "2026-08-22T16:50:41.329Z",
+      "marketId": "0xb47d059e2e134564c7298f6cacd2f4bfd27f09c2",
+      "question": "Will the US and Canada conclude a final trade agreement before 03:59 UTC on Aug 24, 2026?",
+      "category": "politics",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": [
+        0.15123285812222761,
+        0.8487671418777725
+      ],
+      "syntheticPrice": false,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.28,
+            0.72
+          ],
+          "confidence": 0.55
+        },
+        "gemini": {
+          "probs": [
+            0.05,
+            0.95
+          ],
+          "confidence": 0.8,
+          "grounded": false
+        },
+        "polymarket": null
+      },
+      "disagreement": 0.23000000000000004,
+      "blendedProbs": [
+        0.1777777777777778,
+        0.8222222222222222
+      ],
+      "confidence": 0.55,
+      "decision": "skip",
+      "outcomeIdx": null,
+      "edge": 0,
+      "thresholdUsed": 0.125,
+      "size": null,
+      "execution": null,
+      "skipReason": "models disagree sharply (spread=0.23 >= hard threshold 0.13)"
+    },
+    {
+      "ts": "2026-08-22T15:09:30.494Z",
+      "marketId": "0x36387895d67e697749eb57ef5679c56782e7d13e",
+      "question": "Will LAFC vs Portland Timbers produce 4 or more combined goals (MLS, kickoff 02:30 UTC Aug 23, 2026)?",
+      "category": "sports",
+      "outcomes": [
+        "Yes",
+        "No",
+        "Match not completed"
+      ],
+      "rawPrice": [
+        0.420638,
+        0.5,
+        0.5
+      ],
+      "syntheticPrice": true,
+      "signals": {
+        "llm": {
+          "probs": [
+            0.5599999999999999,
+            0.33999999999999997,
+            0.09999999999999998
+          ],
+          "confidence": 0.62
+        },
+        "gemini": {
           "probs": [
             0.44,
-            0.56
+            0.54,
+            0.02
           ],
-          "confidence": 0.58
-        },
-        "gemini": {
-          "probs": [
-            0.22,
-            0.78
-          ],
-          "confidence": 0.45,
+          "confidence": 0.55,
           "grounded": false
         },
         "polymarket": null
       },
-      "disagreement": 0.22,
+      "disagreement": 0.20000000000000007,
       "blendedProbs": [
-        0.37172413793103454,
-        0.6282758620689656
+        0.5174193548387097,
+        0.41096774193548397,
+        0.07161290322580645
       ],
-      "confidence": 0.58,
+      "confidence": 0.62,
+      "decision": "skip",
+      "outcomeIdx": 0,
+      "edge": 0.0967813548387097,
+      "thresholdUsed": 0.20500000000000002,
+      "size": null,
+      "execution": null,
+      "skipReason": "models disagree sharply (spread=0.20 >= hard threshold 0.13)"
+    },
+    {
+      "ts": "2026-08-22T14:22:20.857Z",
+      "marketId": "0x8949043421c48733a169a0a142b866b1270c3427",
+      "question": "Premier League, Aug 22 2026 14:00 UTC: will Ipswich Town vs Sunderland end exactly 1-0 to Ipswich after 90+?",
+      "category": "sports",
+      "outcomes": [
+        "Yes",
+        "No"
+      ],
+      "rawPrice": null,
+      "syntheticPrice": false,
+      "signals": {
+        "llm": null,
+        "gemini": null,
+        "polymarket": null
+      },
+      "disagreement": null,
+      "blendedProbs": [],
+      "confidence": 0,
       "decision": "skip",
       "outcomeIdx": null,
       "edge": 0,
-      "thresholdUsed": 0.125,
+      "thresholdUsed": 0,
       "size": null,
       "execution": null,
-      "skipReason": "models disagree sharply (spread=0.22 >= hard threshold 0.13)"
+      "skipReason": "market's resolution window has already passed (resolvesAt was 22.3m ago) — no longer tradable on-chain"
     },
     {
-      "ts": "2026-08-21T04:42:08.662Z",
-      "marketId": "0x2258cfca1af0eac76dcc6d0b1a134f274bdf2d3e",
-      "question": "Will AARO or ODNI publicly release previously unreleased UAP records between Aug 10 00:00 and Aug 21 14:00 UTC 2026?",
+      "ts": "2026-08-22T14:22:20.857Z",
+      "marketId": "0xb47d059e2e134564c7298f6cacd2f4bfd27f09c2",
+      "question": "Will the US and Canada conclude a final trade agreement before 03:59 UTC on Aug 24, 2026?",
       "category": "politics",
       "outcomes": [
         "Yes",
         "No"
       ],
       "rawPrice": [
-        0.08626743922658728,
-        0.9137325607734127
+        0.2401176819417717,
+        0.7598823180582284
       ],
       "syntheticPrice": false,
       "signals": {
@@ -799,362 +1260,29 @@
           ],
           "confidence": 0.46
         },
-        "gemini": null,
-        "polymarket": null
-      },
-      "disagreement": null,
-      "blendedProbs": [
-        0.28,
-        0.72
-      ],
-      "confidence": 0.46,
-      "decision": "skip",
-      "outcomeIdx": 0,
-      "edge": 0.19373256077341275,
-      "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "sized trade too small (0.787 tokens < 1 token floor; of 7.36 remaining) — price impact isn't worth it at this size"
-    },
-    {
-      "ts": "2026-08-21T04:42:04.992Z",
-      "marketId": "0x77985bbb52a7744a8eeab5a82d02c8c079fa7a55",
-      "question": "Will WTI front-month crude futures settle below $65.00 on Aug 21, 2026?",
-      "category": "finance",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.07755606098051585,
-        0.9224439390194842
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.46,
-            0.54
-          ],
-          "confidence": 0.56
-        },
         "gemini": {
           "probs": [
-            0.22,
-            0.78
+            0.05,
+            0.95
           ],
-          "confidence": 0.45,
+          "confidence": 0.8,
           "grounded": false
         },
         "polymarket": null
       },
-      "disagreement": 0.24000000000000002,
+      "disagreement": 0.23000000000000004,
       "blendedProbs": [
-        0.38551724137931037,
-        0.6144827586206897
-      ],
-      "confidence": 0.56,
-      "decision": "skip",
-      "outcomeIdx": null,
-      "edge": 0,
-      "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "models disagree sharply (spread=0.24 >= hard threshold 0.13)"
-    },
-    {
-      "ts": "2026-08-21T04:37:05.383Z",
-      "marketId": "0x2258cfca1af0eac76dcc6d0b1a134f274bdf2d3e",
-      "question": "Will AARO or ODNI publicly release previously unreleased UAP records between Aug 10 00:00 and Aug 21 14:00 UTC 2026?",
-      "category": "politics",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.08626743922658728,
-        0.9137325607734127
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.28,
-            0.72
-          ],
-          "confidence": 0.46
-        },
-        "gemini": null,
-        "polymarket": null
-      },
-      "disagreement": null,
-      "blendedProbs": [
-        0.28,
-        0.72
+        0.1777777777777778,
+        0.8222222222222222
       ],
       "confidence": 0.46,
       "decision": "skip",
-      "outcomeIdx": 0,
-      "edge": 0.19373256077341275,
+      "outcomeIdx": 1,
+      "edge": 0.06233990416399382,
       "thresholdUsed": 0.125,
       "size": null,
       "execution": null,
-      "skipReason": "sized trade too small (0.787 tokens < 1 token floor; of 7.36 remaining) — price impact isn't worth it at this size"
-    },
-    {
-      "ts": "2026-08-21T04:37:05.352Z",
-      "marketId": "0x77985bbb52a7744a8eeab5a82d02c8c079fa7a55",
-      "question": "Will WTI front-month crude futures settle below $65.00 on Aug 21, 2026?",
-      "category": "finance",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.07755606098051585,
-        0.9224439390194842
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.46,
-            0.54
-          ],
-          "confidence": 0.56
-        },
-        "gemini": {
-          "probs": [
-            0.22,
-            0.78
-          ],
-          "confidence": 0.45,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.24000000000000002,
-      "blendedProbs": [
-        0.38551724137931037,
-        0.6144827586206897
-      ],
-      "confidence": 0.56,
-      "decision": "skip",
-      "outcomeIdx": null,
-      "edge": 0,
-      "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "models disagree sharply (spread=0.24 >= hard threshold 0.13)"
-    },
-    {
-      "ts": "2026-08-21T04:32:03.259Z",
-      "marketId": "0x2258cfca1af0eac76dcc6d0b1a134f274bdf2d3e",
-      "question": "Will AARO or ODNI publicly release previously unreleased UAP records between Aug 10 00:00 and Aug 21 14:00 UTC 2026?",
-      "category": "politics",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.08626743922658728,
-        0.9137325607734127
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.28,
-            0.72
-          ],
-          "confidence": 0.46
-        },
-        "gemini": null,
-        "polymarket": null
-      },
-      "disagreement": null,
-      "blendedProbs": [
-        0.28,
-        0.72
-      ],
-      "confidence": 0.46,
-      "decision": "skip",
-      "outcomeIdx": 0,
-      "edge": 0.19373256077341275,
-      "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "sized trade too small (0.787 tokens < 1 token floor; of 7.36 remaining) — price impact isn't worth it at this size"
-    },
-    {
-      "ts": "2026-08-21T04:32:02.849Z",
-      "marketId": "0x77985bbb52a7744a8eeab5a82d02c8c079fa7a55",
-      "question": "Will WTI front-month crude futures settle below $65.00 on Aug 21, 2026?",
-      "category": "finance",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.07755606098051585,
-        0.9224439390194842
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.46,
-            0.54
-          ],
-          "confidence": 0.56
-        },
-        "gemini": {
-          "probs": [
-            0.22,
-            0.78
-          ],
-          "confidence": 0.45,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.24000000000000002,
-      "blendedProbs": [
-        0.38551724137931037,
-        0.6144827586206897
-      ],
-      "confidence": 0.56,
-      "decision": "skip",
-      "outcomeIdx": null,
-      "edge": 0,
-      "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "models disagree sharply (spread=0.24 >= hard threshold 0.13)"
-    },
-    {
-      "ts": "2026-08-21T04:27:03.856Z",
-      "marketId": "0x2258cfca1af0eac76dcc6d0b1a134f274bdf2d3e",
-      "question": "Will AARO or ODNI publicly release previously unreleased UAP records between Aug 10 00:00 and Aug 21 14:00 UTC 2026?",
-      "category": "politics",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.08626743922658728,
-        0.9137325607734127
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.28,
-            0.72
-          ],
-          "confidence": 0.46
-        },
-        "gemini": null,
-        "polymarket": null
-      },
-      "disagreement": null,
-      "blendedProbs": [
-        0.28,
-        0.72
-      ],
-      "confidence": 0.46,
-      "decision": "skip",
-      "outcomeIdx": 0,
-      "edge": 0.19373256077341275,
-      "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "sized trade too small (0.787 tokens < 1 token floor; of 7.36 remaining) — price impact isn't worth it at this size"
-    },
-    {
-      "ts": "2026-08-21T04:27:03.777Z",
-      "marketId": "0x77985bbb52a7744a8eeab5a82d02c8c079fa7a55",
-      "question": "Will WTI front-month crude futures settle below $65.00 on Aug 21, 2026?",
-      "category": "finance",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.07755606098051585,
-        0.9224439390194842
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.46,
-            0.54
-          ],
-          "confidence": 0.56
-        },
-        "gemini": {
-          "probs": [
-            0.22,
-            0.78
-          ],
-          "confidence": 0.45,
-          "grounded": false
-        },
-        "polymarket": null
-      },
-      "disagreement": 0.24000000000000002,
-      "blendedProbs": [
-        0.38551724137931037,
-        0.6144827586206897
-      ],
-      "confidence": 0.56,
-      "decision": "skip",
-      "outcomeIdx": null,
-      "edge": 0,
-      "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "models disagree sharply (spread=0.24 >= hard threshold 0.13)"
-    },
-    {
-      "ts": "2026-08-21T04:22:14.829Z",
-      "marketId": "0x2258cfca1af0eac76dcc6d0b1a134f274bdf2d3e",
-      "question": "Will AARO or ODNI publicly release previously unreleased UAP records between Aug 10 00:00 and Aug 21 14:00 UTC 2026?",
-      "category": "politics",
-      "outcomes": [
-        "Yes",
-        "No"
-      ],
-      "rawPrice": [
-        0.08626743922658728,
-        0.9137325607734127
-      ],
-      "syntheticPrice": false,
-      "signals": {
-        "llm": {
-          "probs": [
-            0.28,
-            0.72
-          ],
-          "confidence": 0.46
-        },
-        "gemini": null,
-        "polymarket": null
-      },
-      "disagreement": null,
-      "blendedProbs": [
-        0.28,
-        0.72
-      ],
-      "confidence": 0.46,
-      "decision": "skip",
-      "outcomeIdx": 0,
-      "edge": 0.19373256077341275,
-      "thresholdUsed": 0.125,
-      "size": null,
-      "execution": null,
-      "skipReason": "sized trade too small (0.787 tokens < 1 token floor; of 7.36 remaining) — price impact isn't worth it at this size"
+      "skipReason": "models disagree sharply (spread=0.23 >= hard threshold 0.13)"
     }
   ]
 }
