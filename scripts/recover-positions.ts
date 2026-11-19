@@ -87,8 +87,8 @@ async function loadAllPositions(wallet: string): Promise<any[]> {
 async function main() {
   console.log(`recover-positions  redeem=${DO_REDEEM}  dryRun=${DRY_RUN}\n`);
 
-  // const wallet = await resolveWalletAddress(client);
-  const wallet = "0x4c6cea84939793e1fad989cac29edf680093b0ef"
+  const wallet = await resolveWalletAddress(client);
+  // const wallet = "0x4c6cea84939793e1fad989cac29edf680093b0ef"
   if (!wallet) {
     throw new Error(
       "Could not resolve wallet — set WALLET_ADDRESS or configure the Delphi signer."

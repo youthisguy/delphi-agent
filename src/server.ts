@@ -26,6 +26,7 @@ import {
 import { withDelphiRetry } from "./delphiRetry.js";
 import { runPositionWatcherPass, readWatcherLog, readWatcherState } from "./positionWatcher.js";
 import { getAllClosedLegs, reopenLeg, markLegClosed, isLegClosed } from "./closedLegs.js";
+import { registerEvidenceRoutes } from "./evidence/routes.js";
 
 
 
@@ -756,7 +757,9 @@ app.post("/api/checkpoint", async (req: any, res: any) => {
   res.json({ ok: true, output: result.output });
 });
 
+registerEvidenceRoutes(app, requireDashboardPassword, client);
+
 app.listen(CONFIG.port, () => {
-  console.log(`Lazy Falcon dashboard API listening on http://localhost:${CONFIG.port}`);
+  console.log(`Pringles dashboard API listening on http://localhost:${CONFIG.port}`);
   console.log(`Dashboard: http://localhost:${CONFIG.port}/dashboard.html`);
 });

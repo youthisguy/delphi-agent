@@ -1,8 +1,4 @@
-/**
- * Lazy Falcon — closed loop: forecast -> blend -> risk check -> journal ->
- * (maybe) trade -> redeem settled winners -> repeat.
- *
- */
+ 
 import "dotenv/config";
 import fs from "node:fs";
 import { DelphiClient, type Market } from "@gensyn-ai/gensyn-delphi-sdk";
@@ -22,6 +18,8 @@ import { extractTradingFeePct, msUntilResolve } from "./marketFields.js";
 import { CONFIG, getDryRun, getCompetitionTokenAddress } from "./config.js";
 import { isLegClosed } from "./closedLegs.js";
 import { runPositionWatcherPass } from "./positionWatcher.js";
+import { EV } from "./evidence/evidenceConfig.js";
+import { startEvidenceLoop } from "./evidence/loop.js";
 
 const client = new DelphiClient();
 
@@ -945,7 +943,11 @@ async function runCycle() {
 }
 
 async function main() {
-  console.log("Starting Lazy Falcon");
+  console.log("Starting Pringles");
+
+  console.log(`Run mode: ${EV.mode}`);
+  if (EV.mode !== "trade") startEvidenceLoop(client);
+  if (EV.mode === "evidence") return;
   console.log(`Loop interval: ${CONFIG.loopIntervalMs / 1000}s`);
   console.log(`Dry run: ${getDryRun()} (toggle via dashboard or data/runtime-config.json)\n`);
 

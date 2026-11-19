@@ -26,7 +26,7 @@ MAX_PUSH_RETRIES=3
 # Required on Render — deploy images have no git identity, so commit fails
 # with "Author identity unknown" without this.
 git config user.email "${GIT_AUTHOR_EMAIL:-checkpoint@delphi-agent.local}"
-git config user.name "${GIT_AUTHOR_NAME:-lazy-falcon-bot}"
+git config user.name "${GIT_AUTHOR_NAME:-pringles-bot}"
 
 # Render's runtime often has no usable origin (or an unauthenticated one).
 # Reconstruct from the same env vars restore-and-start.sh uses.

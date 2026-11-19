@@ -133,7 +133,7 @@ async function evaluate(market: Market) {
 }
 
 async function main() {
-  console.log("Lazy Falcon — live dry-run demo\n");
+  console.log("Pringles — live dry-run demo\n");
 
   const { markets } = await withDelphiRetry(
     () =>

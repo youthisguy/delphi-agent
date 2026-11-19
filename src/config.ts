@@ -105,9 +105,7 @@ export const CONFIG = {
   // gate the entry forecaster uses — no point burning a search call on a
   // slow-moving market. A position already mid-confirmation is always
   // re-checked regardless of this gate (see positionWatcher.ts).
-  positionWatcherOnlyTimeSensitive:
-    process.env.POSITION_WATCHER_ONLY_TIME_SENSITIVE !== "true",
-
+  positionWatcherOnlyTimeSensitive: process.env.POSITION_WATCHER_ONLY_TIME_SENSITIVE !== "false",
   // Minimum time between checks for the SAME position, independent of
   // however often the watcher pass itself is ticked. Gemini quota has
   // held up fine so far even without this being aggressive — default is
