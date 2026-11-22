@@ -1,6 +1,7 @@
 import { EV } from "./evidenceConfig.js";
 import { classifyTopic } from "./queryTemplates.js";
 import { capReached } from "./guards.js";
+import { isHeld } from "./holds.js";
 import { lastResearchedAt, submissionsFor } from "./evidenceJournal.js";
 import type { EvidenceMarket } from "./types.js";
 
@@ -37,6 +38,7 @@ function topicFit(m: EvidenceMarket): number {
 }
 
 export function scoreMarket(m: EvidenceMarket, dryRun: boolean): number {
+  if (isHeld(m.id)) return 0; // a human is working this market — keep the agent off it
   if (capReached(m.id, dryRun)) return 0;
   const last = lastResearchedAt(m.id);
   if (last !== null && Date.now() - last < EV.marketCooldownMs) return 0;

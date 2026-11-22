@@ -107,19 +107,20 @@ export function normUrl(u: string): string {
 }
 
 /** URLs already used as the basis of a packaged/submitted note on this market. */
-export function usedUrls(marketId: string): Set<string> {
+export function usedUrls(marketId: string, dryRun?: boolean): Set<string> {
   const s = new Set<string>();
   for (const a of readAttempts()) {
     if (a.marketId !== marketId || !a.packaged) continue;
+    if (dryRun !== undefined && a.dryRun !== dryRun) continue; // dry-run history must never block live submissions
     for (const l of a.packaged.links) s.add(normUrl(l.url));
   }
   return s;
 }
 
 /** Claim texts previously packaged on this market (any mode) — for near-duplicate detection. */
-export function priorClaims(marketId: string): string[] {
+export function priorClaims(marketId: string, dryRun?: boolean): string[] {
   return readAttempts()
-    .filter((a) => a.marketId === marketId && a.packaged)
+    .filter((a) => a.marketId === marketId && a.packaged && (dryRun === undefined || a.dryRun === dryRun))
     .map((a) => a.packaged!.claim.claim);
 }
 

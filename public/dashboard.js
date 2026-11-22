@@ -26,8 +26,20 @@ const untilResolve = (iso) => {
   return ms < 0 ? `<span class="v bad">overdue</span>` : dur(ms);
 };
 
-async function j(url, opts) {
-  const res = await fetch(url, opts);
+let pwPrompt = null;
+let authCancelled = false;
+function askPassword() {
+  if (!pwPrompt) pwPrompt = Promise.resolve().then(() => { const p = prompt("Dashboard password:"); if (!p) authCancelled = true; pwPrompt = null; return p; });
+  return pwPrompt;
+}
+async function j(url, opts = {}) {
+  const call = (pw) => fetch(url, { ...opts, headers: { ...(opts.headers || {}), ...(pw ? { "x-dashboard-password": pw } : {}) } });
+  let res = await call(sessionStorage.getItem("pw") || "");
+  if (res.status === 401 && !authCancelled) {
+    sessionStorage.removeItem("pw");
+    const pw = await askPassword();
+    if (pw) { sessionStorage.setItem("pw", pw); res = await call(pw); if (res.status === 401) sessionStorage.removeItem("pw"); }
+  }
   if (!res.ok) {
     let detail = "";
     try { const b = await res.json(); detail = b?.error || JSON.stringify(b); } catch { /* status only */ }
@@ -44,9 +56,9 @@ let eventsSeen = 0;
 const feedEvents = [];
 const attemptsById = new Map();
 
-// Competition window (UTC, date-level — confirm exact cutoffs when the official docs land on 23 Nov).
-const COMP_START = Date.UTC(2026, 10, 23, 0, 0, 0);
-const COMP_END = Date.UTC(2026, 11, 11, 23, 59, 59);
+// Competition window per the DoraHacks page: opens 23 Nov 17:00 UTC, closes 11 Dec 17:00 UTC.
+const COMP_START = Date.UTC(2026, 10, 25, 17, 0, 0);
+const COMP_END = Date.UTC(2026, 11, 11, 17, 0, 0);
 
 const labelFor = (a, idx) => (idx === null || idx === undefined ? "—" : a?.outcomes?.[idx] ?? "#" + idx);
 
@@ -56,7 +68,7 @@ async function loadStatus() {
     status = await j("/api/evidence/status");
   } catch (e) {
     $("#pulse").className = "pulse stale";
-    $("#pulseLabel").textContent = "API OFFLINE";
+    $("#pulseLabel").textContent = authCancelled ? "PASSWORD REQUIRED — reload" : "API OFFLINE";
     return;
   }
   renderHeader();
@@ -175,7 +187,7 @@ function renderBoard() {
   $("#boardBody").innerHTML = board.map((m) => {
     const mine = attempts.filter((a) => a.marketId === m.id && a.polarity !== null && a.polarity !== undefined && ["submitted", "judged", "settled"].includes(a.status));
     const pol = mine.length ? labelFor(mine[0], mine[0].polarity) : "—";
-    const state = m.capReached ? `<span class="pill s-submitted">CAP REACHED</span>` : m.onCooldown ? `<span class="pill">COOLDOWN</span>` : m.score > 0 ? `<span class="pill s-researched">QUEUED</span>` : `<span class="pill">SKIPPED</span>`;
+    const state = m.held ? `<span class="pill s-researching">AGENT HELD</span>` : m.capReached ? `<span class="pill s-submitted">CAP REACHED</span>` : m.onCooldown ? `<span class="pill">COOLDOWN</span>` : m.score > 0 ? `<span class="pill s-researched">QUEUED</span>` : `<span class="pill">SKIPPED</span>`;
     return `<tr><td class="q-cell" title="${esc(m.question)}">${esc(m.question)}</td><td>${esc(m.topic)}</td><td>${untilResolve(m.resolvesAt)}</td><td>${fmt(m.score, 2)}</td><td>${m.submissions} / 3</td><td>${esc(pol)}</td><td>${state}</td></tr>`;
   }).join("");
 }
@@ -203,7 +215,7 @@ function renderLedger() {
   $("#ledgerBody").innerHTML = attempts.map((a) => {
     const ok = (a.sourcesFetched || []).filter((s) => s.ok).length;
     const reward = a.judgment ? `reward ${fmt(a.judgment.reward, 4)}` : a.receipt ? esc(trunc(a.receipt.id, 22)) : "—";
-    return `<tr class="click" data-attempt="${esc(a.attemptId)}"><td>${timeAgo(a.startedAt)}</td><td class="q-cell" title="${esc(a.question)}">${esc(a.question)}</td><td>${statusPill(a)}</td><td>${(a.queriesRun || []).length}</td><td>${ok}/${(a.sourcesFetched || []).length}</td><td>${(a.extractedClaims || []).length}</td><td>${esc(labelFor(a, a.polarity))}</td><td>${a.novelty ? fmt(a.novelty.score, 2) : "—"}</td><td>${a.dryRun ? '<span class="pill dry">DRY</span>' : '<span class="pill liveP">LIVE</span>'}</td><td>${reward}</td></tr>`;
+    return `<tr class="click" data-attempt="${esc(a.attemptId)}"><td>${timeAgo(a.startedAt)}</td><td class="q-cell" title="${esc(a.question)}">${esc(a.question)}</td><td>${statusPill(a)}</td><td>${(a.queriesRun || []).length}</td><td>${ok}/${(a.sourcesFetched || []).length}</td><td>${(a.extractedClaims || []).length}</td><td>${esc(labelFor(a, a.polarity))}</td><td>${a.novelty ? fmt(a.novelty.score, 2) : "—"}</td><td>${a.origin === "human" ? '<span class="pill s-researched">HUMAN</span> ' : ""}${a.dryRun ? '<span class="pill dry">DRY</span>' : '<span class="pill liveP">LIVE</span>'}</td><td>${reward}</td></tr>`;
   }).join("");
 }
 
@@ -284,7 +296,7 @@ function openAttempt(id) {
   const L = (idx) => labelFor(a, idx);
   const sources = (a.sourcesFetched || []).map((s) => `<tr><td>${esc(s.domain)}</td><td>${s.publishedAt ? esc(s.publishedAt.slice(0, 10)) : "—"}</td><td>${esc(s.fetchMethod)}</td><td class="${s.ok ? "v good" : "v bad"}">${s.ok ? "readable" : esc(trunc(s.error || "failed", 40))}</td><td style="white-space:normal;word-break:break-all"><a href="${esc(s.url)}" target="_blank" rel="noopener noreferrer">${esc(trunc(s.url, 90))}</a></td></tr>`).join("");
   const claims = (a.extractedClaims || []).map((c) => `<div class="claim"><div>${esc(c.claim)}</div><div class="panel-sub">${esc(c.sourceType)} · ${esc(c.sourceDomain)} · event ${esc(c.eventDate || "—")} · published ${esc((c.sourcePublishedAt || "—").slice(0, 10))} · relevance ${fmt(c.relevance)} · confidence ${fmt(c.confidence)} · supports <b>${esc(L(c.supportsOutcomeIdx))}</b></div><div class="q">“${esc(c.quote)}”</div></div>`).join("");
-  const rej = (a.rejectedCandidates || []).map((c) => `<div class="claim rej"><div>${esc(c.claim)}</div>${c.reasons.map((r) => `<div class="panel-sub">→ ${esc(r)}</div>`).join("")}</div>`).join("");
+  const rej = (a.rejectedCandidates || []).map((c) => `<div class="claim rej"><div>${esc(c.claim)}</div><div class="panel-sub">${esc(c.sourceType || "?")} · ${c.sourceUrl ? `<a href="${esc(c.sourceUrl)}" target="_blank" rel="noopener noreferrer">${esc(c.sourceDomain || c.sourceUrl)}</a>` : esc(c.sourceDomain || "?")}${c.score !== undefined ? ` · score ${fmt(c.score, 2)}` : ""}</div>${c.reasons.map((r) => `<div class="panel-sub">→ ${esc(r)}</div>`).join("")}</div>`).join("");
   const nov = a.novelty ? `<div class="kv"><span class="k">score</span><span>${fmt(a.novelty.score, 3)} (${esc(a.novelty.decision)})</span><span class="k">frontier already knows</span><span>${fmt(a.novelty.checks.frontierLikelyKnows)}</span><span class="k">tight to resolution</span><span>${fmt(a.novelty.checks.tightToResolution)}</span><span class="k">primary strength</span><span>${fmt(a.novelty.checks.primaryStrength)}</span><span class="k">recency</span><span>${fmt(a.novelty.checks.recency)}</span><span class="k">flags</span><span>${esc((a.novelty.checks.flags || []).join(", ") || "none")}</span><span class="k">reasons</span><span>${esc((a.novelty.reasons || []).join(" | "))}</span></div>` : `<div class="panel-sub">no novelty assessment (rejected earlier or still running)</div>`;
   $("#modalBody").innerHTML = `
     <h3>${esc(a.question)}</h3>
@@ -308,17 +320,8 @@ const closeModal = () => $("#modal").classList.remove("open");
 async function runNow() {
   const btn = $("#runBtn");
   btn.disabled = true;
-  const send = async (pw) => j("/api/evidence/run", { method: "POST", headers: { "Content-Type": "application/json", ...(pw ? { "x-dashboard-password": pw } : {}) }, body: "{}" });
   try {
-    let r;
-    try { r = await send(sessionStorage.getItem("pw") || ""); }
-    catch (e) {
-      if (e.status !== 401) throw e;
-      const pw = prompt("Dashboard password:");
-      if (!pw) throw new Error("cancelled");
-      sessionStorage.setItem("pw", pw);
-      r = await send(pw);
-    }
+    const r = await j("/api/evidence/run", { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" });
     btn.textContent = r.alreadyQueued ? "Already queued" : "Queued ✓";
   } catch (e) {
     btn.textContent = "Failed";

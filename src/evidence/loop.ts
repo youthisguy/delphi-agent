@@ -8,6 +8,7 @@ import { appendEvent, newAttemptId, readAttempts, usedUrls, pendingJudgment, flo
 import { listEvidenceMarkets } from "./markets.js";
 import { prioritize, scoreMarket } from "./prioritizer.js";
 import { classifyTopic } from "./queryTemplates.js";
+import { isHeld } from "./holds.js";
 import { lastResearchedAt } from "./evidenceJournal.js";
 import { getAllNodesView } from "../keyPool.js";
 import { compatStatus } from "./compatLlm.js";
@@ -19,7 +20,7 @@ import { packageEvidence } from "./packager.js";
 import { checkSubmitGuards, capReached } from "./guards.js";
 import { createSubmitter, buildPayload, isLiveReady, type Submitter } from "./submit.js";
 import { enabledProviders } from "./search.js";
-import type { EvidenceMarket, NoveltyResult } from "./types.js";
+import type { EvidenceAttempt, EvidenceMarket, NoveltyResult } from "./types.js";
 
 export type MarketOutcome = "submitted" | "rejected" | "error";
 
@@ -36,7 +37,7 @@ export async function processMarket(market: EvidenceMarket, submitter: Submitter
   });
 
   try {
-    const research = await gatherSources(market, usedUrls(mid));
+    const research = await gatherSources(market, usedUrls(mid, dryRun));
     appendEvent(attemptId, mid, "researched", { queriesRun: research.queries, sourcesFetched: research.sources });
 
     if (!research.docs.length) {
@@ -52,21 +53,21 @@ export async function processMarket(market: EvidenceMarket, submitter: Submitter
       return "rejected";
     }
 
-    const rejected: { claim: string; reasons: string[] }[] = [];
+    const rejected: NonNullable<EvidenceAttempt["rejectedCandidates"]> = [];
     let lastNovelty: NoveltyResult | undefined;
 
     for (const claim of claims.slice(0, 3)) {
       const novelty = await assessNovelty(market, claim, dryRun);
       lastNovelty = novelty;
       if (novelty.decision === "reject") {
-        rejected.push({ claim: claim.claim, reasons: novelty.reasons });
+        rejected.push({ claim: claim.claim, reasons: novelty.reasons, sourceDomain: claim.sourceDomain, sourceUrl: claim.sourceUrl, sourceType: claim.sourceType, score: novelty.score });
         continue;
       }
 
       const packaged = await packageEvidence(market, claim);
       const guard = checkSubmitGuards({ marketId: mid, outcomeIdx: claim.supportsOutcomeIdx, packaged, dryRun });
       if (!guard.ok) {
-        rejected.push({ claim: claim.claim, reasons: [`guard: ${guard.reason}`] });
+        rejected.push({ claim: claim.claim, reasons: [`guard: ${guard.reason}`], sourceDomain: claim.sourceDomain, sourceUrl: claim.sourceUrl, sourceType: claim.sourceType });
         continue;
       }
 
@@ -140,7 +141,7 @@ export async function runEvidenceCycle(client?: DelphiClient): Promise<CycleSumm
       .map((m) => {
         const t = lastResearchedAt(m.id);
         return {
-          id: m.id, question: m.question, category: m.category ?? null, topic: classifyTopic(m), resolvesAt: m.resolvesAt,
+          id: m.id, question: m.question, outcomes: m.outcomes, resolutionCriteria: m.resolutionCriteria ?? null, held: isHeld(m.id), category: m.category ?? null, topic: classifyTopic(m), resolvesAt: m.resolvesAt,
           score: Number(scoreMarket(m, dryRun).toFixed(3)), submissions: submissionsFor(m.id, dryRun).length,
           capReached: capReached(m.id, dryRun), onCooldown: t !== null && Date.now() - t < EV.marketCooldownMs,
         };

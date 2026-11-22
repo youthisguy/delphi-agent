@@ -7,9 +7,10 @@
   "scripts": {
     "check-setup": "tsx check-setup.ts",
     "start": "concurrently -k \"tsx src/server.ts\" \"tsx src/index.ts\"",
-   "server": "tsx src/server.ts",
+    "server": "tsx src/server.ts",
     "demo": "tsx src/demo.ts",
-    "rawprices": "tsx src/rawprices.ts",    "backtest": "tsx src/backtest.ts",
+    "rawprices": "tsx src/rawprices.ts",
+    "backtest": "tsx src/backtest.ts",
     "build": "echo 'no build step'",
     "typecheck": "tsc --noEmit",
     "loop": "tsx src/index.ts"
@@ -30,8 +31,10 @@
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
+    "@types/jsdom": "^30.0.0",
     "@types/node": "^26.1.2",
     "@types/string-similarity": "^4.0.2",
+    "jsdom": "^29.1.1",
     "tsx": "^4.23.5",
     "typescript": "^5.9.3"
   }

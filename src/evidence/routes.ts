@@ -4,6 +4,8 @@ import { readAttempts, readEvents, floorStatus } from "./evidenceJournal.js";
 import { effectiveDryRun, getLastCycle } from "./loop.js";
 import { enabledProviders } from "./search.js";
 import { isLiveReady } from "./submit.js";
+import { registerHumanRoutes } from "./humanRoutes.js";
+import { isHeld } from "./holds.js";
 import type { EvidenceEvent, EvidenceAttempt } from "./types.js";
 
 /** One-line, human summary of a journal event for the live feed. */
@@ -32,9 +34,13 @@ export function summarizeEvent(ev: EvidenceEvent, att?: EvidenceAttempt): string
   }
 }
 
-/** Observability + recovery endpoints (read-only except RUN NOW, which just drops a trigger file for the loop process). */
+/**
+ * Observability endpoints. ALL are behind the dashboard password (when DASHBOARD_PASSWORD is set): packaged notes
+ * are competitive information — a duplicate of an earlier submission earns zero, so don't leave them public.
+ * RUN NOW just drops a trigger file that the loop process picks up.
+ */
 export function registerEvidenceRoutes(app: any, guard: (req: any, res: any, next: any) => void, _client?: unknown): void {
-  app.get("/api/evidence/status", (_req: any, res: any) => {
+  app.get("/api/evidence/status", guard, (_req: any, res: any) => {
     let file: any = {};
     try { file = JSON.parse(fs.readFileSync(EV.statusPath, "utf8")); } catch { /* loop hasn't written one yet */ }
     res.json({
@@ -43,11 +49,11 @@ export function registerEvidenceRoutes(app: any, guard: (req: any, res: any, nex
       cycleIntervalMs: EV.cycleIntervalMs, minNoveltyScore: EV.minNoveltyScore,
       floor: floorStatus(),
       lastCycle: file.lastCycle ?? getLastCycle(), progress: file.progress ?? null,
-      marketBoard: file.marketBoard ?? [], llm: file.llm ?? null, updatedAt: file.updatedAt ?? null,
+      marketBoard: (file.marketBoard ?? []).map((m: any) => ({ ...m, held: isHeld(m.id) })), llm: file.llm ?? null, updatedAt: file.updatedAt ?? null,
     });
   });
 
-  app.get("/api/evidence/attempts", (req: any, res: any) => {
+  app.get("/api/evidence/attempts", guard, (req: any, res: any) => {
     const limit = Math.min(Number(req.query.limit ?? 60), 500);
     let a = readAttempts();
     if (typeof req.query.marketId === "string") a = a.filter((x) => x.marketId === req.query.marketId);
@@ -57,7 +63,7 @@ export function registerEvidenceRoutes(app: any, guard: (req: any, res: any, nex
   });
 
   /** Live feed. `after` = number of events the client has already seen; first call (after=0) returns the tail. */
-  app.get("/api/evidence/events", (req: any, res: any) => {
+  app.get("/api/evidence/events", guard, (req: any, res: any) => {
     const events = readEvents();
     const total = events.length;
     let after = Number(req.query.after ?? 0);
@@ -74,7 +80,7 @@ export function registerEvidenceRoutes(app: any, guard: (req: any, res: any, nex
     });
   });
 
-  app.get("/api/evidence/floor", (_req: any, res: any) => res.json(floorStatus()));
+  app.get("/api/evidence/floor", guard, (_req: any, res: any) => res.json(floorStatus()));
 
   // Runs in the LOOP process (it polls this file), so it uses the real Delphi client and shares the loop's state.
   app.post("/api/evidence/run", guard, (_req: any, res: any) => {
@@ -86,4 +92,6 @@ export function registerEvidenceRoutes(app: any, guard: (req: any, res: any, nex
       res.status(500).json({ error: err instanceof Error ? err.message : String(err) });
     }
   });
+
+  registerHumanRoutes(app, guard);
 }

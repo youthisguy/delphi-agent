@@ -85,6 +85,24 @@ a{color:var(--cyan);text-decoration:none}a:hover{text-decoration:underline}
 .claim{border-left:2px solid var(--cyan);padding:4px 8px;margin:6px 0;background:var(--bg-raised)}.claim.rej{border-left-color:var(--amber)}
 .claim .q{color:var(--text-muted);font-style:italic}
 pre{background:#000;border:1px solid var(--border-dim);padding:8px;overflow-x:auto;white-space:pre-wrap;word-break:break-word;font-size:10px}
+
+/* ---- Human Desk ---- */
+.hd label{display:block;color:var(--text-muted);font-size:9px;text-transform:uppercase;letter-spacing:.05em;margin:8px 0 3px}
+.hd input,.hd select,.hd textarea{width:100%;background:#000;color:var(--text-bright);border:1px solid var(--border-bright);padding:5px 7px;font-family:var(--font-mono);font-size:11px;box-sizing:border-box}
+.hd textarea{resize:vertical;min-height:90px;line-height:1.4}
+.hd input:focus,.hd select:focus,.hd textarea:focus{outline:none;border-color:var(--cyan)}
+.hd .inline{display:flex;gap:6px;align-items:center}.hd .inline>input{flex:1}.hd .inline>input.narrow{flex:0 0 120px}
+.hd .res{border:1px solid var(--border-dim);padding:6px 8px;margin:6px 0;background:var(--bg-raised)}
+.hd .res .t{color:var(--text-bright);font-weight:700;display:block;margin-bottom:2px;word-break:break-word}
+.hd .res .m{color:var(--text-muted);font-size:9px}.hd .res .sn{margin:3px 0;color:var(--text-main)}
+.hd .res.used{opacity:.5}
+.hd .btns{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.hd .warn{color:var(--amber)}.hd .err{color:var(--red)}.hd .good{color:var(--green)}
+.hd .out{border:1px solid var(--border-dim);padding:8px;margin-top:10px;min-height:20px;white-space:pre-wrap;word-break:break-word}
+.hd .linkrow{display:flex;gap:6px;margin-bottom:5px}.hd .linkrow input:first-child{flex:1}.hd .linkrow input.d{flex:0 0 120px}
+.hd .scroll{max-height:420px;overflow:auto}
+.hd details{margin-top:8px}.hd summary{cursor:pointer;color:var(--text-muted);font-size:10px}
+.hd .stat{display:flex;gap:12px;flex-wrap:wrap;margin-top:6px;font-size:10px}
 footer{border-top:1px solid var(--border-dim);padding:8px 16px;display:flex;justify-content:space-between;color:var(--text-muted);font-size:9px;background:var(--bg-panel)}
 </style>
 </head>
@@ -114,6 +132,56 @@ footer{border-top:1px solid var(--border-dim);padding:8px 16px;display:flex;just
     <div class="panel">
       <div class="panel-head"><h2>Live Activity</h2><span class="panel-sub" id="feedSub">streaming every 3s</span></div>
       <div class="panel-body"><div class="feed" id="feed"><div class="empty">no events yet</div></div></div>
+    </div>
+  </div>
+
+  <div class="panel hd" id="humanPanel">
+    <div class="panel-head"><h2>Human Desk · Manual Evidence</h2><span class="panel-sub" id="hdMode">backup to the agent · shares the 3-per-market budget and one-direction rule</span></div>
+    <div class="panel-body">
+      <div class="grid cols-2">
+        <div>
+          <label>Market</label>
+          <select id="hdMarket"></select>
+          <div class="stat" id="hdMarketInfo"></div>
+          <label class="inline" style="margin-top:6px"><input type="checkbox" id="hdHold" style="width:auto"> keep the agent off this market while I work on it</label>
+          <details id="hdManual"><summary>market not listed? enter it by hand</summary>
+            <label>Market id</label><input id="hdMId" placeholder="market id from the competition app">
+            <label>Question</label><input id="hdMQ">
+            <label>Outcomes (comma separated, in order)</label><input id="hdMO" placeholder="Yes, No">
+          </details>
+
+          <label>1 · Search</label>
+          <div class="inline"><input id="hdQuery" placeholder="what would move the forecast?" ><input class="narrow" id="hdDays" type="number" min="1" max="365" value="30" title="only sources from the last N days"><button id="hdSearchBtn" class="primary">Search</button></div>
+          <div class="scroll" id="hdResults"><div class="empty">search finds candidate sources; “Read” fetches one and extracts dated, quoted claims</div></div>
+
+          <label>2 · Read a URL (or paste text if it is blocked)</label>
+          <div class="inline"><input id="hdFetchUrl" placeholder="https://…"><input class="narrow" id="hdFetchDate" placeholder="YYYY-MM-DD"><button id="hdFetchBtn">Read</button></div>
+          <textarea id="hdPaste" style="min-height:60px;margin-top:5px" placeholder="optional: paste the page text here (paywalled / login / X / Reddit). Still give the URL above."></textarea>
+          <div class="scroll" id="hdClaims"></div>
+        </div>
+
+        <div>
+          <label>3 · Compose</label>
+          <select id="hdOutcome"></select>
+          <label>Evidence note — what the judge will read (it never browses or searches)</label>
+          <textarea id="hdNote" placeholder="Claim, primary source and date, why it matters to resolution. Concrete, checkable, new."></textarea>
+          <label>Key excerpt copied from the source (optional, added to the note)</label>
+          <input id="hdExcerpt">
+          <label>Links (judge opens each once with a plain fetch)</label>
+          <div id="hdLinks"></div>
+          <div class="btns"><button id="hdAddLink">+ link</button>
+            <select id="hdSrcType" style="width:auto"><option value="secondary">secondary source</option><option value="primary">primary source</option></select></div>
+          <label>Files (max 3 · png / jpg / pdf / csv / txt · 5 MB each) — screenshot showing URL and date for blocked sites</label>
+          <input id="hdFiles" type="file" multiple accept=".png,.jpg,.jpeg,.pdf,.csv,.txt">
+          <div class="btns">
+            <button id="hdPolishBtn">AI polish</button>
+            <button id="hdCheckBtn">Check</button>
+            <button id="hdSubmitBtn" class="primary">Submit</button>
+            <label class="inline" style="margin:0 0 0 6px"><input type="checkbox" id="hdForce" style="width:auto"> submit anyway if flagged duplicate</label>
+          </div>
+          <div class="out" id="hdOut">Nothing submitted yet. Submissions cannot be edited or retracted — use Check first.</div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -158,5 +226,6 @@ footer{border-top:1px solid var(--border-dim);padding:8px 16px;display:flex;just
 
 <div class="modal" id="modal"><div class="box"><button class="x" id="modalClose" type="button">Close ✕</button><div id="modalBody"></div></div></div>
 <script src="dashboard.js"></script>
+<script src="human.js"></script>
 </body>
 </html>

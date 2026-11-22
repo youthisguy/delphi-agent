@@ -7,6 +7,10 @@ export interface EvidenceMarket {
   resolutionCriteria?: string;
   rewardPot?: number;
   url?: string;
+  /** Backtests only: pretend it is this ISO time — search/fetch ignore anything published later. */
+  asOf?: string;
+  /** Official resolution-source URLs (Delphi `dataSources`) — the oracle settles from these. */
+  sourceUrls?: string[];
 }
 
 export interface SourceRef {
@@ -89,6 +93,8 @@ export interface EvidenceAttempt {
   marketId: string;
   question: string;
   outcomes?: string[];
+  /** "human" = submitted from the Human Desk; absent/"agent" = the automated loop. Both share the same caps and polarity lock. */
+  origin?: "agent" | "human";
   startedAt: string;
   dryRun: boolean;
   status: AttemptStatus;
@@ -97,7 +103,7 @@ export interface EvidenceAttempt {
   extractedClaims: ExtractedClaim[];
   extractionDiag?: Record<string, number | string[]>;
   novelty?: NoveltyResult;
-  rejectedCandidates?: { claim: string; reasons: string[] }[];
+  rejectedCandidates?: { claim: string; reasons: string[]; sourceDomain?: string; sourceUrl?: string; sourceType?: string; score?: number }[];
   packaged?: PackagedEvidence;
   polarity: number | null; // outcome index the submitted evidence supports
   submissionPayload?: SubmissionPayload;

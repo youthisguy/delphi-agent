@@ -31,7 +31,11 @@ Return {"note": string}`;
   const words = data.split(/\s+/);
   const body = words.length > EV.maxNoteWords ? words.slice(0, EV.maxNoteWords).join(" ") + "…" : data;
   const when = c.sourcePublishedAt?.slice(0, 10) ?? c.eventDate ?? "undated";
-  const note = `${body}\n\nSource: ${c.sourceUrl} (${c.sourceDomain}, ${when})`;
+  // The judge reads only the submission and opens each link once with a basic fetch (paywalls/X/Reddit fail),
+  // so the decisive sentence is quoted in the note itself. The quote was verified against the page in extract.ts.
+  const qw = c.quote.split(/\s+/);
+  const excerpt = qw.length > 40 ? qw.slice(0, 40).join(" ") + "…" : c.quote;
+  const note = `${body}\n\nKey excerpt: "${excerpt}"\n\nSource: ${c.sourceUrl} (${c.sourceDomain}, ${when})`;
 
   return {
     note,

@@ -46,7 +46,7 @@ function entities(q: string): string[] {
   return [...out].slice(0, 2);
 }
 
-export function buildQueries(m: EvidenceMarket, max: number, now = new Date()): string[] {
+export function buildQueries(m: EvidenceMarket, max: number, now = m.asOf ? new Date(m.asOf) : new Date()): string[] {
   const my = `${now.toLocaleString("en-US", { month: "long" })} ${now.getFullYear()}`;
   const s = cleanQuestion(m.question);
   const topic = classifyTopic(m);

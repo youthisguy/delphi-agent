@@ -23,9 +23,12 @@ export type RunMode = "evidence" | "trade" | "both";
 export const EV = {
   mode: (["evidence", "trade", "both"].includes(e.MODE ?? "") ? e.MODE : "evidence") as RunMode,
 
-  journalPath: path.join(CONFIG.dataDir, "evidence.jsonl"),
-  statusPath: path.join(CONFIG.dataDir, "evidence-status.json"),
+  journalPath: e.EVIDENCE_JOURNAL_PATH || path.join(CONFIG.dataDir, "evidence.jsonl"),
+  statusPath: e.EVIDENCE_STATUS_PATH || path.join(CONFIG.dataDir, "evidence-status.json"),
   triggerPath: path.join(CONFIG.dataDir, "evidence-trigger.json"),
+  holdsPath: path.join(CONFIG.dataDir, "evidence-holds.json"),
+  filesDir: path.join(CONFIG.dataDir, "evidence-files"),
+  maxHumanFileBytes: num("EVIDENCE_MAX_FILE_BYTES", 5 * 1024 * 1024),
 
   // loop pacing
   cycleIntervalMs: num("EVIDENCE_CYCLE_MS", 10 * 60 * 1000),
@@ -46,7 +49,7 @@ export const EV = {
   maxDocChars: num("EVIDENCE_MAX_DOC_CHARS", 9000),
   blockedDomains: list(
     "EVIDENCE_BLOCKED_DOMAINS",
-    "facebook.com,instagram.com,x.com,twitter.com,tiktok.com,linkedin.com,pinterest.com"
+    "facebook.com,instagram.com,x.com,twitter.com,tiktok.com,linkedin.com,pinterest.com,reddit.com"
   ),
   userAgent:
     e.EVIDENCE_USER_AGENT ||

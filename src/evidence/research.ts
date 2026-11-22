@@ -12,8 +12,8 @@ export interface ResearchResult {
   docs: FetchedDoc[];
 }
 
-function rank(r: SearchResult): number {
-  const age = r.publishedAt ? (Date.now() - new Date(r.publishedAt).getTime()) / 86400e3 : 30;
+function rank(r: SearchResult, now: number = Date.now()): number {
+  const age = r.publishedAt ? (now - new Date(r.publishedAt).getTime()) / 86400e3 : 30;
   const recency = Math.max(0, 1 - age / Math.max(EV.recencyDays, 1));
   const gov = /\.(gov|edu|int|mil)(\.|$)/i.test(r.domain) ? 0.3 : 0;
   return recency + gov + (r.content ? 0.1 : 0) + (r.publishedAt ? 0.1 : 0);
@@ -36,10 +36,13 @@ async function pool<T, R>(items: T[], n: number, fn: (t: T) => Promise<R>): Prom
 export async function gatherSources(market: EvidenceMarket, exclude: Set<string>): Promise<ResearchResult> {
   const queries = buildQueries(market, EV.queriesPerMarket);
   const pooled = new Map<string, SearchResult>();
+  const cut = market.asOf ? Date.parse(market.asOf) : null;
+  const nowMs = cut ?? Date.now();
+  const leaks = (iso: string | null | undefined) => cut !== null && (!iso || Date.parse(iso) > cut);
 
   for (const q of queries) {
     try {
-      for (const r of await searchAll(q)) {
+      for (const r of await searchAll(q, market.asOf ? { asOf: market.asOf } : undefined)) {
         const key = normUrl(r.url);
         const d = domainOf(r.url);
         if (exclude.has(key)) continue;
@@ -51,7 +54,12 @@ export async function gatherSources(market: EvidenceMarket, exclude: Set<string>
     }
   }
 
-  const top = [...pooled.values()].sort((a, b) => rank(b) - rank(a)).slice(0, EV.maxDocsPerMarket);
+  const extra = (market.sourceUrls ?? [])
+    .filter((u) => !exclude.has(normUrl(u)))
+    .map((u) => ({ url: u, domain: domainOf(u), title: undefined, publishedAt: null, content: undefined }) as unknown as SearchResult);
+  const extraKeys = new Set(extra.map((e) => normUrl(e.url)));
+  const ranked = [...pooled.values()].filter((r) => !extraKeys.has(normUrl(r.url))).sort((a, b) => rank(b, nowMs) - rank(a, nowMs));
+  const top = [...extra, ...ranked].slice(0, EV.maxDocsPerMarket + extra.length);
   const sources: SourceRef[] = [];
   const docs: FetchedDoc[] = [];
 
@@ -64,12 +72,16 @@ export async function gatherSources(market: EvidenceMarket, exclude: Set<string>
     }
     if (out.ok) {
       const doc = { ...out.doc, publishedAt: out.doc.publishedAt ?? r.publishedAt };
+      if (leaks(doc.publishedAt)) {
+        sources.push({ url: r.url, domain: doc.domain, title: doc.title, publishedAt: doc.publishedAt, fetchMethod: out.doc.method, ok: false, error: "after asOf / undated" });
+        return;
+      }
       docs.push(doc);
       sources.push({ url: r.url, domain: doc.domain, title: doc.title, publishedAt: doc.publishedAt, fetchMethod: out.doc.method, ok: true });
       return;
     }
     // Last resort: provider-supplied full text (Tavily/Exa) — still real page content.
-    if (r.content && r.content.length > 400) {
+    if (r.content && r.content.length > 400 && !leaks(r.publishedAt)) {
       const doc: FetchedDoc = {
         url: r.url, finalUrl: r.url, domain: r.domain, title: r.title,
         publishedAt: r.publishedAt, text: r.content.slice(0, EV.maxDocChars), method: "snippet",

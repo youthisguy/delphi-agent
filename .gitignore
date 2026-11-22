@@ -9,4 +9,7 @@ data/*
 !data/journal.jsonl
 !data/summary.json
 !data/loop-status.json
-!data/runtime-config.json
+!data/runtime-config.jsondata/evidence-files/
+.bak-human/
+data/evidence-files/
+.bak-human/
