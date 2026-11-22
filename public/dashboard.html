@@ -103,6 +103,49 @@ pre{background:#000;border:1px solid var(--border-dim);padding:8px;overflow-x:au
 .hd .scroll{max-height:420px;overflow:auto}
 .hd details{margin-top:8px}.hd summary{cursor:pointer;color:var(--text-muted);font-size:10px}
 .hd .stat{display:flex;gap:12px;flex-wrap:wrap;margin-top:6px;font-size:10px}
+/* ---- mobile fixes ---- */
+/* checkbox was being stretched by .inline>input{flex:1} */
+.hd input[type=checkbox]{flex:none!important;width:auto!important;padding:0!important;margin:0 4px 0 0;accent-color:var(--cyan)}
+.hd label.inline{display:flex;align-items:center;gap:6px;text-transform:none;letter-spacing:0;font-size:10px;color:var(--text-main);cursor:pointer}
+.panel-head{flex-wrap:wrap}
+.modal table{min-width:560px}
+.modal td a{word-break:break-all}
+@media(max-width:700px){
+  body{font-size:12px}
+  .wrap{padding:8px;gap:10px}
+  .grid{gap:10px}
+  /* live activity: stack each event instead of squeezing four columns into ~330px */
+  .feed{height:auto;max-height:420px;padding:6px}
+  .fl{flex-wrap:wrap;gap:1px 8px;padding:6px 0}
+  .fl .t{order:1}
+  .fl .ty{order:2;width:auto;flex:none}
+  .fl .m{order:3;flex:1 1 100%;width:auto;white-space:normal;overflow:visible}
+  .fl .sm{order:4;flex:1 1 100%;color:var(--text-main)}
+  /* fixed-width grids */
+  .brk{grid-template-columns:100px 1fr 28px}
+  /* modal */
+  .modal{padding:10px 6px}
+  .modal .box{padding:10px}
+  .modal h3{font-size:13px;padding-right:64px}
+  .modal td:last-child{min-width:220px}
+  /* human desk */
+  .hd .inline{flex-wrap:wrap}
+  .hd .inline>input{min-width:0;flex:1 1 140px}
+  .hd .inline>input.narrow{flex:1 1 90px}
+  .hd .inline>button{flex:1 1 auto}
+  .hd .linkrow{flex-wrap:wrap}
+  .hd .linkrow input:first-child{flex:1 1 100%}
+  .hd .linkrow input.d{flex:1 1 120px}
+  .hd .btns button{flex:1 1 auto}
+  .hd input,.hd select,.hd textarea{font-size:16px} /* stops iOS zooming into fields */
+  .hd .scroll{max-height:320px}
+  .kpi .v{font-size:18px}
+}
+@media(max-width:420px){
+  .cols-kpi{grid-template-columns:1fr 1fr}
+  .panel-head h2{font-size:10px}
+  .panel-sub{width:100%}
+}
 footer{border-top:1px solid var(--border-dim);padding:8px 16px;display:flex;justify-content:space-between;color:var(--text-muted);font-size:9px;background:var(--bg-panel)}
 </style>
 </head>
