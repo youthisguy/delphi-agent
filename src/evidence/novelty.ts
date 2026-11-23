@@ -72,6 +72,10 @@ Return {"frontierLikelyKnows":0-1 (would a strong, up-to-date forecaster already
   checks.frontierLikelyKnows = n(data.frontierLikelyKnows);
   checks.tightToResolution = n(data.tightToResolution);
   checks.primaryStrength = n(data.primaryStrength);
+  // The forecaster sees market odds (and an already-known fact earns nothing), so prices from other markets are weak evidence.
+  const MARKET_ODDS = /(^|\.)(kalshi\.com|polymarket\.com|manifold\.markets|metaculus\.com|predictit\.org)$/i;
+  if (MARKET_ODDS.test(c.sourceDomain) && process.env.EVIDENCE_ALLOW_MARKET_ODDS !== "true") flags.push("market-odds source (forecaster already sees prices)");
+  if (checks.frontierLikelyKnows >= Number(process.env.EVIDENCE_MAX_FRONTIER_KNOWS ?? 0.7)) flags.push("forecaster likely already knows this");
   if (data.isRestatement) flags.push("restatement");
   if (data.isSpeculation) flags.push("speculation");
   if (data.privateOrConfidential) flags.push("private-or-confidential");

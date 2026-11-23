@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>PRINGLES // EVIDENCE MINER</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet" />
+<style>
+:root{--bg-root:#040608;--bg-panel:#0a0d12;--bg-raised:#11151d;--bg-head:#0e121a;--border-dim:#18202c;--border-bright:#2b384e;
+--text-main:#c3cedd;--text-muted:#5e6d82;--text-bright:#fff;--cyan:#00f0ff;--cyan-glow:rgba(0,240,255,.15);--amber:#ffaa00;--amber-glow:rgba(255,170,0,.15);
+--green:#00ff88;--green-glow:rgba(0,255,136,.15);--red:#ff3366;--red-glow:rgba(255,51,102,.15);--font-mono:"JetBrains Mono",monospace;--font-head:"Space Grotesk",sans-serif}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg-root);color:var(--text-main);font-family:var(--font-mono);font-size:11px;line-height:1.4;letter-spacing:-.01em;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body::before{content:" ";display:block;position:fixed;inset:0;background:linear-gradient(rgba(18,16,16,0) 50%,rgba(0,0,0,.25) 50%);background-size:100% 4px;z-index:999;pointer-events:none;opacity:.5}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:8px 16px;background:var(--bg-panel);border-bottom:1px solid var(--border-bright);position:sticky;top:0;z-index:100}
+.brand-group{display:flex;align-items:center;gap:10px}
+.wing{width:18px;height:18px;filter:drop-shadow(0 0 4px var(--cyan))}
+.brand h1{font-family:var(--font-head);font-size:15px;letter-spacing:.14em;color:var(--text-bright);text-transform:uppercase}
+.sys-badge{font-size:9px;background:rgba(0,240,255,.1);color:var(--cyan);border:1px solid var(--cyan);padding:1px 5px;border-radius:2px}
+.status-cluster{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.pulse-wrap{display:flex;align-items:center;gap:6px;font-size:10px}
+.pulse{width:6px;height:6px;border-radius:50%;background:var(--text-muted)}
+.pulse.live{background:var(--green);box-shadow:0 0 8px var(--green);animation:blink 1.5s infinite}
+.pulse.work{background:var(--cyan);box-shadow:0 0 8px var(--cyan);animation:blink .8s infinite}
+.pulse.stale{background:var(--red);box-shadow:0 0 8px var(--red)}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.mode-pill{font-weight:700;font-size:10px;padding:2px 8px;border:1px solid var(--amber);color:var(--amber);background:var(--amber-glow)}
+.mode-pill.live{border-color:var(--green);color:var(--green);background:var(--green-glow)}
+.wrap{padding:12px;display:flex;flex-direction:column;gap:12px;max-width:1600px;margin:0 auto}
+.grid{display:grid;gap:12px}.cols-kpi{grid-template-columns:repeat(7,1fr)}.cols-now{grid-template-columns:1fr 2fr}.cols-3{grid-template-columns:repeat(3,1fr)}.cols-2{grid-template-columns:1fr 1fr}
+@media(max-width:1100px){.cols-kpi{grid-template-columns:repeat(2,1fr)}.cols-now,.cols-3,.cols-2{grid-template-columns:1fr}}
+.panel{background:var(--bg-panel);border:1px solid var(--border-dim);position:relative;display:flex;flex-direction:column;min-width:0}
+.panel::before{content:"";position:absolute;top:-1px;left:-1px;width:4px;height:4px;border-top:1px solid var(--cyan);border-left:1px solid var(--cyan)}
+.panel::after{content:"";position:absolute;bottom:-1px;right:-1px;width:4px;height:4px;border-bottom:1px solid var(--cyan);border-right:1px solid var(--cyan)}
+.panel-head{background:var(--bg-head);border-bottom:1px solid var(--border-dim);padding:6px 10px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.panel-head h2{font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;display:flex;align-items:center;gap:6px}
+.panel-head h2::before{content:"//";color:var(--cyan)}
+.panel-sub{color:var(--text-muted);font-size:9px}
+.panel-body{padding:10px;flex:1;min-width:0}
+.kpi{background:var(--bg-panel);border:1px solid var(--border-dim);padding:10px}
+.kpi .k{color:var(--text-muted);font-size:9px;text-transform:uppercase;display:block;margin-bottom:3px}
+.kpi .v{font-size:20px;font-weight:700;color:var(--text-bright)}
+.kpi .s{font-size:9px;color:var(--text-muted);margin-top:2px}
+.v.good{color:var(--green)}.v.bad{color:var(--red)}.v.warn{color:var(--amber)}.v.cyan{color:var(--cyan)}
+.bar{height:6px;background:#000;border:1px solid var(--border-dim);margin:4px 0 8px}
+.bar>i{display:block;height:100%;background:var(--cyan);box-shadow:0 0 6px var(--cyan)}.bar.ok>i{background:var(--green);box-shadow:0 0 6px var(--green)}.bar.amber>i{background:var(--amber);box-shadow:none}
+.row{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:4px 0;border-bottom:1px dashed var(--border-dim)}.row:last-child{border-bottom:none}
+.row .k{color:var(--text-muted)}
+.dot{display:inline-block;width:6px;height:6px;border-radius:50%;margin-right:5px;background:var(--text-muted)}
+.dot.ok{background:var(--green);box-shadow:0 0 5px var(--green)}.dot.warn{background:var(--amber);box-shadow:0 0 5px var(--amber)}.dot.off{background:var(--red);box-shadow:0 0 5px var(--red)}
+.chip{display:inline-block;border:1px solid var(--border-bright);padding:1px 6px;margin:0 4px 4px 0;font-size:9px}
+.chip.on{border-color:var(--green);color:var(--green)}.chip.off{opacity:.45}
+button{font-family:var(--font-mono);font-size:10px;font-weight:700;background:var(--bg-raised);color:var(--text-main);border:1px solid var(--border-bright);padding:4px 10px;cursor:pointer;text-transform:uppercase}
+button:hover{background:var(--border-bright);color:#fff}button:disabled{opacity:.4;cursor:not-allowed}
+button.primary{background:var(--cyan-glow);border-color:var(--cyan);color:var(--cyan)}button.primary:hover{background:var(--cyan);color:#000;box-shadow:0 0 8px var(--cyan)}
+.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;text-align:left}
+th{background:var(--bg-head);color:var(--text-muted);font-weight:600;font-size:9px;text-transform:uppercase;letter-spacing:.05em;padding:6px 8px;border-bottom:1px solid var(--border-bright);position:sticky;top:0;z-index:1}
+td{padding:5px 8px;border-bottom:1px solid var(--border-dim);white-space:nowrap}
+tr.click{cursor:pointer}tr.click:hover td{background:var(--bg-raised)}
+.q-cell{max-width:340px;overflow:hidden;text-overflow:ellipsis;color:var(--text-bright)}
+.pill{display:inline-block;padding:1px 5px;font-size:8px;font-weight:700;text-transform:uppercase;border-radius:2px;border:1px solid var(--border-dim);color:var(--text-muted)}
+.pill.s-researching,.pill.s-researched{color:var(--cyan);border-color:var(--cyan);background:var(--cyan-glow)}
+.pill.s-rejected{color:var(--amber);border-color:var(--amber);background:var(--amber-glow)}
+.pill.s-packaged,.pill.s-submitted,.pill.s-judged,.pill.s-settled{color:var(--green);border-color:var(--green);background:var(--green-glow)}
+.pill.s-error{color:var(--red);border-color:var(--red);background:var(--red-glow)}
+.pill.dry{color:var(--amber);border-color:var(--amber)}.pill.liveP{color:var(--green);border-color:var(--green)}
+.scroll-y{max-height:340px;overflow-y:auto}.scroll-y::-webkit-scrollbar,.feed::-webkit-scrollbar{width:4px}.scroll-y::-webkit-scrollbar-thumb,.feed::-webkit-scrollbar-thumb{background:var(--border-bright)}
+.empty{color:var(--text-muted);font-size:10px;padding:14px;text-align:center}
+.feed{background:#000;border:1px solid var(--border-dim);padding:8px;height:300px;overflow-y:auto;font-size:10px}
+.fl{padding:2px 0;border-bottom:1px solid #0b0f15;display:flex;gap:8px;cursor:pointer}.fl:hover{background:var(--bg-raised)}
+.fl .t{color:var(--text-muted);flex:none}.fl .ty{flex:none;width:76px;font-weight:700;text-transform:uppercase}.fl .m{flex:none;width:190px;color:var(--text-bright);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.fl .sm{flex:1;min-width:0;word-break:break-word}
+.ty.started{color:var(--cyan)}.ty.researched{color:#7fb7ff}.ty.rejected{color:var(--amber)}.ty.packaged,.ty.submitted,.ty.judged,.ty.settled{color:var(--green)}.ty.error{color:var(--red)}
+.now{font-size:12px;color:var(--text-bright);margin:6px 0}
+.brk{display:grid;grid-template-columns:170px 1fr 28px;align-items:center;gap:8px;margin:5px 0}
+.note{background:var(--bg-raised);border:1px solid var(--border-dim);padding:8px;margin-bottom:8px;white-space:pre-wrap;word-break:break-word;color:var(--text-bright)}
+.note .meta{color:var(--text-muted);font-size:9px;margin-bottom:4px}
+a{color:var(--cyan);text-decoration:none}a:hover{text-decoration:underline}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:1000;display:none;align-items:flex-start;justify-content:center;padding:30px 12px;overflow-y:auto}.modal.open{display:flex}
+.modal .box{background:var(--bg-panel);border:1px solid var(--cyan);width:min(1000px,100%);padding:14px;position:relative}
+.modal h3{font-family:var(--font-head);color:var(--text-bright);font-size:14px;margin-bottom:4px}
+.modal h4{font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--cyan);margin:14px 0 5px}
+.modal .x{position:absolute;top:8px;right:8px}
+.kv{display:grid;grid-template-columns:150px 1fr;gap:3px 10px}.kv .k{color:var(--text-muted)}
+.claim{border-left:2px solid var(--cyan);padding:4px 8px;margin:6px 0;background:var(--bg-raised)}.claim.rej{border-left-color:var(--amber)}
+.claim .q{color:var(--text-muted);font-style:italic}
+pre{background:#000;border:1px solid var(--border-dim);padding:8px;overflow-x:auto;white-space:pre-wrap;word-break:break-word;font-size:10px}
+
+/* ---- Human Desk ---- */
+.hd label{display:block;color:var(--text-muted);font-size:9px;text-transform:uppercase;letter-spacing:.05em;margin:8px 0 3px}
+.hd input,.hd select,.hd textarea{width:100%;background:#000;color:var(--text-bright);border:1px solid var(--border-bright);padding:5px 7px;font-family:var(--font-mono);font-size:11px;box-sizing:border-box}
+.hd textarea{resize:vertical;min-height:90px;line-height:1.4}
+.hd input:focus,.hd select:focus,.hd textarea:focus{outline:none;border-color:var(--cyan)}
+.hd .inline{display:flex;gap:6px;align-items:center}.hd .inline>input{flex:1}.hd .inline>input.narrow{flex:0 0 120px}
+.hd .res{border:1px solid var(--border-dim);padding:6px 8px;margin:6px 0;background:var(--bg-raised)}
+.hd .res .t{color:var(--text-bright);font-weight:700;display:block;margin-bottom:2px;word-break:break-word}
+.hd .res .m{color:var(--text-muted);font-size:9px}.hd .res .sn{margin:3px 0;color:var(--text-main)}
+.hd .res.used{opacity:.5}
+.hd .btns{display:flex;gap:6px;flex-wrap:wrap;margin-top:6px}
+.hd .warn{color:var(--amber)}.hd .err{color:var(--red)}.hd .good{color:var(--green)}
+.hd .out{border:1px solid var(--border-dim);padding:8px;margin-top:10px;min-height:20px;white-space:pre-wrap;word-break:break-word}
+.hd .linkrow{display:flex;gap:6px;margin-bottom:5px}.hd .linkrow input:first-child{flex:1}.hd .linkrow input.d{flex:0 0 120px}
+.hd .scroll{max-height:420px;overflow:auto}
+.hd details{margin-top:8px}.hd summary{cursor:pointer;color:var(--text-muted);font-size:10px}
+.hd .stat{display:flex;gap:12px;flex-wrap:wrap;margin-top:6px;font-size:10px}
+footer{border-top:1px solid var(--border-dim);padding:8px 16px;display:flex;justify-content:space-between;color:var(--text-muted);font-size:9px;background:var(--bg-panel)}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="brand-group">
+    <svg class="wing" viewBox="0 0 24 24" fill="none"><path d="M2 14L11 4L12 9L22 6L14 13L18 20L11 16.5L6 22L7 15L2 14Z" fill="var(--cyan)"/></svg>
+    <div class="brand"><h1>Pringles</h1></div>
+    <span class="sys-badge">EVIDENCE MINER</span>
+  </div>
+  <div class="status-cluster">
+    <div class="pulse-wrap"><span class="pulse" id="pulse"></span><span id="pulseLabel">SYS_INIT…</span></div>
+    <div class="panel-sub" id="compClock">—</div>
+    <span class="mode-pill" id="modePill">—</span>
+    <button class="primary" id="runBtn" type="button">Run cycle now</button>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="grid cols-kpi" id="kpis"><div class="empty" style="grid-column:1/-1">loading…</div></div>
+
+  <div class="grid cols-now">
+    <div class="panel">
+      <div class="panel-head"><h2>Now</h2><span class="panel-sub" id="nowSub">—</span></div>
+      <div class="panel-body" id="nowPanel"><div class="empty">waiting for the loop…</div></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><h2>Live Activity</h2><span class="panel-sub" id="feedSub">streaming every 3s</span></div>
+      <div class="panel-body"><div class="feed" id="feed"><div class="empty">no events yet</div></div></div>
+    </div>
+  </div>
+
+  <div class="panel hd" id="humanPanel">
+    <div class="panel-head"><h2>Human Desk · Manual Evidence</h2><span class="panel-sub" id="hdMode">backup to the agent · shares the 3-per-market budget and one-direction rule</span></div>
+    <div class="panel-body">
+      <div class="grid cols-2">
+        <div>
+          <label>Market</label>
+          <select id="hdMarket"></select>
+          <div class="stat" id="hdMarketInfo"></div>
+          <label class="inline" style="margin-top:6px"><input type="checkbox" id="hdHold" style="width:auto"> keep the agent off this market while I work on it</label>
+          <details id="hdManual"><summary>market not listed? enter it by hand</summary>
+            <label>Market id</label><input id="hdMId" placeholder="market id from the competition app">
+            <label>Question</label><input id="hdMQ">
+            <label>Outcomes (comma separated, in order)</label><input id="hdMO" placeholder="Yes, No">
+          </details>
+
+          <label>1 · Search</label>
+          <div class="inline"><input id="hdQuery" placeholder="what would move the forecast?" ><input class="narrow" id="hdDays" type="number" min="1" max="365" value="30" title="only sources from the last N days"><button id="hdSearchBtn" class="primary">Search</button></div>
+          <div class="scroll" id="hdResults"><div class="empty">search finds candidate sources; “Read” fetches one and extracts dated, quoted claims</div></div>
+
+          <label>2 · Read a URL (or paste text if it is blocked)</label>
+          <div class="inline"><input id="hdFetchUrl" placeholder="https://…"><input class="narrow" id="hdFetchDate" placeholder="YYYY-MM-DD"><button id="hdFetchBtn">Read</button></div>
+          <textarea id="hdPaste" style="min-height:60px;margin-top:5px" placeholder="optional: paste the page text here (paywalled / login / X / Reddit). Still give the URL above."></textarea>
+          <div class="scroll" id="hdClaims"></div>
+        </div>
+
+        <div>
+          <label>3 · Compose</label>
+          <select id="hdOutcome"></select>
+          <label>Evidence note — what the judge will read (it never browses or searches)</label>
+          <textarea id="hdNote" placeholder="Claim, primary source and date, why it matters to resolution. Concrete, checkable, new."></textarea>
+          <label>Key excerpt copied from the source (optional, added to the note)</label>
+          <input id="hdExcerpt">
+          <label>Links (judge opens each once with a plain fetch)</label>
+          <div id="hdLinks"></div>
+          <div class="btns"><button id="hdAddLink">+ link</button>
+            <select id="hdSrcType" style="width:auto"><option value="secondary">secondary source</option><option value="primary">primary source</option></select></div>
+          <label>Files (max 3 · png / jpg / pdf / csv / txt · 5 MB each) — screenshot showing URL and date for blocked sites</label>
+          <input id="hdFiles" type="file" multiple accept=".png,.jpg,.jpeg,.pdf,.csv,.txt">
+          <div class="btns">
+            <button id="hdPolishBtn">AI polish</button>
+            <button id="hdCheckBtn">Check</button>
+            <button id="hdSubmitBtn" class="primary">Submit</button>
+            <label class="inline" style="margin:0 0 0 6px"><input type="checkbox" id="hdForce" style="width:auto"> submit anyway if flagged duplicate</label>
+          </div>
+          <div class="out" id="hdOut">Nothing submitted yet. Submissions cannot be edited or retracted — use Check first.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid cols-3">
+    <div class="panel">
+      <div class="panel-head"><h2>Competition Floor</h2><span class="panel-sub">PRIZE ELIGIBILITY</span></div>
+      <div class="panel-body" id="floorPanel"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><h2>Pipeline Health</h2><span class="panel-sub">SEARCH · LLM</span></div>
+      <div class="panel-body" id="healthPanel"></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><h2>Why Candidates Get Rejected</h2><span class="panel-sub" id="rejSub">—</span></div>
+      <div class="panel-body" id="rejPanel"></div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><h2>Market Board // Priority</h2><span class="panel-sub" id="boardSub">0 MARKETS</span></div>
+    <div class="scroll-y"><table><thead><tr><th>MARKET</th><th>TOPIC</th><th>RESOLVES</th><th>PRIORITY</th><th>SUBMITTED</th><th>DIRECTION</th><th>STATE</th></tr></thead><tbody id="boardBody"></tbody></table></div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-head"><h2>Evidence Ledger</h2><span class="panel-sub" id="ledgerSub">click a row for the full trail</span></div>
+    <div class="scroll-y" style="max-height:420px"><table><thead><tr><th>STARTED</th><th>MARKET</th><th>STATUS</th><th>QUERIES</th><th>SOURCES</th><th>CLAIMS</th><th>SUPPORTS</th><th>NOVELTY</th><th>MODE</th><th>RECEIPT / REWARD</th></tr></thead><tbody id="ledgerBody"></tbody></table></div>
+  </div>
+
+  <div class="grid cols-2">
+    <div class="panel">
+      <div class="panel-head"><h2>Latest Packaged Notes</h2><span class="panel-sub">what we would submit</span></div>
+      <div class="panel-body scroll-y" id="notesPanel"><div class="empty">no accepted evidence yet</div></div>
+    </div>
+    <div class="panel">
+      <div class="panel-head"><h2>Judge Feedback &amp; Settlement</h2><span class="panel-sub">rewards</span></div>
+      <div class="panel-body scroll-y" id="judgePanel"><div class="empty">no judgments yet — appears once live submission is wired (23 Nov)</div></div>
+    </div>
+  </div>
+</div>
+
+<footer><span>PRINGLES // evidence miner</span><span id="footInfo">—</span></footer>
+
+<div class="modal" id="modal"><div class="box"><button class="x" id="modalClose" type="button">Close ✕</button><div id="modalBody"></div></div></div>
+<script src="dashboard.js"></script>
+<script src="human.js"></script>
+</body>
+</html>

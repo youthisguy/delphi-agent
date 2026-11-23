@@ -262,16 +262,25 @@ function renderJudge() {
 }
 
 // ---------------- live feed ----------------
+let polling = false;
+const feedSeen = new Set();
 async function pollEvents() {
+  if (polling) return; // never overlap: slow responses used to append the same events many times
+  polling = true;
+  try { await pollEventsInner(); } finally { polling = false; }
+}
+async function pollEventsInner() {
   let r;
   try { r = await j("/api/evidence/events?after=" + eventsSeen); } catch { return; }
   const fresh = r.events || [];
-  if (r.total < eventsSeen) { feedEvents.length = 0; eventsSeen = 0; }
+  if (r.total < eventsSeen) { feedEvents.length = 0; feedSeen.clear(); eventsSeen = 0; $("#feed").innerHTML = ""; }
   if (!fresh.length) { eventsSeen = r.total; return; }
   const box = $("#feed");
   const stick = box.scrollTop + box.clientHeight >= box.scrollHeight - 30;
   if (!feedEvents.length) box.innerHTML = "";
   for (const e of fresh) {
+    if (feedSeen.has(e.seq)) continue;
+    feedSeen.add(e.seq);
     feedEvents.push(e);
     const d = document.createElement("div");
     d.className = "fl";

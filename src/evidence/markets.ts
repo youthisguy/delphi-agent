@@ -18,6 +18,21 @@ export function mockMarkets(): EvidenceMarket[] {
   return MOCK.map((m, i) => ({ ...m, resolvesAt: soon(10 + i * 4) }));
 }
 
+/** Official resolution sources: URLs in dataSources (strings or {url}) plus any URL written into the criteria text. */
+export function officialSourceUrls(m: any): string[] {
+  const out: string[] = [];
+  const add = (u: unknown) => {
+    if (typeof u !== "string") return;
+    const x = u.trim().replace(/[)\].,;]+$/, "");
+    if (/^https?:\/\/\S+$/i.test(x) && !out.includes(x)) out.push(x);
+  };
+  for (const d of Array.isArray(m?.dataSources) ? m.dataSources : []) add(typeof d === "string" ? d : d?.url ?? d?.link);
+  for (const t of [m?.resolutionCriteria, m?.description, m?.metadata?.description, m?.metadata?.resolutionCriteria]) {
+    if (typeof t === "string") for (const u of t.match(/https?:\/\/[^\s"'<>]+/gi) ?? []) add(u);
+  }
+  return out.slice(0, 4);
+}
+
 /**
  * Market discovery. Until 23 Nov this lists ordinary open Delphi markets (or mocks).
  * SWAP POINT: when the competition market list/endpoint is published, replace the
@@ -37,6 +52,7 @@ export async function listEvidenceMarkets(client?: DelphiClient): Promise<Eviden
       category: m.category,
       resolvesAt: extractResolvesAt(m),
       resolutionCriteria: m.resolutionCriteria ?? m.description ?? m.metadata?.description ?? (Array.isArray(m.dataSources) ? m.dataSources.join("; ") : undefined),
+      sourceUrls: officialSourceUrls(m),
       rewardPot: typeof m.rewardPot === "number" ? m.rewardPot : undefined,
       url: extractAppMarketId(m) ? `https://competition.delphi.fyi/markets/${m.id}` : undefined,
     }))

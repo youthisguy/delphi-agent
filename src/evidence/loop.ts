@@ -137,7 +137,7 @@ export async function runEvidenceCycle(client?: DelphiClient): Promise<CycleSumm
 
     const markets = await listEvidenceMarkets(client);
     summary.marketsSeen = markets.length;
-    lastBoard = markets
+    const buildBoard = () => markets
       .map((m) => {
         const t = lastResearchedAt(m.id);
         return {
@@ -148,6 +148,7 @@ export async function runEvidenceCycle(client?: DelphiClient): Promise<CycleSumm
       })
       .sort((a, b) => b.score - a.score)
       .slice(0, 100);
+    lastBoard = buildBoard();
     const queue = prioritize(markets, dryRun).filter((m) => !capReached(m.id, dryRun)).slice(0, EV.maxMarketsPerCycle);
     writeStatus();
 
@@ -160,6 +161,7 @@ export async function runEvidenceCycle(client?: DelphiClient): Promise<CycleSumm
       if (r === "submitted") summary.submitted++;
       else if (r === "rejected") summary.rejected++;
       else summary.errors++;
+      lastBoard = buildBoard(); // keep submitted counts / cooldown / direction current
     }
 
     lastCycle = summary;
