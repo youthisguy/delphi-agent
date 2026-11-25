@@ -56,7 +56,7 @@ let eventsSeen = 0;
 const feedEvents = [];
 const attemptsById = new Map();
 
-// Competition window per the DoraHacks page: opens 23 Nov 17:00 UTC, closes 11 Dec 17:00 UTC.
+// Competition window per the DoraHacks page: opens 25 Nov 17:00 UTC, closes 11 Dec 17:00 UTC.
 const COMP_START = Date.UTC(2026, 10, 25, 17, 0, 0);
 const COMP_END = Date.UTC(2026, 11, 11, 17, 0, 0);
 
@@ -84,8 +84,8 @@ function renderHeader() {
   const live = s.liveSubmitterReady && !s.dryRun;
   const pill = $("#modePill");
   pill.className = "mode-pill" + (live ? " live" : "");
-  pill.textContent = live ? "LIVE SUBMIT" : s.liveSubmitterReady ? "DRY_RUN" : "DRY_RUN · live not wired";
-  pill.title = `MODE=${s.mode}`;
+  pill.textContent = live ? "LIVE SUBMIT" : s.liveSubmitterReady ? "DRY_RUN" : "DRY_RUN · live not ready";
+  pill.title = `MODE=${s.mode}` + ((s.liveReasons || []).length ? "\n" + s.liveReasons.join("\n") : "");
 
   const p = s.progress;
   const stale = s.updatedAt ? Date.now() - new Date(s.updatedAt).getTime() > (s.cycleIntervalMs || 600000) * 2.5 && !p?.running : true;

@@ -18,7 +18,7 @@ import { extractClaims } from "./extract.js";
 import { assessNovelty } from "./novelty.js";
 import { packageEvidence } from "./packager.js";
 import { checkSubmitGuards, capReached } from "./guards.js";
-import { createSubmitter, buildPayload, isLiveReady, refreshLimits, refreshEntryStates, refreshLiveReadiness, type Submitter } from "./submit.js";
+import { createSubmitter, buildPayload, isLiveReady, refreshLimits, refreshEntryStates, refreshLiveReadiness, liveStatus, type Submitter } from "./submit.js";
 import { getHourLimits } from "./slots.js";
 import { enabledProviders } from "./search.js";
 import type { EvidenceAttempt, EvidenceMarket, NoveltyResult } from "./types.js";
@@ -187,7 +187,7 @@ export function writeStatus(last: CycleSummary | null = lastCycle): void {
   fs.mkdirSync(path.dirname(EV.statusPath), { recursive: true });
   fs.writeFileSync(EV.statusPath, JSON.stringify({
     updatedAt: new Date().toISOString(), mode: EV.mode, dryRun: effectiveDryRun(),
-    liveSubmitterReady: isLiveReady(), searchProviders: enabledProviders(),
+    liveSubmitterReady: isLiveReady(), liveReasons: liveStatus().reasons, searchProviders: enabledProviders(),
     cycleIntervalMs: EV.cycleIntervalMs, floor: floorStatus(), lastCycle: last,
     progress, marketBoard: lastBoard,
     llm: { order: EV.llmOrder, stats: llmStats, compat: compatStatus(), nodes: getAllNodesView() },

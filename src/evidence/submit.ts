@@ -118,11 +118,18 @@ export function isLiveReady(): boolean {
 }
 export const liveStatus = (): LiveState => ({ ...live });
 
+/** For processes that don't run the loop (the dashboard/Human Desk): refresh readiness if stale, and the market's slots. */
+export async function ensureLiveReady(marketId?: string, maxAgeMs = 5 * 60e3): Promise<void> {
+  if (!EV.apiKey) return;
+  if (!live.checkedAt || Date.now() - Date.parse(live.checkedAt) > maxAgeMs) await refreshLiveReadiness();
+  if (marketId && isLiveReady()) await fetchEntryState(marketId).catch(() => {});
+}
+
 function parseLimits(raw: any) {
   return {
-    remaining: num(pick(raw, "submissionsLeftThisHour", "submissionsRemainingThisHour", "hourRemaining", "submissions.remaining", "hour.remaining", "hourly.remaining", "remaining")),
-    resetsAt: str(pick(raw, "hourResetsAt", "resetsAt", "resetAt", "hour.resetsAt", "submissions.resetsAt")) ?? null,
-    dailyRewardLeft: num(pick(raw, "dailyRewardCapLeft", "dailyRewardLeft", "reward.remaining", "rewards.remaining", "daily.remaining")),
+    remaining: num(pick(raw, "submitsLeftThisHour", "submissionsLeftThisHour", "submissionsRemainingThisHour", "hourRemaining", "submissions.remaining", "hour.remaining", "hourly.remaining", "remaining")),
+    resetsAt: str(pick(raw, "hourEndsAt", "hourResetsAt", "resetsAt", "resetAt", "hour.resetsAt", "submissions.resetsAt")) ?? null,
+    dailyRewardLeft: num(pick(raw, "dailyCapLeft", "dailyRewardCapLeft", "dailyRewardLeft", "reward.remaining", "rewards.remaining", "daily.remaining")),
   };
 }
 
@@ -175,7 +182,7 @@ export async function refreshLiveReadiness(): Promise<LiveState> {
 // ---------------------------------------------------------------- entry state (server-side slot accounting)
 
 function parseEntryState(raw: any): Omit<ServerSlots, "at"> | null {
-  const remaining = num(pick(raw, "submissionsLeft", "submissionsRemaining", "remaining", "slotsLeft", "left", "submissions.remaining", "limits.remaining"));
+  const remaining = num(pick(raw, "remainingOnMarket", "submissionsLeft", "submissionsRemaining", "remaining", "slotsLeft", "left", "submissions.remaining", "limits.remaining"));
   let can = pick(raw, "canSubmit", "can_submit", "allowed", "eligible", "open");
   if (typeof can !== "boolean") can = remaining !== null ? remaining > 0 : null;
   if (can === null) return null;

@@ -5,7 +5,7 @@ import { browserFetch } from "./browserFallback.js";
 import { extractClaims } from "./extract.js";
 import { usedUrls, normUrl, submissionsFor } from "./evidenceJournal.js";
 import { effectiveDryRun } from "./loop.js";
-import { createSubmitter } from "./submit.js";
+import { createSubmitter, ensureLiveReady } from "./submit.js";
 import { readHolds, setHold } from "./holds.js";
 import { readBoard, findMarket, checkHuman, submitHuman, polishNote, lockedOutcomeFor, type HumanDraft } from "./human.js";
 
@@ -14,7 +14,8 @@ const bad = (res: any, msg: string, code = 400) => res.status(code).json({ error
 
 /** Human Desk API. Every route sits behind the dashboard password (when DASHBOARD_PASSWORD is set). */
 export function registerHumanRoutes(app: any, guard: (req: any, res: any, next: any) => void): void {
-  app.get("/api/evidence/human/markets", guard, (_req: any, res: any) => {
+  app.get("/api/evidence/human/markets", guard, async (_req: any, res: any) => {
+    await ensureLiveReady().catch(() => {});
     const dry = effectiveDryRun();
     const holds = new Set(readHolds());
     res.json({
@@ -86,9 +87,10 @@ export function registerHumanRoutes(app: any, guard: (req: any, res: any, next: 
     }
   });
 
-  app.post("/api/evidence/human/check", guard, (req: any, res: any) => {
+  app.post("/api/evidence/human/check", guard, async (req: any, res: any) => {
     const d = req.body as HumanDraft;
     if (!d || typeof d.marketId !== "string" || typeof d.note !== "string") return bad(res, "marketId and note are required");
+    await ensureLiveReady(d.marketId).catch(() => {});
     res.json(checkHuman({ ...d, links: d.links ?? [] }, effectiveDryRun()));
   });
 
@@ -96,6 +98,7 @@ export function registerHumanRoutes(app: any, guard: (req: any, res: any, next: 
     const d = req.body as HumanDraft;
     if (!d || typeof d.marketId !== "string" || typeof d.note !== "string") return bad(res, "marketId and note are required");
     try {
+      await ensureLiveReady(d.marketId);
       const dry = effectiveDryRun();
       res.json(await submitHuman({ ...d, links: d.links ?? [] }, createSubmitter(dry), dry));
     } catch (err) {
