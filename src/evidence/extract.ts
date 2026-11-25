@@ -13,6 +13,9 @@ Rules:
 - supportsOutcomeIdx = the index of the outcome this fact makes MORE LIKELY (e.g. a fact that rules something out points to the opposite outcome). Use null only if the fact genuinely does not shift the odds either way.
 Return JSON only.`;
 
+const FORCE_SYSTEM_SUFFIX = `
+FORCE MODE: always choose a supportsOutcomeIdx (never null). If the page has no direct answer, still return the single most relevant dated fact on the page (background, trend, scheduled event) with relevance >= 0.3. Return {"claims":[]} only if the page is completely unrelated.`;
+
 function norm(s: string): string {
   return s.toLowerCase().replace(/[‘’]/g, "'").replace(/[“”]/g, '"').replace(/[–—]/g, "-").replace(/\s+/g, " ").trim();
 }
@@ -69,7 +72,7 @@ Max 3 claims, best first. Return {"claims":[]} if the page has nothing relevant 
     try {
       const { data } = await generateJson<any[]>({
         label: "extract",
-        system: SYSTEM,
+        system: EV.forceSubmit ? SYSTEM + FORCE_SYSTEM_SUFFIX : SYSTEM,
         user,
         validate: (raw: any) => {
           if (!raw || !Array.isArray(raw.claims)) throw new Error("missing claims[]");

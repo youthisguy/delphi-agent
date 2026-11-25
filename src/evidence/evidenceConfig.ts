@@ -39,6 +39,9 @@ export const EV = {
   autoCheckpoint: bool("EVIDENCE_AUTO_CHECKPOINT", true),
   mockMarkets: bool("EVIDENCE_MOCK_MARKETS", false),
 
+  // FORCE MODE: submit even when the novelty gate would reject (hard competition rules still apply)
+  forceSubmit: bool("EVIDENCE_FORCE_SUBMIT", false),
+
   // search / fetch
   searchProviders: list("SEARCH_PROVIDERS", "tavily,serper,exa,brave"),
   searchFanout: num("SEARCH_FANOUT", 2), // providers queried per query

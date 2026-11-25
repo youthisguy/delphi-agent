@@ -30,6 +30,22 @@ function recencyScore(c: ExtractedClaim): number {
 const SYSTEM = `You are the quality gate for a prediction-market evidence desk. A judge pays only for evidence that is NEW, DATED, PRIMARY and decision-relevant to the market's resolution.
 Score honestly and conservatively. Return JSON only.`;
 
+async function forceDirection(market: EvidenceMarket, c: ExtractedClaim): Promise<number | null> {
+  try {
+    const { data } = await generateJson<number>({
+      label: "force-direction",
+      system: "Pick which outcome a fact makes even slightly more likely. You must choose one. Return JSON only.",
+      user: `Market: ${market.question}\nOutcomes: ${market.outcomes.map((o, i) => `${i}: ${o}`).join(" | ")}\nFact: ${c.claim}\nReturn {"idx": int}`,
+      validate: (r: any) => {
+        const i = Number(r?.idx);
+        if (!Number.isInteger(i) || i < 0 || i >= market.outcomes.length) throw new Error("bad idx");
+        return i;
+      },
+    });
+    return data;
+  } catch { return null; }
+}
+
 export async function assessNovelty(market: EvidenceMarket, c: ExtractedClaim, dryRun: boolean): Promise<NoveltyResult> {
   const reasons: string[] = [];
   const flags: string[] = [];
@@ -40,11 +56,15 @@ export async function assessNovelty(market: EvidenceMarket, c: ExtractedClaim, d
   const reject = (why: string): NoveltyResult => ({ score: 0, decision: "reject", reasons: [...reasons, why], checks });
 
   // 1. deterministic gates first (cheap, no LLM)
-  if (c.supportsOutcomeIdx === null) return reject("no clear direction — evidence must point one way");
+  if (c.supportsOutcomeIdx === null) {
+    const forced = EV.forceSubmit ? await forceDirection(market, c) : null;
+    if (forced === null) return reject("no clear direction - evidence must point one way");
+    c.supportsOutcomeIdx = forced; // loop/guards/packager read this field
+  }
   if (usedUrls(market.id).has(normUrl(c.sourceUrl))) { checks.duplicateOfPrior = true; return reject("source URL already used on this market"); }
   if (isNearDuplicate(c.claim, priorClaims(market.id))) { checks.duplicateOfPrior = true; return reject("near-duplicate of an earlier note on this market"); }
   if (polarityConflict(market.id, c.supportsOutcomeIdx, dryRun)) { checks.polarityConflict = true; return reject("opposite direction to an earlier submission (would cancel)"); }
-  if (c.sourceType === "aggregator") return reject("aggregator source, not primary or reputable reporting");
+  if (c.sourceType === "aggregator" && !EV.forceSubmit) return reject("aggregator source, not primary or reputable reporting");
 
   // 2. LLM judgement on novelty / tightness / privacy
   const judged = recentJudgments(4);
@@ -68,6 +88,12 @@ Return {"frontierLikelyKnows":0-1 (would a strong, up-to-date forecaster already
     },
   });
 
+  if (EV.forceSubmit && data.directionOk === false && market.outcomes.length === 2) {
+    c.supportsOutcomeIdx = 1 - c.supportsOutcomeIdx!;
+    data.directionOk = true;
+    if (polarityConflict(market.id, c.supportsOutcomeIdx, dryRun)) { checks.polarityConflict = true; return reject("opposite direction to an earlier submission (would cancel)"); }
+  }
+
   const n = (x: unknown) => Math.max(0, Math.min(1, Number(x) || 0));
   checks.frontierLikelyKnows = n(data.frontierLikelyKnows);
   checks.tightToResolution = n(data.tightToResolution);
@@ -83,7 +109,8 @@ Return {"frontierLikelyKnows":0-1 (would a strong, up-to-date forecaster already
 
   const score =
     (1 - checks.frontierLikelyKnows) * 0.35 + checks.tightToResolution * 0.35 + checks.primaryStrength * 0.2 + (checks.recency ?? 0) * 0.1;
-  const decision = flags.length === 0 && score >= EV.minNoveltyScore ? "accept" : "reject";
-  if (decision === "reject") reasons.push(flags.length ? `flags: ${flags.join(", ")}` : `score ${score.toFixed(2)} < ${EV.minNoveltyScore}`);
+  const blocking = EV.forceSubmit ? flags.filter((f) => f.startsWith("private")) : flags;
+  const decision = blocking.length === 0 && (EV.forceSubmit || score >= EV.minNoveltyScore) ? "accept" : "reject";
+  if (decision === "reject") reasons.push(blocking.length ? `flags: ${blocking.join(", ")}` : `score ${score.toFixed(2)} < ${EV.minNoveltyScore}`);
   return { score: Number(score.toFixed(3)), decision, reasons, checks };
 }
