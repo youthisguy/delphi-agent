@@ -3,6 +3,7 @@ import path from "node:path";
 import { EV, COMPETITION_RULES } from "./evidenceConfig.js";
 import { appendEvent, newAttemptId, priorClaims, usedUrls, normUrl, submissionsFor, readAttempts } from "./evidenceJournal.js";
 import { checkSubmitGuards } from "./guards.js";
+import { slotsLeft as serverSlotsLeft } from "./slots.js";
 import { isNearDuplicate } from "./novelty.js";
 import { generateJson } from "./llmRouter.js";
 import { buildPayload, type Submitter } from "./submit.js";
@@ -79,7 +80,7 @@ export function checkHuman(d: HumanDraft, dryRun: boolean): CheckResult {
   const warnings: string[] = [];
   const market = findMarket(d.marketId, d.market);
   const note = assembleNote(d);
-  const slotsLeft = Math.max(0, COMPETITION_RULES.maxSubmissionsPerMarket - submissionsFor(d.marketId, dryRun).length);
+  const slotsLeft = serverSlotsLeft(d.marketId, dryRun);
   const lockedOutcome = lockedOutcomeFor(d.marketId, dryRun);
   const res = (): CheckResult => ({ ok: errors.length === 0, errors, warnings, slotsLeft, lockedOutcome, note });
 
@@ -154,7 +155,7 @@ export async function submitHuman(d: HumanDraft, submitter: Submitter, dryRun: b
 
   appendEvent(attemptId, market.id, "started", { question: market.question, outcomes: market.outcomes, origin: "human", startedAt: new Date().toISOString(), dryRun, queriesRun: [], sourcesFetched: sources, extractedClaims: [claim], polarity: null });
   appendEvent(attemptId, market.id, "packaged", { packaged, polarity: d.outcomeIdx });
-  const payload = buildPayload(market.id, d.outcomeIdx, packaged);
+  const payload = buildPayload(market.id, d.outcomeIdx, packaged, market.outcomes[d.outcomeIdx]);
   const receipt = await submitter.submit(payload);
   appendEvent(attemptId, market.id, "submitted", { submissionPayload: payload, submittedAt: receipt.submittedAt, receipt: { id: receipt.id, raw: receipt.raw } });
   return { attemptId, receipt, files: filePaths, note: chk.note, dryRun };

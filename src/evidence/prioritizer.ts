@@ -15,15 +15,22 @@ function estimateRewardPot(m: EvidenceMarket): number {
   return m.rewardPot ?? 1;
 }
 
-/** Prefer markets with time left but a cutoff near enough that early evidence still matters. */
+/** Use the evidence cutoff (the real submission deadline); early evidence earns most. */
 function timeFactor(m: EvidenceMarket): number {
-  if (!m.resolvesAt) return 0.6;
-  const days = (new Date(m.resolvesAt).getTime() - Date.now()) / 86400e3;
+  const end = m.evidenceCutoffAt ?? m.resolvesAt;
+  if (!end) return 0.6;
+  const days = (new Date(end).getTime() - Date.now()) / 86400e3;
   if (!Number.isFinite(days) || days <= 0.1) return 0; // too late to matter
   if (days <= 3) return 1;
   if (days <= 14) return 0.85;
-  if (days <= 45) return 0.6;
-  return 0.35;
+  return 0.6;
+}
+
+/** The docs point at 20-80% odds as the sweet spot; extreme prices leave little room to move the forecast. */
+function oddsFactor(m: EvidenceMarket): number {
+  const p = m.odds?.[0];
+  if (p === undefined) return 0.8;
+  return p >= 0.2 && p <= 0.8 ? 1 : 0.4;
 }
 
 /** Placeholder: topics with abundant public reporting score higher. Replace with search-hit counts later. */
@@ -44,7 +51,7 @@ export function scoreMarket(m: EvidenceMarket, dryRun: boolean): number {
   if (last !== null && Date.now() - last < EV.marketCooldownMs) return 0;
   // Slight boost for markets we haven't touched yet: spreads us across >=3 markets for the activity floor.
   const novelty = submissionsFor(m.id, dryRun).length === 0 ? 1.25 : 1;
-  return estimateRewardPot(m) * timeFactor(m) * evidenceDensity(m) * topicFit(m) * novelty;
+  return estimateRewardPot(m) * timeFactor(m) * evidenceDensity(m) * topicFit(m) * novelty * oddsFactor(m);
 }
 
 export function prioritize(markets: EvidenceMarket[], dryRun: boolean): EvidenceMarket[] {

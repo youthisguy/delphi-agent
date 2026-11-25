@@ -11,6 +11,11 @@ export interface EvidenceMarket {
   asOf?: string;
   /** Official resolution-source URLs (Delphi `dataSources`) — the oracle settles from these. */
   sourceUrls?: string[];
+  /** [yes, no] implied probabilities from the competition list. */
+  odds?: number[];
+  /** Evidence submission deadline (before trading closes). */
+  evidenceCutoffAt?: string | null;
+  tier?: string;
 }
 
 export interface SourceRef {
@@ -75,6 +80,8 @@ export interface Judgment {
   rationale: string;
   reward: number | null;
   judgedAt: string;
+  rewardState?: string;
+  settlementUpTo?: number | null;
 }
 
 export type AttemptStatus =

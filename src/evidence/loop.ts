@@ -18,7 +18,8 @@ import { extractClaims } from "./extract.js";
 import { assessNovelty } from "./novelty.js";
 import { packageEvidence } from "./packager.js";
 import { checkSubmitGuards, capReached } from "./guards.js";
-import { createSubmitter, buildPayload, isLiveReady, type Submitter } from "./submit.js";
+import { createSubmitter, buildPayload, isLiveReady, refreshLimits, refreshEntryStates, refreshLiveReadiness, type Submitter } from "./submit.js";
+import { getHourLimits } from "./slots.js";
 import { enabledProviders } from "./search.js";
 import type { EvidenceAttempt, EvidenceMarket, NoveltyResult } from "./types.js";
 
@@ -72,7 +73,7 @@ export async function processMarket(market: EvidenceMarket, submitter: Submitter
       }
 
       appendEvent(attemptId, mid, "packaged", { novelty, packaged, polarity: claim.supportsOutcomeIdx });
-      const payload = buildPayload(mid, claim.supportsOutcomeIdx!, packaged);
+      const payload = buildPayload(mid, claim.supportsOutcomeIdx!, packaged, market.outcomes[claim.supportsOutcomeIdx!]);
       const receipt = await submitter.submit(payload);
       appendEvent(attemptId, mid, "submitted", {
         submissionPayload: payload, submittedAt: receipt.submittedAt, receipt: { id: receipt.id, raw: receipt.raw },
@@ -126,6 +127,7 @@ export async function runEvidenceCycle(client?: DelphiClient): Promise<CycleSumm
   if (running) return null;
   running = true;
   try {
+    if (!getDryRun()) await refreshLiveReadiness(); // key + accepted terms + getLimits(); otherwise stays dry-run
     const dryRun = effectiveDryRun();
     const submitter = createSubmitter(dryRun);
     const summary: CycleSummary = { at: new Date().toISOString(), dryRun, marketsSeen: 0, marketsTried: 0, submitted: 0, rejected: 0, errors: 0, judgmentsIngested: 0 };
@@ -137,6 +139,7 @@ export async function runEvidenceCycle(client?: DelphiClient): Promise<CycleSumm
 
     const markets = await listEvidenceMarkets(client);
     summary.marketsSeen = markets.length;
+    if (!dryRun) { await refreshLimits().catch(() => {}); await refreshEntryStates(markets.map((m) => m.id)); }
     const buildBoard = () => markets
       .map((m) => {
         const t = lastResearchedAt(m.id);
@@ -153,6 +156,7 @@ export async function runEvidenceCycle(client?: DelphiClient): Promise<CycleSumm
     writeStatus();
 
     for (const m of queue) {
+      if (!dryRun && getHourLimits()?.remaining === 0) { console.log("[evidence] hourly submission limit reached — pausing until it resets"); break; }
       summary.marketsTried++;
       progress = { ...progress, currentMarketId: m.id, currentQuestion: m.question };
       writeStatus();

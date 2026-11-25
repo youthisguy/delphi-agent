@@ -23,7 +23,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@gensyn-ai/gensyn-delphi-sdk": "^2.1.0",
+    "@gensyn-ai/gensyn-delphi-sdk": "^2.4.1",
     "concurrently": "^9.2.4",
     "express": "^5.2.1",
     "openai": "^7.4.0",

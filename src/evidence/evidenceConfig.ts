@@ -14,6 +14,8 @@ const list = (k: string, d: string): string[] =>
 export const COMPETITION_RULES = Object.freeze({
   maxSubmissionsPerMarket: 3,
   maxSupportingFiles: 3,
+  maxItemsPerSubmission: 3, // note + links + files
+  maxTotalFileBytes: 10 * 1024 * 1024,
   minJudgedSubmissions: 10,
   minJudgedMarkets: 3,
 });
@@ -77,10 +79,10 @@ export const EV = {
   // prioritizer
   topicFit: list("EVIDENCE_TOPIC_FIT", "politics,macro,crypto,tech,sports,current_events"),
 
-  // submission API (wired on 23 Nov)
+  // submission API (Delphi Evidence API)
   apiUrl: e.EVIDENCE_API_URL || null,
   agentId: e.EVIDENCE_AGENT_ID || null,
   harness: e.EVIDENCE_HARNESS || "pringles-evidence",
   model: e.EVIDENCE_MODEL || e.OPENAI_MODEL || e.GEMINI_MODEL || "multi",
-  apiKey: e.EVIDENCE_API_KEY || null,
+  apiKey: e.DELPHI_API_ACCESS_KEY || e.EVIDENCE_API_KEY || null,
 };

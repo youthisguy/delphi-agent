@@ -1,9 +1,7 @@
 import type { DelphiClient } from "@gensyn-ai/gensyn-delphi-sdk";
-import { CONFIG } from "../config.js";
-import { withDelphiRetry } from "../delphiRetry.js";
-import { extractResolvesAt, extractAppMarketId } from "../marketFields.js";
 import { EV } from "./evidenceConfig.js";
 import type { EvidenceMarket } from "./types.js";
+import { fetchWithTimeout } from "../fetchWithTimeout.js";
 
 const MOCK: Omit<EvidenceMarket, "resolvesAt">[] = [
   { id: "mock-fed", question: "Will the Federal Reserve cut interest rates at its December 2026 meeting?", outcomes: ["Yes", "No"], category: "macro" },
@@ -34,27 +32,36 @@ export function officialSourceUrls(m: any): string[] {
 }
 
 /**
- * Market discovery. Until 23 Nov this lists ordinary open Delphi markets (or mocks).
- * SWAP POINT: when the competition market list/endpoint is published, replace the
- * listMarkets call below — everything downstream consumes EvidenceMarket only.
+ * Market discovery. Live: the competition list (a top-level JSON array). Mock: EVIDENCE_MOCK_MARKETS=true.
+ * Outcomes are always ["Yes","No"] (index 0 = Yes, 1 = No); the market id is the contract address.
  */
-export async function listEvidenceMarkets(client?: DelphiClient): Promise<EvidenceMarket[]> {
-  if (EV.mockMarkets || !client) return mockMarkets();
-  const { markets } = await withDelphiRetry(
-    () => client.listMarkets({ status: "open" as any, limit: CONFIG.maxMarketsPerLoop } as any),
-    { label: "listMarkets(evidence)", maxRetries: 2 }
-  );
-  return (markets ?? [])
-    .map((m: any): EvidenceMarket => ({
-      id: String(m.id),
-      question: m.question ?? m.metadata?.question ?? "",
-      outcomes: m.outcomes ?? m.metadata?.outcomes ?? ["Yes", "No"],
-      category: m.category,
-      resolvesAt: extractResolvesAt(m),
-      resolutionCriteria: m.resolutionCriteria ?? m.description ?? m.metadata?.description ?? (Array.isArray(m.dataSources) ? m.dataSources.join("; ") : undefined),
-      sourceUrls: officialSourceUrls(m),
-      rewardPot: typeof m.rewardPot === "number" ? m.rewardPot : undefined,
-      url: extractAppMarketId(m) ? `https://competition.delphi.fyi/markets/${m.id}` : undefined,
-    }))
-    .filter((m) => m.question);
+const COMPETITION_URL = "https://competition.delphi.fyi/markets.json";
+
+export async function listEvidenceMarkets(_client?: DelphiClient): Promise<EvidenceMarket[]> {
+  if (EV.mockMarkets) return mockMarkets();
+  const res = await fetchWithTimeout(COMPETITION_URL, { headers: { Accept: "application/json" } }, 15_000);
+  if (!res.ok) throw new Error(`markets.json HTTP ${res.status}`);
+  const body: any = await res.json();
+  const list: any[] = Array.isArray(body) ? body : body?.markets ?? [];
+  const now = Date.now();
+  return list
+    .filter((m) => (m.status ?? "open") === "open" && m.address && m.question)
+    .filter((m) => !m.evidenceCutoffAt || new Date(m.evidenceCutoffAt).getTime() > now)
+    .map((m): EvidenceMarket => {
+      const yes = Number(m.odds?.yes), no = Number(m.odds?.no);
+      return {
+        id: String(m.address),
+        question: m.question,
+        outcomes: ["Yes", "No"],
+        category: m.category,
+        resolvesAt: m.closesAt ?? null,
+        evidenceCutoffAt: m.evidenceCutoffAt ?? null,
+        odds: Number.isFinite(yes) && Number.isFinite(no) ? [yes, no] : undefined,
+        tier: m.marketTier,
+        resolutionCriteria: m.resolutionCriteria,
+        sourceUrls: officialSourceUrls(m),
+        rewardPot: m.pots?.judgement ? Number(m.pots.judgement) / 1e6 : undefined,
+        url: m.delphiUrl,
+      };
+    });
 }
