@@ -83,6 +83,8 @@ const a = await sub({ files: [{ name: "shot 1.png", mime: "image/png", dataBase6
 assert(a.code === 200 && a.json.dryRun && a.json.receipt.id.startsWith("dry-") && fs.existsSync(a.json.files[0]), "submit records in dry-run and saves the file");
 const att = J.readAttempts().find((x) => x.attemptId === a.json.attemptId)!;
 assert(att.origin === "human" && att.status === "submitted" && att.polarity === 1, "journal shows a human submitted attempt with polarity");
+assert(/Relevance: this fact points toward the outcome "No"\./.test(att.submissionPayload?.note ?? "") && ((att.submissionPayload?.note ?? "").match(/Relevance:/g) ?? []).length === 1, "sent note states the direction once (the API has no outcome field)");
+assert(H.checkHuman(good, true).note === H.checkHuman({ ...good, note: H.checkHuman(good, true).note }, true).note, "preview note is stable: Relevance line is never added twice");
 assert((await sub({})).code === 422, "same note again blocked as duplicate");
 assert((await sub({ outcomeIdx: 0, note: "A totally different claim about CPI hitting 3.4 percent on 10 Nov 2026 per BLS.", links: [{ url: "https://www.bls.gov/x", publishedAt: iso.slice(0, 10) }] })).code === 422, "opposite outcome blocked (both sides cancel)");
 const b = await sub({ note: "BLS CPI for October 2026 printed 3.4 percent, above the 3 percent threshold the Fed cited.", links: [{ url: "https://www.bls.gov/cpi", publishedAt: iso.slice(0, 10) }] });

@@ -64,6 +64,8 @@ export interface PackagedEvidence {
   links: { url: string; title?: string; publishedAt?: string | null }[];
   files: string[]; // <=3, only when they materially help verification
   claim: ExtractedClaim;
+  /** packaging style tag, e.g. "v2+derived+translated+bundled" - lets rewards be compared across styles */
+  style?: string;
 }
 
 export interface SubmissionPayload {

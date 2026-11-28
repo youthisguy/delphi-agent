@@ -16,7 +16,7 @@ import { llmStats } from "./llmRouter.js";
 import { gatherSources } from "./research.js";
 import { extractClaims } from "./extract.js";
 import { assessNovelty } from "./novelty.js";
-import { packageEvidence } from "./packager.js";
+import { packageEvidence, pickRelated } from "./packager.js";
 import { checkSubmitGuards, capReached } from "./guards.js";
 import { createSubmitter, buildPayload, isLiveReady, refreshLimits, refreshEntryStates, refreshLiveReadiness, liveStatus, type Submitter } from "./submit.js";
 import { getHourLimits } from "./slots.js";
@@ -65,7 +65,8 @@ export async function processMarket(market: EvidenceMarket, submitter: Submitter
         continue;
       }
 
-      const packaged = await packageEvidence(market, claim);
+      const related = await pickRelated(market, claim, claims, dryRun);
+      const packaged = await packageEvidence(market, claim, related);
       const guard = checkSubmitGuards({ marketId: mid, outcomeIdx: claim.supportsOutcomeIdx, packaged, dryRun });
       if (!guard.ok) {
         rejected.push({ claim: claim.claim, reasons: [`guard: ${guard.reason}`], sourceDomain: claim.sourceDomain, sourceUrl: claim.sourceUrl, sourceType: claim.sourceType });

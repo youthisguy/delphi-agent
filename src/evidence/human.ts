@@ -98,6 +98,7 @@ export function checkHuman(d: HumanDraft, dryRun: boolean): CheckResult {
 
   const files = d.files ?? [];
   if (files.length > COMPETITION_RULES.maxSupportingFiles) errors.push(`max ${COMPETITION_RULES.maxSupportingFiles} files`);
+  if (1 + links.length + files.length > COMPETITION_RULES.maxItemsPerSubmission) warnings.push(`Delphi says a submission holds up to ${COMPETITION_RULES.maxItemsPerSubmission} items in total (note + links + files); this has ${1 + links.length + files.length}, so the API may refuse it`);
   for (const f of files) {
     if (!ALLOWED_MIME.test(f.mime)) errors.push(`${f.name}: unsupported type ${f.mime} (png, jpg, pdf, csv, txt)`);
     if (Math.floor((f.dataBase64.length * 3) / 4) > EV.maxHumanFileBytes) errors.push(`${f.name}: larger than ${Math.round(EV.maxHumanFileBytes / 1e6)} MB`);
